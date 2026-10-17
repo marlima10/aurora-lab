@@ -109,3 +109,7 @@ O ambiente completo separado por servico usa compose.server.yaml; consulte AUROR
 O OctoPrint usa Python 3.12 e s6-overlay 3.2.3.2 em amd64. `download-plugins.py` obtém fontes fixadas por commit e SHA-256 de `plugins.lock.json`, sem incluir ZIPs no Git. A configuração nova deixa HomeAssistant desativado por compatibilidade.
 
 O monitor publica JSON compatível com o portal e o proxy Nginx, sem acesso ao socket Docker. Backups usam snapshots SQLite e verificam os bancos extraídos antes de registrar sucesso. Fitness é obrigatório; PrintHistory é validado quando seu banco existe. A persistência do ambiente completo fica em subpastas de `data/`, enquanto o portátil mantém `data/fitness.sqlite3`. Detalhes em `AURORASERVER.md` e `UPGRADE-PYTHON-OCTOPRINT.md`.
+
+## Energia 3.0
+
+site/power.css e site/power.js ampliam o dashboard sem alterar o contrato Fitness. compose.power.yaml acrescenta o container opcional power; docker/server/power/power.py lê bateria, DRM e RAPL e fornece controles autenticados de CPU/brilho. O monitor encaminha /api/power e /api/power/settings ao serviço local. Estado e histórico em data/power; chave privada em secrets/power-admin.key. Consulte AURORASERVER.md para instalação, limites e testes. Cache e APP_SHELL da PWA atualizados em conjunto.

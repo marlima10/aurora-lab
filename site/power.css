@@ -1,0 +1,78 @@
+/* Energy panels reuse the existing Aurora theme tokens. */
+.topbar{grid-template-columns:repeat(6,minmax(0,1fr))}
+.power-battery-button{font:inherit;text-align:left;color:var(--text);cursor:pointer;min-width:0}
+.power-battery-button:hover{border-color:var(--cyan)}
+.power-battery-button svg{width:29px;height:29px;flex-shrink:0;color:var(--green)}
+.power-battery-button[data-low="true"] svg{color:var(--orange)}
+.power-panel{grid-column:1/-1;padding:18px}
+.power-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:0 0 4px}
+.power-subtitle,.power-note{font-size:12px;color:var(--muted);margin:7px 0;line-height:1.6}
+.power-title{display:flex;gap:12px;align-items:center}
+.power-title h2{margin:0}
+.power-btn{font:inherit;min-height:40px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:9px;padding:9px 13px;cursor:pointer}
+.power-btn:hover{border-color:var(--cyan)}
+.power-btn.primary{background:var(--blue);border-color:var(--blue);color:white}
+.power-btn:disabled{opacity:.5;cursor:not-allowed}
+.power-status{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 9px;color:var(--muted);font-size:11px}
+.power-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:15px 0}
+.power-stat,.gpu-item,.power-cost-cell{padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:11px;min-width:0}
+.power-stat small,.power-cost-cell small{display:block;color:var(--muted);font-size:11px}
+.power-value{font-size:clamp(22px,2.5vw,33px);letter-spacing:-.04em;display:block;margin:6px 0;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.power-value span{font-size:13px;letter-spacing:0;color:var(--muted);font-weight:400}
+.power-stat .power-note{margin-bottom:0;font-size:11px;min-height:30px}
+.power-split{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}
+.power-surface{border:1px solid var(--line);border-radius:11px;padding:14px;background:var(--panel)}
+.power-surface h3,.power-dialog h3{font-size:13px;margin:0 0 9px}
+.power-legend{display:flex;gap:16px;color:var(--muted);font-size:11px;flex-wrap:wrap}
+.power-legend i{width:8px;height:8px;display:inline-block;border-radius:50%;margin-right:5px;background:var(--cyan)}
+.power-legend i.cpu{background:var(--purple)}
+.power-chart{display:block;width:100%;height:145px;margin-top:12px;overflow:visible}
+.power-chart text{fill:var(--muted);font-size:10px}
+.gpu-list{display:grid;gap:9px}
+.gpu-item{padding:10px 12px;background:var(--panel2)}
+.gpu-heading{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.gpu-heading strong{font-size:13px}
+.gpu-metrics{display:flex;gap:17px;margin:9px 0 5px;flex-wrap:wrap}
+.gpu-metrics b{font-size:16px}
+.gpu-metrics span{font-size:10px;color:var(--muted);display:block}
+.gpu-item p{font-size:11px;color:var(--muted);margin:4px 0}
+.power-divider{border:0;border-top:1px solid var(--line);margin:18px 0}
+.power-cost-layout{display:grid;grid-template-columns:1fr 1.4fr;gap:16px}
+.power-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.power-inputs label,.power-dialog label.field{font-size:11px;color:var(--muted);display:grid;gap:5px}
+.power-inputs input,.power-dialog input[type="password"]{font:inherit;width:100%;min-height:40px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 10px;min-width:0}
+.power-cost-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-content:start}
+.power-cost-cell b{display:block;font-size:22px;letter-spacing:-.03em;margin:7px 0}
+.power-cost-cell.saving{border-color:color-mix(in srgb,var(--green) 45%,var(--line))}
+.power-cost-cell.saving b{color:var(--green)}
+.power-small{font-size:11px;color:var(--muted);margin:7px 0 0}
+.power-notice{padding:9px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:12px;line-height:1.6}
+.power-dialog{width:min(620px,calc(100% - 24px));max-height:85dvh;overflow:auto;margin:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 25px 100px #0008}
+.power-dialog::backdrop{background:#010711bb;backdrop-filter:blur(5px)}
+.power-dialog .panel-title{align-items:start}
+.power-dialog .panel-title h2{font-size:19px}
+.power-close{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:8px;width:36px;height:36px;font:inherit;font-size:20px;cursor:pointer;flex-shrink:0}
+.power-battery-detail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 20px}
+.power-battery-detail div{background:var(--panel2);padding:10px;border-radius:9px;font-size:11px;color:var(--muted)}
+.power-battery-detail b{display:block;font-size:16px;color:var(--text);margin:3px 0}
+.power-profiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border:0;padding:0;margin:0 0 15px;min-width:0}
+.power-profiles legend{font-size:13px;font-weight:600;margin-bottom:10px}
+.power-profile{border:1px solid var(--line);border-radius:10px;padding:11px;cursor:pointer;font-size:12px}
+.power-profile:has(input:checked){border-color:var(--cyan);background:color-mix(in srgb,var(--cyan) 8%,var(--panel))}
+.power-profile:has(input:disabled){opacity:.55;cursor:not-allowed}
+.power-profile b{display:block;margin:6px 0}
+.power-profile small{display:block;color:var(--muted);font-size:10px;line-height:1.6}
+.power-brightness{display:flex;gap:12px;align-items:center;margin:10px 0 18px}
+.power-brightness input{flex:1;accent-color:var(--cyan)}
+.power-feedback{font-size:12px;min-height:22px;line-height:1.6;margin:12px 0;color:var(--muted)}
+.power-feedback[data-state="error"]{color:var(--red)}
+.power-feedback[data-state="ok"]{color:var(--green)}
+.power-dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:14px}
+.power-dialog details{font-size:12px;margin-top:15px;color:var(--muted)}
+.power-dialog summary{cursor:pointer;color:var(--text);padding:6px 0}
+.power-dialog ul{padding-left:18px;line-height:1.8}
+.power-loading{color:var(--muted)}
+.power-btn:focus-visible,.power-close:focus-visible,.power-battery-button:focus-visible,.power-dialog input:focus-visible,.power-inputs input:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+@media(max-width:1250px){.topbar{grid-template-columns:repeat(3,minmax(0,1fr))}.power-cost-layout{grid-template-columns:1fr}.power-value{font-size:27px}}
+@media(max-width:850px){.power-split{grid-template-columns:1fr}.power-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar{grid-template-columns:repeat(2,minmax(0,1fr))}.power-panel{padding:13px}.power-panel>.panel-title{align-items:start;flex-wrap:wrap}}
+@media(max-width:520px){.power-cost-grid{grid-template-columns:1fr}.power-cost-cell{padding:12px}.power-cost-cell b{margin:3px 0}.power-dialog{padding:16px}.power-profiles{grid-template-columns:1fr}.power-profile b{display:inline;margin-left:7px}.power-profile small{margin-top:5px}.power-battery-detail{gap:5px}.power-battery-detail div{padding:8px}.power-title{flex-wrap:wrap}}

@@ -1,0 +1,21 @@
+# Opcional: sensores e controles locais de energia em um container dedicado.
+services:
+  power:
+    build: {context: ./docker/server/power}
+    network_mode: host
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    environment: {TZ: America/Sao_Paulo}
+    volumes:
+      - /sys:/host/sys:ro
+      - /proc:/host/proc:ro
+      - /sys/devices/system/cpu:/host/cpu:rw
+      - ${BACKLIGHT_PATH:-/sys/class/backlight/intel_backlight}:/host/backlight:rw
+      - ./data/power:/state
+      - ./secrets/power-admin.key:/run/secrets/power-admin.key:ro
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}

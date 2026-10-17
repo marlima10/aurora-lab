@@ -13,6 +13,7 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.request import urlopen, Request
+from urllib.error import HTTPError, URLError
 
 PROC = pathlib.Path('/host/proc')
 STATE = pathlib.Path('/state')
@@ -141,7 +142,54 @@ def loop():
         time.sleep(5)
 
 class Handler(BaseHTTPRequestHandler):
+    def power_proxy(self):
+        path = self.path.split('?', 1)[0]
+        if path not in ('/api/power', '/api/power/settings'):
+            self.send_error(404)
+            return
+        headers = {}
+        body = None
+        if self.command == 'POST':
+            try:
+                length = int(self.headers.get('Content-Length', '0'))
+            except ValueError:
+                self.send_error(400)
+                return
+            if not 0 < length <= 1024:
+                self.send_error(413)
+                return
+            body = self.rfile.read(length)
+            headers = {'Content-Type': self.headers.get('Content-Type', ''), 'Authorization': self.headers.get('Authorization', '')}
+        request = Request('http://127.0.0.1:9110' + path, data=body, headers=headers, method=self.command)
+        try:
+            response = urlopen(request, timeout=10)
+        except HTTPError as exc:
+            response = exc
+        except (URLError, TimeoutError):
+            payload = b'{"error":"Monitor de energia indisponivel."}'
+            self.send_response(503)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('Content-Length', str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+            return
+        with response:
+            payload = response.read(1000000)
+            self.send_response(response.code)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('Content-Length', str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+    def do_POST(self):
+        self.power_proxy()
+
     def do_GET(self):
+        if self.path.split('?', 1)[0].startswith('/api/power'):
+            self.power_proxy()
+            return
         name=self.path.split('?',1)[0].rsplit('/',1)[-1]
         with lock:
             if name=='status.json': result=latest.copy()

@@ -81,6 +81,8 @@ services:
       - ./site:/source/config/site:ro
       - ./AURORASERVER.md:/source/config/AURORASERVER.md:ro
       - ./.env:/source/config/.env:ro
+      - ./data/power:/source/power:ro
+      - ./compose.power.yaml:/source/config/compose.power.yaml:ro
       - ./data/monitor:/source/monitor:ro
       - ./data/backup-status:/status
       - ./backups:/backups
