@@ -9,9 +9,9 @@ Linux amd64 com Docker Engine e plugin Compose. Ambiente validado no Debian 13. 
 ## Instalação nova
 
 ```sh
-git clone https://github.com/rafaellima2222/aurora-lab.git
+git clone https://github.com/marlima10/aurora-lab.git
 cd aurora-lab
-git checkout v2.0.0
+git checkout rafael
 sudo sh docker/server/prepare.sh
 ```
 

@@ -1,6 +1,6 @@
 # Aurora Lab 2.0
 
-Fork de [marlima10/aurora-lab](https://github.com/marlima10/aurora-lab), preservando o portal e a API Fitness originais e acrescentando o ambiente completo AuroraServer. [Alterações da versão 2.0](CHANGELOG.md).
+Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 
 Portal pessoal que reúne um dashboard de Home Lab e ferramentas para acompanhar treinos e evolução de peso. A interface usa HTML, CSS e JavaScript; a API Fitness usa PHP e SQLite, com execução pelo Docker Compose.
 
@@ -50,8 +50,9 @@ PHP, Composer, Nginx e SQLite são preparados na imagem. Não é necessário ins
 Baixe o código pelo GitHub ou clone o repositório, se tiver Git instalado:
 
 ```sh
-git clone https://github.com/rafaellima2222/aurora-lab.git
+git clone https://github.com/marlima10/aurora-lab.git
 cd aurora-lab
+git checkout rafael
 ```
 
 Se o projeto já estiver no computador, abra o terminal na pasta que contém `compose.yaml`. Em seguida:
