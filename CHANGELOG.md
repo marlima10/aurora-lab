@@ -2,6 +2,10 @@
 
 ## 2.0.0 — 2026-10-17
 
+### Processo de atualização
+
+- Guia ATUALIZACAO.md com backup, validação, implantação, retorno, Pull Request para main e incremento de versão da release oficial.
+
 ### Ambiente completo AuroraServer
 
 - Novo `compose.server.yaml` com Nginx, PHP-FPM, OctoPrint, Samba, monitoramento, backups, Tailscale e Cockpit em serviços separados.
