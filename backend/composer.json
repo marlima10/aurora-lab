@@ -1,0 +1,8 @@
+{
+  "name": "aurora-lab/fitness-api",
+  "description": "API Fitness do Aurora Lab",
+  "type": "project",
+  "require": {"php": "^8.2", "ext-pdo": "*", "ext-pdo_sqlite": "*"},
+  "autoload": {"psr-4": {"Aurora\\": "src/"}},
+  "scripts": {"test": "php tests/run.php"}
+}

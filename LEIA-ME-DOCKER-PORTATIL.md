@@ -5,10 +5,10 @@ Este pacote permite executar o portal em outro computador com Docker Desktop, se
 ## Conteúdo
 
 - Site Aurora Lab e páginas Fitness, planos e exercícios.
-- API Fitness em PHP e cópia do banco SQLite em `data/fitness.sqlite3`.
+- API Fitness em PHP organizada em `backend/`. O banco local fica em `data/fitness.sqlite3`; ele não está incluído no GitHub.
 - Configuração Nginx isolada, sem encaminhar tráfego ao RK.
 
-O banco é uma cópia de 16/10/2026. A instalação nova passa a gravar separadamente; registros criados depois no RK não serão sincronizados.
+O pacote portátil original continha uma cópia do banco de 16/10/2026. Ao baixar do GitHub, a instalação cria um banco novo; para preservar os registros existentes, copie sua pasta `data/` separadamente. Não há sincronização automática com o RK.
 
 ## Requisitos
 
@@ -49,7 +49,7 @@ docker compose down
 
 Para mover o portal, pare os containers e copie a pasta inteira para o outro computador. O arquivo `data/fitness.sqlite3` contém os registros; ele não sincroniza com o banco do RK.
 
-**Não use `docker compose down -v`.** Faça cópias da pasta `data` antes de substituir ou atualizar o pacote.
+Faça cópias da pasta `data` antes de substituir ou atualizar o pacote. As migrations são aplicadas na inicialização do serviço PHP; o seed inicial roda uma vez. Consulte `ESTRUTURA.md` para arquitetura e testes.
 
 ## Limites deste pacote
 
@@ -57,4 +57,4 @@ O Fitness e o site funcionam sem o RK. Câmera, monitoramento de hardware, hist�
 
 A aplicação não pede login. A porta 8088 fica aberta no computador e pode ser acessível na rede local. Use em rede confiável e não exponha diretamente à internet.
 
-O ZIP inclui dados pessoais de peso e treino; guarde-o em local privado.
+Se copiar ou compactar a pasta `data`, o pacote resultante conterá dados pessoais de peso e treino; guarde-o em local privado.

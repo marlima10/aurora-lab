@@ -16,9 +16,8 @@ services:
       retries: 3
   php:
     build:
-      context: ./docker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/Dockerfile
     volumes:
-      - ./site/fitness-api:/var/www/fitness-api:ro
       - ./data:/var/lib/fitness
     restart: unless-stopped

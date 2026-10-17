@@ -1,0 +1,7 @@
+**
+!backend/
+!backend/**
+backend/vendor/
+!docker/
+!docker/Dockerfile
+!docker/php-entrypoint.sh
