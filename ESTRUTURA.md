@@ -97,3 +97,15 @@ O dashboard mantém as integrações originais, mas monitoramento, câmera, rede
 - [Padrão de desenvolvimento](skills/aurora-development/SKILL.md): responsabilidades, compatibilidade, banco e testes.
 
 Atualize estes documentos junto das mudanças de arquitetura e das decisões visuais adotadas.
+
+## Implantacao AuroraServer
+
+O ambiente completo separado por servico usa compose.server.yaml; consulte AURORASERVER.md para volumes, restauracao, VPN, plugins e dispositivos USB. O compose.yaml continua disponivel para o pacote portatil original.
+
+## Ambiente completo 2.0
+
+`compose.server.yaml` acrescenta serviços independentes para OctoPrint, câmera opcional, Samba, monitoramento, backup, VPN e administração. Receitas e scripts em `docker/server/`. `compose.printer.yaml` adiciona o dispositivo serial ao OctoPrint. `docker/server/prepare.sh` prepara diretórios e segredos locais, sem substituir dados existentes. `.env.example` contém somente exemplos.
+
+O OctoPrint usa Python 3.12 e s6-overlay 3.2.3.2 em amd64. `download-plugins.py` obtém fontes fixadas por commit e SHA-256 de `plugins.lock.json`, sem incluir ZIPs no Git. A configuração nova deixa HomeAssistant desativado por compatibilidade.
+
+O monitor publica JSON compatível com o portal e o proxy Nginx, sem acesso ao socket Docker. Backups usam snapshots SQLite e verificam os bancos extraídos antes de registrar sucesso. Fitness é obrigatório; PrintHistory é validado quando seu banco existe. A persistência do ambiente completo fica em subpastas de `data/`, enquanto o portátil mantém `data/fitness.sqlite3`. Detalhes em `AURORASERVER.md` e `UPGRADE-PYTHON-OCTOPRINT.md`.

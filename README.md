@@ -1,4 +1,6 @@
-# Aurora Lab
+# Aurora Lab 2.0
+
+Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 
 Portal pessoal que reúne um dashboard de Home Lab e ferramentas para acompanhar treinos e evolução de peso. A interface usa HTML, CSS e JavaScript; a API Fitness usa PHP e SQLite, com execução pelo Docker Compose.
 
@@ -18,7 +20,7 @@ Portal pessoal que reúne um dashboard de Home Lab e ferramentas para acompanhar
 
 O dashboard reúne atalhos e painéis para impressora 3D, câmera, recursos do sistema, rede, armazenamento e backups.
 
-**Nesta distribuição portátil, as integrações do servidor RK/Armbian não estão incluídas.** Monitoramento, câmera e os demais recursos que dependem desse servidor aparecem como indisponíveis. O módulo Fitness funciona de forma independente.
+**Dois modos de execução:** o pacote portátil (`compose.yaml`) oferece portal e Fitness. O ambiente completo Linux (`compose.server.yaml`) acrescenta OctoPrint, câmera USB opcional, Samba, monitoramento, backups, Tailscale e Cockpit em contêineres separados. Consulte [instalação AuroraServer](AURORASERVER.md).
 
 ## Tecnologias e arquitetura
 
@@ -50,6 +52,7 @@ Baixe o código pelo GitHub ou clone o repositório, se tiver Git instalado:
 ```sh
 git clone https://github.com/marlima10/aurora-lab.git
 cd aurora-lab
+git checkout rafael
 ```
 
 Se o projeto já estiver no computador, abra o terminal na pasta que contém `compose.yaml`. Em seguida:
@@ -154,3 +157,12 @@ A versão atual não possui login. Use em uma rede confiável; a publicação na
 - [Pacote Docker portátil](LEIA-ME-DOCKER-PORTATIL.md): transferência da instalação e limites das integrações.
 
 As skills são documentos versionados neste repositório para orientar a evolução do projeto; não dependem de instalação global no Codex.
+
+## Implantacao AuroraServer
+
+O ambiente completo separado por servico usa compose.server.yaml; consulte AURORASERVER.md para volumes, restauracao, VPN, plugins e dispositivos USB. O compose.yaml continua disponivel para o pacote portatil original.
+
+
+## Versão 2.0.0
+
+Consulte o [histórico de alterações](CHANGELOG.md) e a [instalação completa no Linux](AURORASERVER.md). A identidade visual e o contrato da API Fitness foram preservados. Dados, senhas e backups são mantidos fora do repositório.
