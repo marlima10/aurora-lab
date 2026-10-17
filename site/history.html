@@ -1,0 +1,17 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/aurora.css"><title>Aurora Lab · Histórico</title><link rel="stylesheet" href="/aurora-layout.css?v=20261007-1"></head><body><div class="wrap"><div class="top"><div class="brand">📈 AURORA LAB · HISTÓRICO</div><a class="btn" href="/">← Dashboard</a></div>
+<div class="card"><div id="legend" class="chips" style="margin-bottom:12px"></div><canvas id="c" style="width:100%;height:380px;display:block;cursor:crosshair"></canvas><div class="muted" id="when" style="margin-top:8px">Últimas 24h · passe o mouse para ver os valores</div></div></div>
+<script src="/aurora.js"></script><script>
+const S=[['cpu','CPU','%','#39e58c'],['memory','Memória','%','#3996ff'],['temp','Temperatura','°C','#ff9d24'],['disk','Disco','%','#8c5cff']];let d=[],hi=-1;
+function draw(){const c=$('c'),r=c.getBoundingClientRect(),k=devicePixelRatio||1;c.width=r.width*k;c.height=r.height*k;const x=c.getContext('2d');x.scale(k,k);
+ const W=r.width,Hh=r.height,L=38,R=10,T=10,B=24,w=W-L-R,h=Hh-T-B;x.font='11px system-ui';x.lineWidth=1;
+ for(let v=0;v<=100;v+=25){let y=T+h-v/100*h;x.strokeStyle='#1f3550';x.beginPath();x.moveTo(L,y);x.lineTo(W-R,y);x.stroke();x.fillStyle='#8fa3bd';x.fillText(v,8,y+4)}
+ if(d.length<2)return;const n=d.length-1,X=i=>L+i*w/n,Y=v=>T+h-Math.min(100,+v||0)/100*h;
+ [0,.25,.5,.75,1].forEach(f=>{let i=Math.round(f*n);x.fillStyle='#8fa3bd';x.fillText(new Date(d[i].time).toTimeString().slice(0,5),Math.min(X(i)-14,W-36),Hh-6)});
+ S.forEach(([key,,,col])=>{x.strokeStyle=col;x.lineWidth=2;x.lineJoin='round';x.beginPath();d.forEach((p,i)=>i?x.lineTo(X(i),Y(p[key])):x.moveTo(X(i),Y(p[key])));x.stroke()});
+ if(hi>=0){x.strokeStyle='#8fa3bd';x.lineWidth=1;x.beginPath();x.moveTo(X(hi),T);x.lineTo(X(hi),T+h);x.stroke();S.forEach(([key,,,col])=>{x.fillStyle=col;x.beginPath();x.arc(X(hi),Y(d[hi][key]),4,0,7);x.fill()})}
+ const p=d[hi>=0?hi:n];$('legend').innerHTML=S.map(([key,name,u,col])=>`<span class="chip"><i class="dot" style="background:${col};box-shadow:none"></i>${name} <b>${(+p[key]).toFixed(key==='temp'?1:0)}${u}</b></span>`).join('');
+ $('when').textContent=hi>=0?new Date(p.time).toLocaleString('pt-BR'):'Últimas 24h · passe o mouse para ver os valores'}
+c.onmousemove=e=>{const r=c.getBoundingClientRect();hi=Math.max(0,Math.min(d.length-1,Math.round((e.clientX-r.left-38)/(r.width-48)*(d.length-1))));draw()};c.onmouseleave=()=>{hi=-1;draw()};
+async function go(){if(document.hidden)return;try{d=await json('/api/history.json');draw()}catch(e){console.error(e)}}
+addEventListener('resize',draw);document.addEventListener('visibilitychange',go);go();setInterval(go,60000);
+</script><script src="/aurora-layout.js?v=20261007-1" defer></script></body></html>

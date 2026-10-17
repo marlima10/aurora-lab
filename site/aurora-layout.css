@@ -1,0 +1,67 @@
+/* Compacte o menu lateral em uma barra de ícones; em telas estreitas use uma barra inferior. */
+.aurora-compact-sidebar{width:68px!important;min-width:68px!important;padding:12px 7px!important;align-items:center;z-index:1001}
+.aurora-has-compact-nav .app{grid-template-columns:68px minmax(0,1fr)!important}
+.aurora-compact-sidebar .logo{width:100%;justify-content:center;padding:3px 0 14px!important}
+.aurora-compact-sidebar .logo>div,.aurora-compact-sidebar .side-foot{display:none!important}
+.aurora-compact-sidebar .logo-mark{font-size:26px!important}
+.aurora-compact-sidebar .side-nav{width:100%;display:flex;flex-direction:column;gap:8px!important;align-items:center}
+.aurora-primary-nav{width:100%;display:flex;flex-direction:column;align-items:center;gap:7px}
+.aurora-compact-sidebar .side-nav a,.aurora-more-toggle{width:48px;height:46px;min-height:46px!important;justify-content:center;gap:0!important;padding:0!important;border:1px solid transparent!important;border-radius:13px!important;background:transparent;color:#a9bfd3;text-decoration:none;display:grid;place-items:center;position:relative;cursor:pointer}
+.aurora-compact-sidebar .side-nav a>span:first-child,.aurora-more-toggle>span:first-child{font-size:21px;line-height:1}
+.aurora-compact-sidebar .side-nav a .aurora-link-label,.aurora-more-toggle .aurora-link-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.aurora-compact-sidebar .side-nav a:hover,.aurora-more-toggle:hover{background:#102b43!important;color:#eaf5ff!important;border-color:#245477!important}
+.aurora-compact-sidebar .side-nav a.active{background:#103d55!important;color:#65ddec!important;border-color:#258fa8!important;box-shadow:inset 0 0 0 1px #145b70,0 0 17px #168db533!important}
+.aurora-more-toggle[aria-expanded="true"]{background:#102b43;color:#eaf5ff}
+.aurora-more-toggle.active{background:#103d55;color:#65ddec;border-color:#258fa8}
+.aurora-generated-shell{padding-left:68px!important}
+.aurora-generated-sidebar{position:fixed!important;inset:0 auto 0 0!important;height:100vh!important}
+.aurora-more-panel{position:fixed;z-index:1100;top:14px;left:78px;width:min(330px,calc(100vw - 90px));max-height:calc(100dvh - 28px);overflow:auto;padding:14px;border:1px solid #245477;border-radius:15px;background:#071827;color:#eaf5ff;box-shadow:0 20px 60px #0009}
+.aurora-more-panel[hidden]{display:none!important}
+.aurora-menu-head,.aurora-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.aurora-mark{color:#62d6e6;font-size:20px}
+.aurora-close{width:36px;height:36px;border:1px solid #2b4a63;border-radius:9px;background:#102338;color:#eaf5ff;font-size:21px;cursor:pointer}
+.aurora-more-links{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:15px}
+.aurora-more-link{display:flex;align-items:center;gap:9px;min-height:42px;padding:7px 9px;border-radius:9px;color:#cfdeeb;text-decoration:none;font-size:12px}
+.aurora-more-link>span:first-child{width:24px;text-align:center;font-size:17px;color:#65ddec}
+.aurora-more-link:hover,.aurora-more-link.active{background:#12354a;color:#fff}
+.aurora-setting-title,.aurora-dialog-head h2{font-size:13px;margin:13px 0 8px;font-weight:700}
+.aurora-palette{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.aurora-theme-choice{display:flex;align-items:center;gap:8px;min-height:39px;padding:6px 8px;border:1px solid #23425a;border-radius:9px;background:#0b2033;color:#dbe9f5;font-size:11px;cursor:pointer}
+.aurora-theme-choice[aria-pressed="true"]{border-color:#48cbd8;background:#103448}
+.aurora-swatches{display:flex;gap:3px}.aurora-swatches i{width:12px;height:12px;border-radius:50%;background:var(--swatch);border:1px solid #ffffff44}
+.aurora-customize{width:100%;margin-top:10px;min-height:40px;border:1px solid #245477;border-radius:9px;background:#0b2943;color:#eaf5ff;font:inherit;font-size:12px;cursor:pointer}
+.aurora-shortcuts-dialog{width:min(440px,calc(100vw - 28px));max-height:85vh;padding:18px;border:1px solid #245477;border-radius:16px;background:#071827;color:#eaf5ff;box-shadow:0 20px 70px #0009}
+.aurora-shortcuts-dialog::backdrop{background:#020914bb;backdrop-filter:blur(3px)}
+.aurora-shortcuts-dialog p{margin:0 0 12px;color:#a9bfd3;font-size:12px}
+.aurora-checks{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:45vh;overflow:auto}
+.aurora-check{display:flex;align-items:center;gap:8px;min-height:39px;padding:6px 8px;border:1px solid #18354c;border-radius:8px;background:#0a1d2d;font-size:12px;cursor:pointer}
+.aurora-check input{accent-color:#16c8ff}.aurora-check>span:nth-child(2){width:22px;color:#65ddec;text-align:center;font-size:16px}
+.aurora-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.aurora-dialog-actions button{min-height:38px;padding:7px 11px;border:1px solid #2a4c66;border-radius:8px;background:#10263b;color:#eaf5ff;cursor:pointer}
+.aurora-dialog-actions .aurora-save{border-color:#1479b4;background:#096c9f}
+.aurora-theme-choice:focus-visible,.aurora-more-link:focus-visible,.aurora-more-toggle:focus-visible,.aurora-shortcut:focus-visible,.aurora-close:focus-visible,.aurora-customize:focus-visible,.aurora-check:focus-within{outline:2px solid #67e4f2;outline-offset:2px}
+html[data-aurora-theme="violet"]{--bg:#100e1b;--panel:#1a1730;--panel2:#211b38;--line:#342b50;--text:#f2edff;--muted:#b3a8ce;--cyan:#c09aff;--blue:#7e68ea;--purple:#a178ef;--green:#59d9b0;--orange:#f1b568;--red:#ff718b}
+html[data-aurora-theme="amber"]{--bg:#15130f;--panel:#211d17;--panel2:#302719;--line:#443522;--text:#fff4df;--muted:#c8b99e;--cyan:#f2b85b;--blue:#d88044;--purple:#ca8a67;--green:#9bd27c;--orange:#ffc46e;--red:#ff7968}
+html[data-aurora-theme="forest"]{--bg:#071611;--panel:#0c2119;--panel2:#123124;--line:#1c4734;--text:#eafff1;--muted:#9cbba7;--cyan:#66e0a0;--blue:#2caa83;--purple:#64b7a0;--green:#8be47b;--orange:#e9bd67;--red:#ff7b7b}
+html[data-aurora-theme="ice"]{--bg:#eaf2f7;--panel:#f7fbfd;--panel2:#dce8f0;--line:#bfd1de;--text:#183247;--muted:#526a7b;--cyan:#087eaa;--blue:#4266ca;--purple:#7253bb;--green:#14734f;--orange:#a95809;--red:#b42336}
+html[data-aurora-theme="aurora"]{--bg:#030914;--panel:#07182a;--panel2:#0a2036;--line:#173b5b;--text:#eaf5ff;--muted:#86a5c3;--cyan:#16c8ff;--blue:#1479ff;--purple:#7d4cff;--green:#34e89e;--orange:#ff9d2e;--red:#ff445d}
+html[data-aurora-theme] body{background:var(--bg)!important;color:var(--text)!important}
+html[data-aurora-theme] .sidebar{background:var(--panel)!important;border-color:var(--line)!important}
+html[data-aurora-theme] .panel,html[data-aurora-theme] .card,html[data-aurora-theme] .head-stat,html[data-aurora-theme] .clockbox,html[data-aurora-theme] .top-status,html[data-aurora-theme] .fitness-stat.panel,html[data-aurora-theme] .fitness-chart.panel,html[data-aurora-theme] .plan-card,html[data-aurora-theme] .schedule-row,html[data-aurora-theme] .exercise-catalog-item,html[data-aurora-theme] .exercise-form-panel,html[data-aurora-theme] .exercise-catalog-panel{background:var(--panel)!important;border-color:var(--line)!important;color:var(--text)!important}
+html[data-aurora-theme] .side-nav a:not(.active),html[data-aurora-theme] .logo small,html[data-aurora-theme] .side-foot,html[data-aurora-theme] .panel small,html[data-aurora-theme] .muted,html[data-aurora-theme] .fitness-section-title p,html[data-aurora-theme] .fitness-heading p,html[data-aurora-theme] .fitness-chart-head p,html[data-aurora-theme] label,html[data-aurora-theme] .plan-footnote,html[data-aurora-theme] .plan-card-meta{color:var(--muted)!important}
+html[data-aurora-theme] a,html[data-aurora-theme] .panel-title>a,html[data-aurora-theme] .panel-link,html[data-aurora-theme] .fitness-eyebrow,html[data-aurora-theme] .fitness-chart-kicker,html[data-aurora-theme] .head-stat>span{color:var(--cyan)!important}
+html[data-aurora-theme] .online,html[data-aurora-theme] .green,html[data-aurora-theme] .safe,html[data-aurora-theme] .status-count,html[data-aurora-theme] .live-dot{color:var(--green)!important}
+html[data-aurora-theme] .offline,html[data-aurora-theme] .red{color:var(--red)!important}
+html[data-aurora-theme] input:not([type="checkbox"]),html[data-aurora-theme] select,html[data-aurora-theme] textarea{background:var(--panel2)!important;border-color:var(--line)!important;color:var(--text)!important}
+html[data-aurora-theme="ice"] .sidebar,html[data-aurora-theme="ice"] .top-status,html[data-aurora-theme="ice"] .clockbox,html[data-aurora-theme="ice"] .head-stat,html[data-aurora-theme="ice"] .quick,html[data-aurora-theme="ice"] .fitness-topbar .head-stat{background:#f7fbfd!important;color:#183247!important;box-shadow:none!important}
+html[data-aurora-theme="ice"] .quick{color:#183247!important}html[data-aurora-theme="ice"] .quick small{color:#35536a!important}html[data-aurora-theme="ice"] .catalog-item{background:#f7fbfd!important;border-color:var(--line)!important;color:var(--text)!important}
+html[data-aurora-theme="ice"] .side-nav a:not(.active){color:#35536a!important}html[data-aurora-theme="ice"] .side-nav a.active{background:#d3edf5!important;color:#07536d!important;border-color:#75bdd0!important;box-shadow:none!important}
+html[data-aurora-theme="ice"] .panel,html[data-aurora-theme="ice"] .card,html[data-aurora-theme="ice"] .fitness-chart.panel,html[data-aurora-theme="ice"] .plan-card,html[data-aurora-theme="ice"] .schedule-row{background:#f7fbfd!important;box-shadow:0 4px 16px #18324710!important}
+html[data-aurora-theme="ice"] .banner{background:#fff0ed!important;color:#8e2731!important}
+html[data-aurora-theme="ice"] .exercise-builder,html[data-aurora-theme="ice"] .plan-exercise-row,html[data-aurora-theme="ice"] .catalog-item,html[data-aurora-theme="ice"] .fitness-stat-top .fitness-icon{background:#e5eff5!important;color:#183247!important}
+html[data-aurora-theme="ice"] .plan-sql-status[data-state="saved"]{color:#126342!important}
+html[data-aurora-theme="ice"] .aurora-more-panel,html[data-aurora-theme="ice"] .aurora-shortcuts-dialog{background:#f7fbfd!important;color:#183247!important;border-color:#bfd1de!important}
+html[data-aurora-theme="ice"] .aurora-more-link,html[data-aurora-theme="ice"] .aurora-check,html[data-aurora-theme="ice"] .aurora-theme-choice,html[data-aurora-theme="ice"] .aurora-dialog-actions button,html[data-aurora-theme="ice"] .aurora-close{background:#eaf2f7!important;color:#183247!important;border-color:#bfd1de!important}
+html[data-aurora-theme="ice"] .main :is(small,.muted,.kv span,.history-legend,.chart-title,.gitem,.storage-small,.service-row small,.filebox small,.net-stats small,.backup-grid small,.printer-state,.fitness-stat-foot,.plan-footnote,.plan-empty,.plan-card-meta,.schedule-person-name){color:#526a7b!important}
+html[data-aurora-theme="ice"] .main :is(.online,.green,.safe,.status-count,.live-dot){color:#14734f!important}html[data-aurora-theme="ice"] .main :is(.offline,.red){color:#b42336!important}
+@media(max-width:850px){.aurora-has-compact-nav .app{grid-template-columns:minmax(0,1fr)!important}.aurora-has-compact-nav .main{padding-bottom:calc(84px + env(safe-area-inset-bottom))!important}.aurora-compact-sidebar{inset:auto 0 0!important;top:auto!important;left:0!important;width:100%!important;min-width:0!important;height:calc(66px + env(safe-area-inset-bottom))!important;padding:5px 8px env(safe-area-inset-bottom)!important;transform:none!important;transition:none!important;display:flex!important;justify-content:center;box-shadow:0 -8px 28px #0004!important;border-right:0!important;border-top:1px solid var(--line)!important}.aurora-compact-sidebar .logo,.aurora-compact-sidebar .side-foot{display:none!important}.aurora-compact-sidebar .side-nav{width:min(440px,100%);height:100%;flex-direction:row;justify-content:space-around;align-items:center;gap:3px!important}.aurora-primary-nav{flex:1;flex-direction:row;justify-content:space-around;gap:2px}.aurora-compact-sidebar .side-nav a,.aurora-more-toggle{width:52px;height:48px;min-height:48px!important;border-radius:12px!important}.aurora-compact-sidebar .side-nav a>span:first-child,.aurora-more-toggle>span:first-child{font-size:20px}.aurora-more-panel{left:10px;right:10px;bottom:calc(73px + env(safe-area-inset-bottom));top:auto;width:auto;max-height:min(72vh,600px)}.aurora-generated-shell{padding-left:0!important;padding-bottom:calc(70px + env(safe-area-inset-bottom))!important}.aurora-shortcuts-dialog{max-height:82vh}.menu-toggle{display:none!important}.nav-scrim{display:none!important}}

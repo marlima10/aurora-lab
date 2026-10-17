@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Aurora Lab">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/icons/app-192.png">
+<link rel="stylesheet" href="/aurora.css?v=20261007-2">
+<link rel="stylesheet" href="/fitness.css?v=20261013-fitness-upgrades-1">
+<title>Aurora Lab · Treinos e peso</title>
+<link rel="stylesheet" href="/aurora-layout.css?v=20261007-1"></head>
+<body>
+<div class="app fitness-app">
+  <aside class="sidebar">
+    <div class="logo"><span class="logo-mark">✦</span><div><strong>AURORA LAB</strong><small>Print Server &amp; Home Lab</small></div></div>
+    <nav class="side-nav">
+      <a href="/">⌂ <span>Dashboard</span></a>
+      <a href="/#printer-card">▣ <span>Impressora 3D</span></a>
+      <a href="/#camera-card">◉ <span>Câmera</span></a>
+      <a href="/#system-card">⚙ <span>Sistema</span></a>
+      <a href="/network.html">⌁ <span>Rede</span></a>
+      <a href="/#services-card">✣ <span>Serviços</span></a>
+      <a href="/#storage-card">▤ <span>Armazenamento</span></a>
+      <a href="/history.html">◴ <span>Histórico</span></a>
+      <a class="fitness-nav active" href="/fitness.html">🏃 <span>Treinos e peso</span></a>
+      <a href="/fitness-planos.html">▦ <span>Planos de treino</span></a>
+    </nav>
+    <div class="side-foot"><b>AURORA LAB V6.5</b><span>rk322x-box</span></div>
+  </aside>
+
+  <button class="nav-scrim" id="navScrim" type="button" aria-label="Fechar menu" hidden></button>
+  <main class="main">
+    <header class="topbar fitness-topbar">
+      <div class="mobile-brand"><button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button><span>✦ AURORA LAB</span></div>
+      <div class="head-stat"><span>🏃</span><div><small>Acompanhamento</small><b>Treinos e peso</b></div></div>
+      <div class="clockbox"><small>Hoje</small><b id="todayLabel">--</b></div>
+      <div class="head-stat"><span>👥</span><div><small>Pessoas</small><b id="peopleCount">--</b></div></div>
+      <a class="head-stat portal-back" href="/"><span>⌂</span><div><small>Aurora Lab</small><b>Voltar ao dashboard</b></div></a>
+    </header>
+
+    <div class="fitness-content">
+      <div class="sync-status" id="syncStatus" data-state="checking" role="status" aria-live="polite">Carregando registros salvos neste aparelho…</div>
+      <section class="fitness-heading">
+        <div><div class="fitness-eyebrow">Saúde e atividade</div><h1>Treinos e peso</h1><p>Acompanhe seus registros e sua evolução.</p></div>
+        <div class="fitness-global-filter"><label for="personFilter">Perfil ativo</label><select id="personFilter"></select><button class="fitness-btn" id="installApp" type="button">⬇ Instalar app</button><button class="fitness-btn" id="addPerson">＋ Cadastrar usuário</button><button class="fitness-btn danger" id="deletePerson" disabled>Excluir perfil</button><button class="fitness-btn" id="exportCsvTop">⇩ CSV do perfil</button></div>
+      </section>
+
+      <section class="panel planned-workout-card" id="plannedWorkoutCard" aria-live="polite">
+        <div class="planned-workout-copy"><small>PROGRAMAÇÃO DO PERFIL</small><h2>Treino planejado</h2><p id="plannedWorkoutMessage">Consultando a agenda salva no Armbian…</p><div id="plannedWorkoutExercises" class="planned-workout-exercises"></div></div>
+        <div class="planned-workout-actions"><button class="fitness-btn primary" id="startPlannedWorkout" type="button" disabled>▶ Iniciar treino</button><a class="fitness-btn" id="openTrainingPlans" href="/fitness-planos.html">Abrir planos</a></div>
+      </section>
+
+      <section class="fitness-stats">
+        <article class="fitness-stat panel">
+          <div class="fitness-stat-top"><div><small>PESO ATUAL</small><h2>Última pesagem</h2></div><span class="fitness-icon cyan">⚖</span></div>
+          <div class="fitness-stat-value" id="weightValue">— <small>kg</small></div>
+          <div class="fitness-stat-foot"><span id="weightSub">Nenhuma pesagem</span><button class="fitness-btn primary" id="addWeight">＋ Registro do dia</button></div>
+        </article>
+        <article class="fitness-stat panel">
+          <div class="fitness-stat-top"><div><small>ROTINA</small><h2>Treinos registrados</h2></div><span class="fitness-icon purple">↗</span></div>
+          <div class="fitness-stat-value" id="workoutValue">0</div>
+          <div class="fitness-stat-foot"><span id="workoutSub">Sessões no período</span><button class="fitness-btn primary" id="addWorkout">＋ Registro do dia</button></div>
+        </article>
+        <article class="fitness-stat panel compact-stat"><div class="fitness-stat-top"><div><small>TEMPO ATIVO</small><h2>Exercício acumulado</h2></div><span class="fitness-icon blue">◷</span></div><div class="fitness-stat-value" id="timeValue">0h 00m</div><div class="fitness-stat-foot"><span>no período selecionado</span></div></article>
+        <article class="fitness-stat panel compact-stat"><div class="fitness-stat-top"><div><small>ENERGIA</small><h2>Calorias registradas</h2></div><span class="fitness-icon orange">✳</span></div><div class="fitness-stat-value" id="kcalValue">0</div><div class="fitness-stat-foot"><span id="distanceValue">0 km acumulados</span></div></article>
+      </section>
+
+      <section class="fitness-lower-grid goal-report-grid">
+        <article class="panel goal-panel">
+          <div class="fitness-section-title"><div><h2>Metas e lembretes</h2><p id="goalProfileHint">Metas do perfil selecionado</p></div></div>
+          <div class="goal-progress" id="goalProgress"></div>
+          <div class="goal-trends" id="goalTrends"></div>
+          <div class="goal-calendar" id="goalCalendar" aria-label="Calendário de treinos das últimas quatro semanas"></div>
+          <form id="goalForm" class="goal-form">
+            <label>Meta de peso (kg)<input type="number" name="weightGoal" min="1" step="0.1" required></label>
+            <label>Treinos por semana<input type="number" name="workoutGoal" min="1" max="14" step="1" required></label>
+            <label>Horário do lembrete<input type="time" name="reminderTime" value="19:00"></label>
+            <label class="goal-check"><input type="checkbox" name="reminderEnabled"> Lembrar se eu ainda não treinei</label>
+            <div class="goal-actions"><button class="fitness-btn primary" type="submit">Salvar metas</button><button class="fitness-btn" id="enableNotifications" type="button">Ativar notificações</button></div>
+          </form>
+          <small class="goal-note">O lembrete é enviado pelo navegador enquanto o portal está aberto. Notificações exigem conexão HTTPS e permissão.</small>
+        </article>
+        <article class="panel report-panel">
+          <div class="fitness-section-title"><div><h2>Comparativo de evolução</h2><p id="reportRangeLabel">Período atual comparado ao anterior</p></div><div class="report-controls"><select id="reportPeriod" aria-label="Período do relatório"><option value="week">Esta semana</option><option value="month">Este mês</option></select><button class="fitness-btn" id="exportReport" type="button">⇩ CSV do período</button></div></div>
+          <div class="report-table-wrap"><table class="report-table"><thead><tr><th>Indicador</th><th id="reportCurrentTitle">Atual</th><th id="reportPreviousTitle">Anterior</th></tr></thead><tbody id="reportBody"></tbody></table></div>
+          <div class="report-insight" id="reportInsight" role="status" aria-live="polite"></div>
+        </article>
+      </section>
+
+      <section class="fitness-chart panel">
+        <div class="fitness-chart-head"><div><div class="fitness-chart-kicker">EVOLUÇÃO CORPORAL</div><h2>Peso ao longo do tempo</h2><p id="weightSummary">Registros de pesagem</p></div><div class="chart-controls" data-chart-filter="weight"><select aria-label="Período do gráfico de peso"><option value="all">Todo o histórico</option><option value="7">7 dias</option><option value="30">30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option><option value="custom">Personalizado</option></select><input type="date" aria-label="Data inicial"><input type="date" aria-label="Data final"></div></div>
+        <div class="fitness-chart-area"><canvas id="weightChart" aria-label="Gráfico de evolução do peso"></canvas></div>
+      </section>
+
+      <section class="fitness-chart panel">
+        <div class="fitness-chart-head"><div><div class="fitness-chart-kicker">GASTO ENERGÉTICO</div><h2>Calorias por dia</h2><p id="kcalSummary">Calorias registradas nos treinos</p></div><div class="chart-controls" data-chart-filter="kcal"><select aria-label="Período do gráfico de calorias"><option value="all">Todo o histórico</option><option value="7">7 dias</option><option value="30">30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option><option value="custom">Personalizado</option></select><input type="date" aria-label="Data inicial"><input type="date" aria-label="Data final"></div></div>
+        <div class="fitness-chart-area"><canvas id="kcalChart" aria-label="Gráfico de calorias por dia"></canvas></div>
+      </section>
+
+      <section class="fitness-chart panel">
+        <div class="fitness-chart-head"><div><div class="fitness-chart-kicker">CONSISTÊNCIA</div><h2>Tempo de treino por dia</h2><p id="timeSummary">Duração acumulada dos treinos</p></div><div class="chart-controls" data-chart-filter="time"><select aria-label="Período do gráfico de tempo"><option value="all">Todo o histórico</option><option value="7">7 dias</option><option value="30">30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option><option value="custom">Personalizado</option></select><input type="date" aria-label="Data inicial"><input type="date" aria-label="Data final"></div></div>
+        <div class="fitness-chart-area"><canvas id="timeChart" aria-label="Gráfico de tempo de treino por dia"></canvas></div>
+      </section>
+
+      <section class="fitness-lower-grid">
+        <article class="panel fitness-activity-panel"><div class="fitness-section-title"><div><h2>Atividades no período</h2><p>Resumo da pessoa e do período selecionados</p></div></div><div class="activity-list" id="activitySummary"></div></article>
+        <article class="panel fitness-activity-panel"><div class="fitness-section-title"><div><h2>Registros recentes</h2><p>Últimos dias registrados</p></div><button class="fitness-btn" id="seeAll">Ver histórico</button></div><div class="activity-list" id="recentList"></div></article>
+      </section>
+
+      <section class="panel fitness-history" id="history-card"><div class="fitness-section-title"><div><h2>Histórico diário</h2><p>Pesagens e atividades registradas</p></div><div class="fitness-history-actions"><label>De <input type="date" id="csvFrom"></label><label>Até <input type="date" id="csvTo"></label><button class="fitness-btn" id="exportCsvHistory">⇩ Exportar CSV</button></div></div><div class="fitness-table-wrap"><table><thead><tr><th>Dia / Data</th><th>Peso</th><th>Atividades</th><th>Tempo</th><th>Distância</th><th>Kcal</th><th>Calcanhar</th><th>Ações</th></tr></thead><tbody id="historyBody"></tbody></table></div></section>
+    </div>
+  </main>
+</div>
+
+<div class="fitness-modal-backdrop" id="dailyModal"><div class="fitness-modal"><div class="fitness-modal-head"><div><small>REGISTRO DIÁRIO</small><h2>Registrar peso e treino</h2></div><button class="fitness-close" data-close="dailyModal">×</button></div><form id="dailyForm"><div class="fitness-form-grid"><div class="fitness-daily-toolbar"><label>Pessoa<select name="person" id="dailyPerson" required></select></label><div class="fitness-modal-foot"><button type="button" class="fitness-btn" data-close="dailyModal">Cancelar</button><button class="fitness-btn primary">Salvar registro do dia</button></div></div><label>Data<input type="date" name="date" required></label><label>Peso ao acordar (kg)<input type="number" name="weight" min="1" max="500" step="0.01" placeholder="Opcional · ex.: 99,8"></label><label>Sono (horas)<input type="number" name="sleep" min="0" max="24" step="0.25"></label><label>Calcanhar antes (0–10)<input type="number" name="heel" min="0" max="10" step="1"></label><label>Calcanhar após (0–10)<input type="number" name="heelAfter" min="0" max="10" step="1"></label><label>Fome (0–10)<input type="number" name="hunger" min="0" max="10"></label><label>Náusea (0–10)<input type="number" name="nausea" min="0" max="10"></label><div class="fitness-section-label wide">Atividades realizadas</div><div id="exerciseRows" class="fitness-exercise-rows"></div><button type="button" class="fitness-add-exercise" id="addExercise">＋ Adicionar atividade</button><label class="check-label"><input type="checkbox" name="rest"> Dia de descanso</label><label class="wide">Observações<input type="text" name="notes" placeholder="Recuperação, disposição, observações..."></label></div></form></div></div>
+
+<div class="fitness-modal-backdrop" id="personModal"><div class="fitness-modal person-modal"><div class="fitness-modal-head"><div><small>PERFIS</small><h2>Cadastrar usuário</h2></div><button class="fitness-close" data-close="personModal">×</button></div><form id="personForm"><div class="fitness-form-grid"><label class="wide">Nome<input name="name" required placeholder="Nome da pessoa"></label><label>Altura (cm)<input type="number" name="height" min="1" placeholder="168"></label><label>Meta de peso (kg)<input type="number" name="goal" min="1" step="0.1" placeholder="78"></label><label class="wide">Peso inicial (kg)<input type="number" name="startWeight" min="1" step="0.01" placeholder="103,3"></label></div><div class="fitness-modal-foot"><button type="button" class="fitness-btn" data-close="personModal">Cancelar</button><button class="fitness-btn primary">Cadastrar</button></div></form></div></div>
+<div class="fitness-modal-backdrop" id="guidedWorkoutModal"><section class="fitness-modal guided-modal" role="dialog" aria-modal="true" aria-labelledby="guidedPlanTitle"><div class="fitness-modal-head"><div><small>SESSÃO GUIADA</small><h2 id="guidedPlanTitle">Treino</h2></div><button class="fitness-close" id="guidedClose" type="button" aria-label="Sair do treino">×</button></div><div class="guided-layout"><section class="guided-current"><div class="guided-session-meta"><span id="guidedExerciseCount">Exercício 1 de 1</span><div><small>Tempo de sessão</small><strong id="guidedElapsed">00:00</strong></div></div><div class="guided-progress-track"><span id="guidedProgress"></span></div><div class="guided-exercise-kicker" id="guidedMuscle">EXERCÍCIO</div><h3 id="guidedExerciseName">—</h3><p id="guidedPrescription"></p><div class="guided-set-card"><div><small id="guidedSetLabel">Série</small><strong id="guidedSetValue">1 / 1</strong></div><div class="guided-rest"><small>Descanso</small><strong id="guidedRestClock">01:30</strong></div></div><div class="guided-actions"><button class="fitness-btn" id="guidedRestButton" type="button">⏱ Descansar 90 s</button><button class="fitness-btn primary" id="guidedCompleteButton" type="button">Concluir série</button></div><div class="guided-finished-message" id="guidedFinishedMessage" hidden>Todos os exercícios concluídos. Informe os dados finais e salve o registro.</div><div class="guided-summary" id="guidedSummary" hidden><label>Distância (km, se aplicável)<input id="guidedDistance" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Opcional"></label><label>Calorias (opcional)<input id="guidedCalories" type="number" min="0" step="1" inputmode="numeric" placeholder="Opcional"></label><button class="fitness-btn primary" id="guidedSave" type="button">Salvar treino no SQL</button></div></section><aside class="guided-exercise-panel"><h3>Exercícios da sessão</h3><ol id="guidedExerciseList"></ol><small>O progresso é registrado ao concluir a sessão.</small></aside></div></section></div>
+<div class="fitness-toast" id="toast" role="status"></div>
+<script src="/mobile-nav.js?v=20261007-1" defer></script>
+<script src="/pwa.js?v=20261007-1" defer></script>
+<script src="/fitness.js?v=20261013-validacoes-1" defer></script>
+<script src="/fitness-guided.js?v=20261013-fitness-upgrades-1" defer></script>
+<script src="/fitness-plan-card.js?v=20261013-fitness-upgrades-1" defer></script>
+<script src="/aurora-layout.js?v=20261007-1" defer></script></body>
+</html>
+
+
+
+

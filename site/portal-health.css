@@ -1,0 +1,8 @@
+.backup-health{margin:8px 0;padding:9px 10px;border:1px solid #184767;border-radius:8px;background:#071827;color:#9eb9d0;font-size:11px;overflow-wrap:anywhere}
+.backup-health[data-state="ok"]{border-color:#176045;color:#66e0a1}
+.backup-health[data-state="error"]{border-color:#773644;color:#ff9aa8}
+.backup-health[data-state="stale"]{border-color:#765317;color:#ffd27a}
+.camera-state{white-space:nowrap}
+.camera-state[data-state="online"]{color:#52e5a0}
+.camera-state[data-state="offline"]{color:#ff8794}
+.camera-state[data-state="connecting"],.camera-state[data-state="waiting"]{color:#ffd27a}

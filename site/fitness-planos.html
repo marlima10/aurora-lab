@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="/aurora.css?v=20261007-2">
+<link rel="stylesheet" href="/fitness.css?v=20261007-7">
+<link rel="stylesheet" href="/fitness-planos.css?v=20261007-3">
+<title>Aurora Lab · Planos de treino</title>
+<link rel="stylesheet" href="/aurora-layout.css?v=20261007-1"></head>
+<body>
+<div class="app fitness-app">
+  <aside class="sidebar">
+    <div class="logo"><span class="logo-mark">✦</span><div><strong>AURORA LAB</strong><small>Print Server &amp; Home Lab</small></div></div>
+    <nav class="side-nav">
+      <a href="/">⌂ <span>Dashboard</span></a><a href="/#printer-card">▣ <span>Impressora 3D</span></a><a href="/#camera-card">◉ <span>Câmera</span></a><a href="/#system-card">⚙ <span>Sistema</span></a><a href="/network.html">⌁ <span>Rede</span></a><a href="/#services-card">✣ <span>Serviços</span></a><a href="/#storage-card">▤ <span>Armazenamento</span></a><a href="/history.html">◴ <span>Histórico</span></a><a href="/fitness.html">🏃 <span>Treinos e peso</span></a><a class="fitness-nav active" href="/fitness-planos.html">▦ <span>Planos de treino</span></a><a class="fitness-nav" href="/fitness-exercicios.html">＋ <span>Exercícios</span></a>
+    </nav>
+    <div class="side-foot"><b>AURORA LAB V6.5</b><span>rk322x-box</span></div>
+  </aside>
+  <button class="nav-scrim" id="navScrim" type="button" aria-label="Fechar menu" hidden></button>
+  <main class="main">
+    <header class="topbar fitness-topbar"><div class="mobile-brand"><button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button><span>✦ AURORA LAB</span></div><div class="head-stat"><span>▦</span><div><small>Fitness</small><b>Planos por pessoa</b></div></div><div class="clockbox"><small>Armazenamento</small><b>SQLite · Armbian</b></div><a class="head-stat portal-back" href="/fitness.html"><span>←</span><div><small>Voltar</small><b>Treinos e peso</b></div></a></header>
+    <div class="plan-content">
+      <div class="plan-sql-status" id="planSqlStatus" data-state="loading" role="status" aria-live="polite">Carregando perfis e planos do banco SQL do Armbian…</div>
+      <section class="plan-heading"><div><div class="fitness-eyebrow">Biblioteca pessoal</div><h1>Planos por pessoa</h1><p>Organize fichas e dias da semana para cada perfil.</p></div><label>Perfil ativo<select id="planPerson" disabled></select></label></section>
+      <div class="plan-toolbar"><a class="fitness-btn" href="/fitness-exercicios.html">＋ Cadastrar exercícios</a></div>
+      <section class="plan-layout">
+        <div class="plan-main-column">
+          <section class="panel schedule-panel"><div class="fitness-section-title"><div><h2>Agenda semanal</h2><p id="schedulePersonName">Repetição semanal do perfil</p></div><button id="addScheduleDay" class="fitness-btn" type="button" disabled>＋ Dia</button></div><div id="scheduleRows" class="schedule-rows"></div><div id="scheduleEmpty" class="plan-empty" hidden>Nenhum dia planejado. Adicione um dia e selecione uma ficha.</div></section>
+          <section class="panel plan-library-panel"><div class="fitness-section-title"><div><h2>Fichas de treino</h2><p>Selecione A, B, C ou D para ver e editar</p></div></div><div id="planCards" class="plan-cards"></div></section>
+        </div>
+      </section>
+      <section class="panel plan-editor" id="planEditor" hidden>
+        <div class="fitness-section-title"><div><div id="editorEyebrow" class="fitness-chart-kicker">FICHA A</div><label class="plan-name-label">Nome da ficha<input id="planNameInput" maxlength="80" autocomplete="off"></label><p>As alterações são gravadas no SQLite ao adicionar, editar ou remover.</p></div><div class="sql-badge">● Gravado no SQL</div></div>
+        <div class="exercise-builder">
+          <label>Grupo muscular<select id="muscleFilter"></select></label>
+          <label class="exercise-choice">Exercício<select id="exerciseChoice"></select></label>
+          <label class="strength-field">Séries<input id="exerciseSets" type="number" min="1" max="20" value="3"></label>
+          <label class="strength-field">Repetições planejadas<input id="exerciseReps" type="number" min="1" max="100" value="10"></label>
+          <label class="cardio-field" hidden>Tempo de cardio (min)<input id="exerciseDuration" type="number" min="1" max="1440" value="20"></label>
+          <button id="addPlanExercise" class="fitness-btn primary" type="button">＋ Adicionar</button>
+        </div>
+        <div id="planExerciseList" class="plan-exercise-list"></div>
+        <div id="planExerciseEmpty" class="plan-empty" hidden>Nenhum exercício nesta ficha. Use o filtro por grupo muscular para montar o treino.</div>
+      </section>
+      <p class="plan-footnote">O editor consulta e grava fichas e agenda diretamente no banco SQLite do Armbian. Se o servidor estiver indisponível, não salva alterações no navegador.</p>
+    </div>
+  </main>
+</div>
+<script src="/mobile-nav.js?v=20261007-1" defer></script><script src="/pwa.js?v=20261007-1" defer></script><script src="/fitness-planos.js?v=20261007-3" defer></script>
+<script src="/aurora-layout.js?v=20261007-1" defer></script></body>
+</html>

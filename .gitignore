@@ -1,0 +1,24 @@
+# Dados pessoais e bancos locais
+/data/
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.db
+*.db-*
+
+# Segredos locais
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependências, arquivos temporários e backups
+node_modules/
+vendor/
+*.log
+*.bak
+*.zip
+.DS_Store
+Thumbs.db
