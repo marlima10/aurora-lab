@@ -33,9 +33,9 @@
       <a href="#backup-card">☁ <span>Backup</span></a>
       <a href="/diagnostics.html">✥ <span>Diagnóstico</span></a>
       <a class="future" href="#" onclick="openOptional(8123,'Home Assistant');return false">⌂ <span>Home Assistant</span></a>
-      <a class="future" href="#" onclick="openOptional(81,'CasaOS');return false">◆ <span>CasaOS</span></a>
+      <a href="#" onclick="openPort(81);return false">◆ <span>CasaOS</span></a>
     </nav>
-    <div class="side-foot"><b>AURORA LAB 3.0</b><span id="sideHost">rk322x-box</span></div>
+    <div class="side-foot"><b>AURORA LAB 4.0</b><span id="sideHost">rk322x-box</span></div>
   </aside>
 
   <button class="nav-scrim" id="navScrim" type="button" aria-label="Fechar menu" hidden></button>
@@ -61,7 +61,7 @@
       <button class="quick q3" onclick="openPort(9090)"><span>🛠️</span><div><b>Cockpit</b><small>:9090 · Administração</small></div><i>→</i></button>
       <button class="quick q4" onclick="openSamba()"><span>📁</span><div><b>Samba</b><small id="sambaPath">Arquivos compartilhados</small></div><i>→</i></button>
       <button class="quick q5" onclick="openOptional(8123,'Home Assistant')"><span>🏠</span><div><b>Home Assistant</b><small>:8123 · Integração futura</small></div><i>→</i></button>
-      <button class="quick q6" onclick="openOptional(81,'CasaOS')"><span>☁️</span><div><b>CasaOS</b><small>:81 · Integração futura</small></div><i>→</i></button>
+      <button class="quick q6" onclick="openPort(81)"><span>☁️</span><div><b>CasaOS</b><small>:81 · Aplicativos e arquivos</small></div><i>→</i></button>
       <a class="quick q7" href="/fitness.html"><span>🏃</span><div><b>Treinos e peso</b><small>Registros e evolução</small></div><i>→</i></a>
     </section>
 
@@ -275,7 +275,7 @@ async function update(){
   gauge('cpu',d.cpu,d.cpu,70,90);gauge('mem',d.memory,d.memory,80,90);gauge('disk',d.disk,d.disk,t.disk?.warn??80,t.disk?.crit??90);gauge('temp',+d.temperature,+d.temperature,t.temperature?.warn??75,t.temperature?.crit??85);
   osInfo.textContent=val(d.os,'Armbian / Debian');kernelInfo.textContent=val(d.kernel);archInfo.textContent=val(d.arch);cpuInfo.textContent=val(d.cpu_model,(val(d.cores)+' cores'));ramdetail.textContent=val(d.memory_used,0)+' / '+val(d.memory_total,0)+' MB';swapdetail.textContent=val(d.swap_used,0)+' / '+val(d.swap_total,0)+' MB';diskdetail.textContent=val(d.disk_used)+' / '+val(d.disk_total)+' · livre '+val(d.disk_free);
   netIface.textContent=val(d.interface);gateway.textContent=val(d.gateway);topNetwork.textContent=d.interface?d.interface:'Conectado';networkStatus.textContent='● '+(d.interface?'Conectado':'Rede');
-  let sv=[['🖨️','OctoPrint',d.octoprint,':5000'],['📷','Câmera (MJPEG)',d.webcam,':8080'],['🌐','Nginx (Portal)',d.nginx,':80'],['📁','Samba (Arquivos)',d.samba,':445'],['🛠️','Cockpit (Sistema)',d.cockpit,':9090'],['🔒','Tailscale (VPN)',d.tailscale,val(d.tailscale_ip)]];
+  let sv=[['🖨️','OctoPrint',d.octoprint,':5000'],['📷','Câmera (MJPEG)',d.webcam,':8080'],['🌐','Nginx (Portal)',d.nginx,':80'],['📁','Samba (Arquivos)',d.samba,':445'],['🛠️','Cockpit (Sistema)',d.cockpit,':9090'],['☁️','CasaOS',d.casaos,':81'],['🔒','Tailscale (VPN)',d.tailscale,val(d.tailscale_ip)]];
   serviceRows.innerHTML=sv.map(x=>serviceRow(...x)).join('');let ons=sv.filter(x=>x[2]==='online').length;serviceCount.textContent=ons+'/'+sv.length+' Online';systemOnline.textContent=(ons===sv.length?'Sistema Online':'Atenção: serviço offline');document.querySelector('.top-status').classList.toggle('warn',ons!==sv.length);
   let prog=Math.min(100,Math.max(0,Number(j.progress||0))), printing=/Printing|Imprimindo/i.test(p.state||'');
   printerState.textContent=val(p.state);printerState.className='printer-state '+(printing?'printing':p.connected?'ready':'offline');jobFile.textContent=val(j.file,'Nenhuma impressão');elapsed.textContent=fmtTime(j.print_time);remaining.textContent=printing&&!j.print_time_left?'calculando…':fmtTime(j.print_time_left);totalTime.textContent=(Number(j.print_time)>0||Number(j.print_time_left)>0)?fmtTime(Number(j.print_time||0)+Number(j.print_time_left||0)):'--';serialInfo.textContent=val(p.port)+' · '+(Number(p.baudrate)>0?p.baudrate:'AUTO');firmware.textContent=val(p.firmware);usbState.textContent=val(p.usb);progressText.textContent=prog.toFixed(0)+'%';progressRing.style.setProperty('--p',prog);progressBar.style.width=prog+'%';
@@ -293,7 +293,7 @@ function updateBackupHealth(){let el=document.getElementById('backupHealth');fet
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork();if(!cam.naturalWidth)connectCamera()}});
 update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
 </script>
-<script src="/aurora-layout.js?v=20261007-1" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+<script src="/aurora-layout.js?v=20261017-v4" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
   <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
   <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
   <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>

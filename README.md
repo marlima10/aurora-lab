@@ -1,4 +1,4 @@
-# Aurora Lab 3.0
+# Aurora Lab 4.0
 
 Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 
@@ -170,3 +170,7 @@ Consulte o [histórico de alterações](CHANGELOG.md) e a [instalação completa
 ## Energia e autonomia
 
 A versão 3.0 acrescenta bateria clicável, histórico de potência, GPUs, simulador de custo com tarifa configurável e pop-up de economia. Controles autenticados em serviço Docker opcional; consulte AURORASERVER.md. Sensores indisponíveis são identificados; consumo na tomada exige medidor externo.
+
+## CasaOS
+
+Gerenciamento no host e aplicativos Docker separados. Consulte [CasaOS](CASAOS.md).

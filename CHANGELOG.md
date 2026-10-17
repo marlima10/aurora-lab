@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## [4.0.0] - 2026-10-17
+
+- CasaOS 0.4.15 na porta 81, com componentes oficiais fixados por SHA-256.
+- Atalhos no portal, monitoramento e backup do estado/configuração CasaOS.
+- Gerenciamento autorizado no Debian; Docker e Samba existentes preservados.
+
 ## 3.0.0 — 2026-10-17
 
 - Bateria clicável, autonomia, saúde e ciclos no dashboard.

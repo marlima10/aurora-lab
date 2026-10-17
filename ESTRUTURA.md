@@ -113,3 +113,7 @@ O monitor publica JSON compatível com o portal e o proxy Nginx, sem acesso ao s
 ## Energia 3.0
 
 site/power.css e site/power.js ampliam o dashboard sem alterar o contrato Fitness. compose.power.yaml acrescenta o container opcional power; docker/server/power/power.py lê bateria, DRM e RAPL e fornece controles autenticados de CPU/brilho. O monitor encaminha /api/power e /api/power/settings ao serviço local. Estado e histórico em data/power; chave privada em secrets/power-admin.key. Consulte AURORASERVER.md para instalação, limites e testes. Cache e APP_SHELL da PWA atualizados em conjunto.
+
+## CasaOS (4.0.0)
+
+Gerenciamento no Debian, porta 81; aplicações em Docker. Instalador e hashes em `docker/server/casaos/`. Configuração `/etc/casaos` e estado `/var/lib/casaos` incluídos no backup. Veja [CASAOS.md](CASAOS.md).
