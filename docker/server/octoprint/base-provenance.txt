@@ -1,0 +1,1 @@
+upstream=https://github.com/OctoPrint/octoprint-docker; commit=32fdd6eae2a9a2c1f97f26cf4c7d3802cb0559db; python_base=3.12-slim-bookworm; octoprint=1.11.8

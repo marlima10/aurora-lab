@@ -1,0 +1,16 @@
+{
+  "url": "https://github.com/just-containers/s6-overlay/releases/tag/v3.2.3.2",
+  "release": "v3.2.3.2",
+  "assets": [
+    {
+      "name": "s6-overlay-noarch.tar.xz",
+      "browser_download_url": "https://github.com/just-containers/s6-overlay/releases/download/v3.2.3.2/s6-overlay-noarch.tar.xz",
+      "digest": "sha256:5379750ed30a84bbd2e2dd74847ba6b5bd29cd0b2e3ea2ec58049b57eb2eda12"
+    },
+    {
+      "name": "s6-overlay-x86_64.tar.xz",
+      "browser_download_url": "https://github.com/just-containers/s6-overlay/releases/download/v3.2.3.2/s6-overlay-x86_64.tar.xz",
+      "digest": "sha256:e6befcc96a437a3831386ecfc51808c5d3e939dc5fe3c02ae9284599e8aa2408"
+    }
+  ]
+}

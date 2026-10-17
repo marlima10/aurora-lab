@@ -1,0 +1,4 @@
+services:
+  octoprint:
+    devices:
+      - '${PRINTER_DEVICE:-/dev/ttyUSB0}:/dev/ttyPrinter'

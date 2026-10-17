@@ -1,0 +1,110 @@
+[
+  {
+    "plugin": "displaylayerprogress",
+    "previous_version": "1.28.0",
+    "repo": "OllisGit/OctoPrint-DisplayLayerProgress",
+    "ref": "1.28.0",
+    "commit": "d46f3bdb98d9ab8cb50ea271f8ceed9468a69f86",
+    "sha256": "d0d14246e146be519494345984d4606d5642c1a4aa26c6dbbdfba3d4df0d401e",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "homeassistant",
+    "previous_version": "3.7.0",
+    "repo": "cmroche/OctoPrint-HomeAssistant",
+    "ref": "3.7.0",
+    "commit": "5a3f738cdbeb34ceeb4f1d3e544c049b86b3ab62",
+    "sha256": "fb557a8d2efbff4e6bd9a2d203e41b70c27a9f8964a2ad082973bbb050e1ed7c",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "printtimegenius",
+    "previous_version": "2.5.1",
+    "repo": "eyal0/OctoPrint-PrintTimeGenius",
+    "ref": "2.5.1",
+    "commit": "5f84e73f937b4a19fd36481b65dd9fd7f49f2490",
+    "sha256": "057772eefb4aff7c4af6d7444a4bdf725e4e0d7f4842a89bb3ce1ca06500840c",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "camerasettings",
+    "previous_version": "0.4.3",
+    "repo": "The-EG/OctoPrint-CameraSettings",
+    "ref": "0.4.3",
+    "commit": "9f3a1120cf61763ded075070e1746b7163e40d75",
+    "sha256": "45dd43b3d492dfc73da03ac7309934e609ad463b3036933b26cb8c06979cc1f4",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "printhistory",
+    "previous_version": "1.4.1",
+    "repo": "imrahil/OctoPrint-PrintHistory",
+    "ref": "1.4.1",
+    "commit": "d39c47dfc280a3966c97ab3a4ebe0a4ba0b1663b",
+    "sha256": "776b629db617e28c9793d1bac9d21facbdbe572da884f9497656e3973d9e9b56",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "firmwareupdater",
+    "previous_version": "1.15.0",
+    "repo": "OctoPrint/OctoPrint-FirmwareUpdater",
+    "ref": "1.15.0",
+    "commit": "b2729886c626727b4ae5df8686c8c18916ac1f30",
+    "sha256": "f6f469500f2049cf86b6cd51932dde9e8a2f2d41d340932772f671c755286299",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "powerfailure",
+    "previous_version": "1.2.2",
+    "repo": "pablogventura/OctoPrint-PowerFailure",
+    "ref": "1.2.2",
+    "commit": "0708215f7c9976eabf94afef00f8ada74eaff166",
+    "sha256": "e033b7403056a6e27dd5cc4344d38e011bc0f978a5290ab90666ea353b0a5acd",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "crealitycloud",
+    "previous_version": "1.1.1",
+    "repo": "crealitycloud/OctoPrint-CrealityCloud-With-Video",
+    "ref": "1.1.1",
+    "commit": "6ee17268fb9d8dc323f893720bf327acfa7cad83",
+    "sha256": "cb58e0c92aea96f5623b524f738e9899c9cbae5d65380d5912f3c089ece9fc79",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "costestimation",
+    "previous_version": "3.6.0",
+    "repo": "Hillshum/OctoPrint-CostEstimation",
+    "ref": "v3.6.0",
+    "commit": "8a4763d933ec1f57c50d20895d5c73c8941cb2d3",
+    "sha256": "ad9551f5f8c07b0a57a179f0df4d001020b2d537998b0007bcae8e57247c5b16",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "ender3v2tempfix",
+    "previous_version": "0.0.4",
+    "repo": "SimplyPrint/OctoPrint-Creality2xTemperatureReportingFix",
+    "ref": "0.0.4",
+    "commit": "b187e625450fb0fbcf7b3f285a0e872012cad2d7",
+    "sha256": "0a7ac607601489a6d8bb2ceded6a87950cda81ad018c8827aa887c4b7633019b",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "uicustomizer",
+    "previous_version": "0.1.10.0",
+    "repo": "LazeMSS/OctoPrint-UICustomizer",
+    "ref": "0.1.10.0",
+    "commit": "790f6a1367956ae66a77e03711c569667fba9020",
+    "sha256": "8506af6d54042a866ef66de5a836bfae613095c97a2d6fc13a6ef82ef82237dc",
+    "matched_original_tag": true
+  },
+  {
+    "plugin": "dashboard",
+    "previous_version": "1.19.13",
+    "repo": "j7126/OctoPrint-Dashboard",
+    "ref": "1.19.13",
+    "commit": "6c0bda97f7691efd7b417505698bfcc3924830ee",
+    "sha256": "36a502df24a017b1fe119dae9fe101cc99d1437086e7d56050f896be5515ee06",
+    "matched_original_tag": true
+  }
+]

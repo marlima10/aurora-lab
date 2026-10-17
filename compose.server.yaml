@@ -1,0 +1,110 @@
+name: auroralab
+x-logging: &logging
+  driver: json-file
+  options: {max-size: 10m, max-file: '3'}
+services:
+  web:
+    image: nginx:stable-alpine
+    ports: ['${BIND_IP:-0.0.0.0}:80:80', '${BIND_IP:-0.0.0.0}:8088:80']
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+      - ./docker/server/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [php, monitor]
+    extra_hosts: ['monitor:host-gateway']
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: [CMD, wget, -q, --spider, 'http://127.0.0.1/']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  php:
+    build: {context: ., dockerfile: docker/Dockerfile}
+    volumes: ['./data/fitness:/var/lib/fitness']
+    restart: unless-stopped
+    logging: *logging
+  octoprint:
+    build: {context: ./docker/server/octoprint}
+    ports: ['${BIND_IP:-0.0.0.0}:5000:80']
+    environment: {TZ: America/Sao_Paulo, ENABLE_MJPG_STREAMER: 'false'}
+    volumes: ['./data/octoprint:/octoprint']
+    restart: unless-stopped
+    logging: *logging
+  camera:
+    profiles: [camera]
+    build: {context: ./docker/server/camera}
+    devices: ['${CAMERA_DEVICE:-/dev/auroralab-camera-usb}:/dev/video0']
+    ports: ['${BIND_IP:-0.0.0.0}:8080:8080']
+    restart: unless-stopped
+    logging: *logging
+  samba:
+    build: {context: ./docker/server/samba}
+    ports: ['${BIND_IP:-0.0.0.0}:445:445']
+    volumes:
+      - ./data/prints:/shares/prints
+      - ./data/samba:/var/lib/samba
+      - ./secrets/samba-users.txt:/run/secrets/samba-users.txt:ro
+    restart: unless-stopped
+    logging: *logging
+  monitor:
+    build: {context: ./docker/server/monitor}
+    network_mode: host
+    command: [python, /app/monitor.py]
+    user: '65534:65534'
+    read_only: true
+    tmpfs: [/tmp]
+    environment: {SERVER_IP: '${SERVER_IP:-192.168.0.71}', TZ: America/Sao_Paulo}
+    volumes:
+      - ./docker/server/monitor.py:/app/monitor.py:ro
+      - ./secrets/octoprint-api.key:/run/secrets/octoprint-api.key:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - ./data/monitor:/state
+      - ./data/backup-status:/backup-status:ro
+    restart: unless-stopped
+    logging: *logging
+  backup:
+    image: python:3.13-slim
+    command: [python, /app/backup.py]
+    environment: {TZ: America/Sao_Paulo, BACKUP_INTERVAL: '86400'}
+    volumes:
+      - ./docker/server/backup.py:/app/backup.py:ro
+      - ./data/fitness:/source/fitness
+      - ./data/octoprint:/source/octoprint
+      - ./data/prints:/source/prints:ro
+      - ./data/samba:/source/samba:ro
+      - ./data/tailscale:/source/tailscale:ro
+      - ./secrets:/source/secrets:ro
+      - ./compose.server.yaml:/source/config/compose.server.yaml:ro
+      - ./docker:/source/config/docker:ro
+      - ./backend:/source/config/backend:ro
+      - ./site:/source/config/site:ro
+      - ./AURORASERVER.md:/source/config/AURORASERVER.md:ro
+      - ./.env:/source/config/.env:ro
+      - ./data/monitor:/source/monitor:ro
+      - ./data/backup-status:/status
+      - ./backups:/backups
+    restart: unless-stopped
+    logging: *logging
+  tailscale:
+    image: tailscale/tailscale:stable
+    entrypoint: [tailscaled]
+    command: ['--state=/var/lib/tailscale/tailscaled.state', '--socket=/var/run/tailscale/tailscaled.sock']
+    network_mode: host
+    cap_add: [NET_ADMIN]
+    devices: [/dev/net/tun:/dev/net/tun]
+    environment:
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: 'false'
+      TS_AUTH_ONCE: 'true'
+      TS_HOSTNAME: auroraserver
+      TS_EXTRA_ARGS: --accept-dns=false
+    volumes: ['./data/tailscale:/var/lib/tailscale']
+    restart: unless-stopped
+    logging: *logging
+  cockpit:
+    image: quay.io/cockpit/ws:latest
+    ports: ['${BIND_IP:-0.0.0.0}:9090:9090']
+    environment: {COCKPIT_SSH_HOST: '${SERVER_IP:-192.168.0.71}'}
+    restart: unless-stopped
+    logging: *logging

@@ -1,0 +1,6 @@
+#!/command/with-contenv sh
+set -eu
+mkdir -p /octoprint/octoprint
+if [ ! -s /octoprint/octoprint/config.yaml ]; then
+    cp /etc/aurora/octoprint-defaults.yaml /octoprint/octoprint/config.yaml
+fi

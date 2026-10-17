@@ -22,3 +22,11 @@ vendor/
 *.zip
 .DS_Store
 Thumbs.db
+
+/secrets/
+/backups/
+/deploy-state/
+
+__pycache__/
+*.pyc
+/compose.rollback.yaml
