@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS-Gateway/releases/download/v0.4.9-alpha4/linux-amd64-casaos-gateway-v0.4.9-alpha4.tar.gz",
+    "sha256": "458e66bdd8f8ad63fe5610c01dd76bb76d5054c899c92f2bba31be36d769c798",
+    "file": "linux-amd64-casaos-gateway-v0.4.9-alpha4.tar.gz",
+    "verification": "publisher-checksums"
+  },
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS-MessageBus/releases/download/v0.4.4-3-alpha2/linux-amd64-casaos-message-bus-v0.4.4-3-alpha2.tar.gz",
+    "sha256": "29823621aaa33dd22271f436e741f5959a7df6a7d5540036a5da866de0f7c7fe",
+    "file": "linux-amd64-casaos-message-bus-v0.4.4-3-alpha2.tar.gz",
+    "verification": "publisher-checksums"
+  },
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS-UserService/releases/download/v0.4.8/linux-amd64-casaos-user-service-v0.4.8.tar.gz",
+    "sha256": "62f3d12d93215af58af3d9da4448b244b33b533a0321afa46229fde1f6d66bab",
+    "file": "linux-amd64-casaos-user-service-v0.4.8.tar.gz",
+    "verification": "publisher-checksums"
+  },
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS-LocalStorage/releases/download/v0.4.4/linux-amd64-casaos-local-storage-v0.4.4.tar.gz",
+    "sha256": "523edb627ec11b1bc74d408a6929028903ff404115d316d1fb7f40cf819ba831",
+    "file": "linux-amd64-casaos-local-storage-v0.4.4.tar.gz",
+    "verification": "publisher-checksums"
+  },
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS-AppManagement/releases/download/v0.4.10-alpha2/linux-amd64-casaos-app-management-v0.4.10-alpha2.tar.gz",
+    "sha256": "161557e5fbe9066183746798af090f62d33da7b80f9b1ad5159e9fe9dbdfbe2b",
+    "file": "linux-amd64-casaos-app-management-v0.4.10-alpha2.tar.gz",
+    "verification": "publisher-checksums"
+  },
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS/releases/download/v0.4.15/linux-amd64-casaos-v0.4.15.tar.gz",
+    "sha256": "8e5bd4372fa8a32e6c7c4f35617d27613fcce7a6be25ba92593c81cade3b2317",
+    "file": "linux-amd64-casaos-v0.4.15.tar.gz",
+    "verification": "publisher-checksums"
+  },
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS-CLI/releases/download/v0.4.4-3-alpha1/linux-amd64-casaos-cli-v0.4.4-3-alpha1.tar.gz",
+    "sha256": "d25ad6bbd68f555f20ec0ab4a0984ca2691a68e112562dc613d5707493173a0d",
+    "file": "linux-amd64-casaos-cli-v0.4.4-3-alpha1.tar.gz",
+    "verification": "publisher-checksums"
+  },
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS-UI/releases/download/v0.4.25/linux-all-casaos-v0.4.25.tar.gz",
+    "sha256": "390d399ba89aeba9ce2747ea58348acb0c86740fb55a6e617eb42a1d3f715bf5",
+    "file": "linux-all-casaos-v0.4.25.tar.gz",
+    "verification": "github-asset-digest"
+  },
+  {
+    "url": "https://github.com/IceWhaleTech/CasaOS-AppStore/releases/download/v0.4.5/linux-all-appstore-v0.4.5.tar.gz",
+    "sha256": "4f346a057097c09706813052c3ef5d0ef49b609aea320b4fcf3af7609b3957b5",
+    "file": "linux-all-appstore-v0.4.5.tar.gz",
+    "verification": "official-https-local-sha256"
+  }
+]

@@ -137,3 +137,7 @@ Testes Linux de conversões, perfis, retorno e autenticação:
 ```sh
 python3 docker/server/power/test_power.py
 ```
+
+## CasaOS (4.0.0)
+
+Gerenciamento no Debian, porta 81; aplicações em Docker. Instalador e hashes em `docker/server/casaos/`. Configuração `/etc/casaos` e estado `/var/lib/casaos` incluídos no backup. Veja [CASAOS.md](CASAOS.md).
