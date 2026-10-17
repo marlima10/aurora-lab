@@ -12,7 +12,9 @@
 <link rel="stylesheet" href="/aurora.css?v=20261007-2">
 <link rel="stylesheet" href="/portal-health.css?v=20261007-1">
 <title>Aurora Lab · Dashboard</title>
-<link rel="stylesheet" href="/aurora-layout.css?v=20261007-1"></head>
+<link rel="stylesheet" href="/aurora-layout.css?v=20261007-1">
+<link rel="stylesheet" href="/power.css?v=20261017-energy-1">
+</head>
 <body>
 <div class="app">
   <aside class="sidebar">
@@ -33,7 +35,7 @@
       <a class="future" href="#" onclick="openOptional(8123,'Home Assistant');return false">⌂ <span>Home Assistant</span></a>
       <a class="future" href="#" onclick="openOptional(81,'CasaOS');return false">◆ <span>CasaOS</span></a>
     </nav>
-    <div class="side-foot"><b>AURORA LAB V6.5</b><span id="sideHost">rk322x-box</span></div>
+    <div class="side-foot"><b>AURORA LAB 3.0</b><span id="sideHost">rk322x-box</span></div>
   </aside>
 
   <button class="nav-scrim" id="navScrim" type="button" aria-label="Fechar menu" hidden></button>
@@ -41,6 +43,10 @@
     <header class="topbar">
       <div class="mobile-brand"><button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button><span>✦ AURORA LAB</span></div>
       <div class="top-status ok"><i></i><div><b id="systemOnline">Sistema Online</b><small id="topUptime">Uptime --</small></div></div>
+      <button class="head-stat power-battery-button" id="powerBatteryButton" type="button" aria-haspopup="dialog" aria-controls="powerDialog" aria-label="Bateria e configurações de economia">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="3" y="8" width="24" height="16" rx="3" stroke="currentColor" stroke-width="2"/><path d="M29 13v6M7 12v8M11 12v8M15 12v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <div><small>Bateria · configurar</small><b id="powerBatteryPercent">—</b><small id="powerBatteryState">Aguardando leitura</small></div>
+      </button>
       <div class="clockbox"><small id="dateNow">--</small><b id="timeNow">--:--</b></div>
       <div class="head-stat"><span>▣</span><div><small>IP Local</small><b id="topLocalIp">--</b></div></div>
       <div class="head-stat"><span>🔒</span><div><small>IP Tailscale</small><b id="topTailIp">--</b></div></div>
@@ -92,6 +98,55 @@
         <div class="kv"><span>Uptime</span><b id="uptime">--</b></div>
       </article>
 
+      <article class="panel power-panel" id="energy-card" aria-labelledby="powerHeading">
+        <div class="panel-title">
+          <div><p class="power-eyebrow">AuroraServer / Energia</p><div class="power-title"><h2 id="powerHeading">Consumo e autonomia</h2><span class="power-status" id="powerLive" role="status">Aguardando sensores</span></div></div>
+          <button class="power-btn" id="powerSettingsButton" type="button" aria-haspopup="dialog" aria-controls="powerDialog">Configurar economia ↗</button>
+        </div>
+        <p class="power-subtitle">Acompanhe o notebook, conheça o consumo dos componentes e planeje o gasto mensal.</p>
+        <div class="power-stats">
+          <div class="power-stat"><small>Potência do notebook</small><b class="power-value" id="powerDraw">—</b><p class="power-note" id="powerDrawSource">Aguardando leitura da bateria</p></div>
+          <div class="power-stat"><small>Pacote do processador</small><b class="power-value" id="powerCpu">—</b><p class="power-note">Intel RAPL · CPU e domínios integrados</p></div>
+          <div class="power-stat"><small>Energia acompanhada</small><b class="power-value" id="powerObserved">—</b><p class="power-note" id="powerCoverage">Pacote CPU hoje · somente intervalos observados</p></div>
+          <div class="power-stat"><small>Perfil atual</small><b class="power-value" style="font-size:22px" id="powerProfile">—</b><p class="power-note" id="powerProfileSub">Clique na bateria para configurar</p></div>
+        </div>
+        <div class="power-split">
+          <section class="power-surface" aria-labelledby="powerHistoryTitle">
+            <h3 id="powerHistoryTitle">Potência ao longo do tempo</h3>
+            <div class="power-legend"><span><i></i>Descarga da bateria</span><span><i class="cpu"></i>Pacote CPU</span></div>
+            <svg class="power-chart" id="powerChart" viewBox="0 0 600 145" role="img" aria-label="Histórico recente da potência da bateria e do pacote CPU, em watts"></svg>
+            <p class="power-small" id="powerChartEmpty">O histórico aparece após duas amostras. Não são estimados intervalos sem leitura.</p>
+            <p class="power-small">Uma amostra por minuto · até 90 minutos no gráfico. CPU e GPU integrada podem compartilhar energia; não some as leituras.</p>
+          </section>
+          <section class="power-surface" aria-labelledby="powerGpuTitle">
+            <h3 id="powerGpuTitle">Placas de vídeo</h3>
+            <div class="gpu-list" id="powerGpuList"><p class="power-note">Aguardando identificação das GPUs…</p></div>
+          </section>
+        </div>
+        <hr class="power-divider">
+        <div class="panel-title"><h3 style="margin:0;font-size:14px">Planejamento do gasto energético</h3><span class="power-status">Simulação · 30 dias</span></div>
+        <div class="power-cost-layout">
+          <div>
+            <div class="power-inputs">
+              <label for="powerTariff">Tarifa total (R$/kWh)<input id="powerTariff" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="Sua tarifa"></label>
+              <label for="powerAwake">Potência ligado (W)<input id="powerAwake" type="number" inputmode="decimal" min="0" max="10000" step="0.1" placeholder="Medida na tomada"></label>
+              <label for="powerSleep">Potência suspenso (W)<input id="powerSleep" type="number" inputmode="decimal" min="0" max="10000" step="0.1" placeholder="Informe a medição"></label>
+              <label for="powerNightHours">Horas suspenso por dia<input id="powerNightHours" type="number" inputmode="decimal" min="0" max="24" step="0.5" value="7"></label>
+            </div>
+            <button class="power-btn" id="powerEstimateFromBattery" style="margin-top:10px" type="button" disabled>Usar descarga atual como estimativa</button>
+            <p class="power-small">Parâmetros salvos somente neste navegador.</p>
+          </div>
+          <div>
+            <div class="power-cost-grid">
+              <div class="power-cost-cell"><small>Ligado 24 h por dia</small><b id="powerCost24">—</b><span class="power-small" id="powerKwh24">Informe a potência</span></div>
+              <div class="power-cost-cell"><small>Com suspensão simulada</small><b id="powerCostNight">—</b><span class="power-small" id="powerKwhNight">Preencha os parâmetros</span></div>
+              <div class="power-cost-cell saving"><small>Economia estimada</small><b id="powerSavings">—</b><span class="power-small" id="powerSavingsKwh">Comparação estimada</span></div>
+            </div>
+            <p class="power-note" id="powerCostNote" role="status">Informe a tarifa e as potências para comparar.</p>
+          </div>
+        </div>
+        <p class="power-notice">O consumo na tomada precisa de wattímetro ou tomada com medição. A bateria informa sua descarga, e o RAPL acompanha componentes da CPU. A suspensão das 00h às 07h é apenas uma simulação até validar o despertar automático no notebook.</p>
+      </article>
       <article class="panel printer-panel" id="printer-card">
         <div class="panel-title"><h2>🖨️ Impressora 3D</h2><span class="printer-state" id="printerState">--</span></div>
         <div class="printer-body">
@@ -238,4 +293,25 @@ function updateBackupHealth(){let el=document.getElementById('backupHealth');fet
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork();if(!cam.naturalWidth)connectCamera()}});
 update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
 </script>
-<script src="/aurora-layout.js?v=20261007-1" defer></script></body></html>
+<script src="/aurora-layout.js?v=20261007-1" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+  <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
+  <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
+  <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>
+  <form id="powerSettingsForm">
+    <fieldset class="power-profiles"><legend>Perfil de uso</legend>
+      <label class="power-profile"><input type="radio" name="powerProfileChoice" value="eco" disabled><b>Economia máxima</b><small>Prioriza eficiência e desativa o turbo. Menor desempenho de pico.</small></label>
+      <label class="power-profile"><input type="radio" name="powerProfileChoice" value="balanced" disabled><b>Equilibrado</b><small>Eficiência no uso comum, com turbo disponível quando necessário.</small></label>
+      <label class="power-profile"><input type="radio" name="powerProfileChoice" value="performance" disabled><b>Desempenho</b><small>Prioriza resposta rápida. Pode consumir mais energia.</small></label>
+    </fieldset>
+    <p class="power-small" id="powerControlNote">Aguardando os controles do notebook.</p>
+    <label class="field" for="powerBrightness" style="margin-top:16px">Brilho da tela</label>
+    <div class="power-brightness"><input id="powerBrightness" type="range" min="5" max="100" step="5" value="50" disabled><output id="powerBrightnessValue" for="powerBrightness">—</output></div>
+    <label class="field" for="powerAdminKey">Chave administrativa do painel<input id="powerAdminKey" type="password" autocomplete="off" spellcheck="false" placeholder="Informe para autorizar alterações"></label>
+    <p class="power-small">A chave é fornecida ao administrador. Não use a senha do Debian. Ela fica somente na memória desta aba enquanto aberta.</p>
+    <details><summary>Mais formas de economizar</summary><ul><li>Configure o apagamento da tela após 2–5 minutos no Debian.</li><li>Prefira cabo de rede quando disponível. Não desative o Wi-Fi que mantém seu acesso.</li><li>A NVIDIA está sendo monitorada; o painel não altera drivers nem força o desligamento da GPU.</li><li>Suspensão 00h–07h: desativada até testar o RTC com acesso físico. Não suspender durante impressão, backup ou atualização.</li></ul></details>
+    <div class="power-feedback" id="powerFeedback" role="status" aria-live="polite"></div>
+    <div class="power-dialog-actions"><button class="power-btn" id="powerCancel" type="button">Fechar</button><button class="power-btn primary" id="powerApply" type="submit" disabled>Aplicar economia</button></div>
+  </form>
+</dialog>
+<script src="/power.js?v=20261017-energy-1" defer></script>
+</body></html>

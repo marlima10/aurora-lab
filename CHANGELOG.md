@@ -1,5 +1,16 @@
 # Histórico de versões
 
+## 3.0.0 — 2026-10-17
+
+- Bateria clicável, autonomia, saúde e ciclos no dashboard.
+- Potência CPU/GPU, origem das leituras e indisponibilidade explícita.
+- Histórico e energia observada, sem duplicar RAPL ou inventar medições da tomada.
+- Simulador mensal com tarifa configurável e comparação de suspensão.
+- Pop-up acessível de perfis e brilho, autenticado em container separado.
+- Configurações persistidas, limites validados e retorno em falha.
+- Suspensão bloqueada até teste físico do RTC; rede, USB e drivers preservados.
+- Cache da PWA atualizado e nove testes Linux de sensores e controles.
+
 ## 2.0.0 — 2026-10-17
 
 ### Processo de atualização

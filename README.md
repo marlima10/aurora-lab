@@ -1,4 +1,4 @@
-# Aurora Lab 2.0
+# Aurora Lab 3.0
 
 Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 
@@ -166,3 +166,7 @@ O ambiente completo separado por servico usa compose.server.yaml; consulte AUROR
 ## Versão 2.0.0
 
 Consulte o [histórico de alterações](CHANGELOG.md) e a [instalação completa no Linux](AURORASERVER.md). A identidade visual e o contrato da API Fitness foram preservados. Dados, senhas e backups são mantidos fora do repositório.
+
+## Energia e autonomia
+
+A versão 3.0 acrescenta bateria clicável, histórico de potência, GPUs, simulador de custo com tarifa configurável e pop-up de economia. Controles autenticados em serviço Docker opcional; consulte AURORASERVER.md. Sensores indisponíveis são identificados; consumo na tomada exige medidor externo.

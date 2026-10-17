@@ -99,3 +99,41 @@ O monitor usa rede do host e montagens de `/proc` e `/sys` somente para leitura,
 ## Atualização da versão portátil
 
 O banco portátil continua em `data/fitness.sqlite3`; o ambiente completo usa `data/fitness/fitness.sqlite3`. Faça uma cópia consistente e mova para o caminho correspondente com os serviços parados. Não execute os dois ambientes ao mesmo tempo apontando para o mesmo banco. Para continuar no portátil, mantenha `docker compose up -d --build`, sem adicionar o arquivo de servidor.
+
+## Energia e bateria — versão 3.0
+
+Bateria clicável, CPU/GPU, histórico e simulação de custos no dashboard. Tarifa, potências e horas de suspensão são editáveis e salvas somente no navegador. Valores financeiros são projeções de 30 dias.
+
+O container opcional `power` usa `compose.power.yaml`. Instalação no Debian:
+
+```sh
+cd /srv/auroralab
+sudo sh docker/server/power/prepare.sh
+sudo docker compose -f compose.server.yaml -f compose.power.yaml config --quiet
+sudo docker compose -f compose.server.yaml -f compose.power.yaml up -d --build power
+sudo docker compose -f compose.server.yaml up -d --no-deps --force-recreate monitor
+sudo docker compose -f compose.server.yaml exec web nginx -t
+sudo docker compose -f compose.server.yaml exec web nginx -s reload
+```
+
+Em outra máquina, ajuste `BACKLIGHT_PATH` em `.env` para o dispositivo em `/sys/class/backlight`. O padrão é `intel_backlight`. O modo portátil indica sensores indisponíveis quando não há esse serviço.
+
+`GET /api/power` oferece telemetria. `POST /api/power/settings` exige a chave aleatória de `secrets/power-admin.key`, acessível somente ao administrador. Informe a chave no pop-up; não use a senha Linux. A chave permanece somente na memória da aba, não em localStorage, URL ou código público. Acesse controles pela rede confiável ou VPN.
+
+O serviço escuta somente em `127.0.0.1:9110`; o monitor encaminha chamadas pelo Nginx. Executa sem capabilities, sem socket Docker e sem modo privileged. `/sys` e `/proc` são somente leitura; os diretórios CPU e brilho têm escrita. Só são aceitos perfis fixos de CPU e brilho de 5–100%, com retorno em falha. Outro gerenciador ativo bloqueia os perfis da CPU. Ajustes aplicados são persistidos em `data/power/settings.json` e reaplicados ao iniciar o container.
+
+Economia máxima: powersave, preferência power e turbo desativado. Equilibrado: powersave, balance_performance e turbo disponível. Desempenho: performance e turbo disponível. Rede, USB, Docker e drivers não são desligados.
+
+A bateria fornece descarga/carregamento; somente a descarga é usada como aproximação do notebook ligado. Na tomada, a carga da bateria não é apresentada como consumo total. O pacote CPU usa diferenças de contadores RAPL, incluindo volta do contador e exclusão de lacunas maiores que 30 segundos. O domínio gráfico integrado não é somado novamente ao pacote CPU. Energia acompanhada representa somente os intervalos observados no dia.
+
+A GeForce MX110 com nouveau nesta máquina não expõe watts nem uso por sysfs. São mostrados nome, driver e estado, com valores indisponíveis em vez de zero fictício. A Intel integrada mostra watts quando existe domínio gráfico RAPL. Histórico: até 1.440 amostras, uma por minuto; gráfico: últimas 90. O custo real na tomada exige wattímetro ou tomada medidora.
+
+Suspensão automática 00h–07h permanece desativada. Testar RTC com acesso físico e implementar bloqueios de impressão, backup e atualização antes de automatizar. Não aplicar auto-tune genérico, trocar driver NVIDIA ou desligar o Wi-Fi sem diagnóstico.
+
+Os backups incluem estado de energia e a chave privada; manter acesso restrito. Referências: [power_supply](https://www.kernel.org/doc/html/latest/power/power_supply_class.html), [powercap/RAPL](https://cdn.kernel.org/doc/html/latest/power/powercap/powercap.html).
+
+Testes Linux de conversões, perfis, retorno e autenticação:
+
+```sh
+python3 docker/server/power/test_power.py
+```
