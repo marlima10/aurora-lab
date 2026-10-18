@@ -149,3 +149,7 @@ Gerenciamento no Debian, porta 81; aplicações em Docker. Instalador e hashes e
 ## openGym (6.0.0)
 
 `compose.opengym.yaml`: interface e API em rede Docker própria; HTTPS privado 8081; estado JSON em `data/opengym/`, separado do Fitness. `site/opengym.html` abre o endereço HTTPS fornecido pelo monitor. Preparação em `docker/server/opengym/prepare.py`. Veja [OPENGYM.md](OPENGYM.md).
+
+## Cockpit com autenticação local (11.0.0)
+
+Cockpit/PAM no Debian autorizado; proxy HTTPS Docker preserva acesso 9090 e não depende de senha SSH. Backend restrito 9091. Preparação e Nginx em `docker/server/cockpit/`; configurações e certificados locais incluídos no backup. Veja [COCKPIT.md](COCKPIT.md).
