@@ -89,3 +89,25 @@ ip -br -4 addr
 Conexão recusada sugere ausência de escuta; timeout pode indicar rota ou filtro; uma resposta HTTP aponta para o serviço. Local funcionando e remoto falhando exige conferir bind, IP, firewall e políticas VPN. Para CasaOS, consulte também `sudo journalctl -u casaos-gateway -n 60 --no-pager`.
 
 No dispositivo de origem, confirme Tailscale conectado e use `tailscale ping IP-TAILSCALE`. Esse ping testa conectividade Tailscale, não garante permissão TCP/HTTP. O HTTPS privado requer domínio e rota Serve corretos; passkeys openGym dependem da origem configurada.
+
+
+## Preparação: secrets/samba-users.txt é um diretório
+
+O bind mount do Docker pode criar um diretório quando o arquivo de origem ainda não existe. A preparação atual repara somente diretórios vazios e recusa qualquer conteúdo. Na raiz do projeto, com a seleção Compose correta:
+
+```sh
+sudo docker compose stop samba
+sudo sh docker/server/prepare.sh
+sudo docker compose up -d --build --no-deps --force-recreate samba
+sudo docker compose logs --tail=30 samba
+```
+
+Se o caminho ainda estiver ocupado ou tiver conteúdo, confira `sudo ls -la secrets/samba-users.txt` e os contêineres que o montam; não use remoção recursiva. O mesmo cuidado vale para a chave OctoPrint e `.env`. Execute a preparação antes de iniciar os serviços na instalação nova.
+
+Teste de regressão em Linux como root, usando apenas diretórios temporários:
+
+```sh
+sudo python3 docker/server/test_prepare.py
+```
+
+Os testes criam fixtures próprias, incluindo pseudo terminal para a senha, e não alteram os dados da instalação.

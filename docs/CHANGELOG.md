@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## [14.0.0] - 2026-10-18
+
+- Preparação valida os caminhos de configuração e segredos, substitui apenas diretórios vazios por arquivos e preserva conteúdo existente.
+- Arquivo Samba vazio sem banco inicializado solicita senha em terminal interativo; erros de caminho são informados antes da solicitação.
+- Testes de regressão cobrem instalação nova, reexecução, diretórios incorretos, preservação e entrada de senha.
+
 ## [13.0.0] - 2026-10-18
 
 - Documentação centralizada em docs/, com README mantido na raiz e referências de backup atualizadas.
