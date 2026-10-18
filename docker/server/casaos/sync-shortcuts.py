@@ -39,6 +39,7 @@ known={
     'php':('PHP AuroraLAB',portainer,'php'),
     'homeassistant':('Home Assistant Aurora',portal+':8123/','homeassistant'),
     'opengym-web':('openGym',portal+'/opengym','opengym'),
+    'opengym-garmin':('Garmin - importar treinos',portal+'/garmin','opengym'),
     'opengym-api':('openGym - API',portainer,'api'),
     'backup':('Backup AuroraLAB',portainer,'backup'),
     'cockpit':('Cockpit',portal+':9090/','cockpit'),

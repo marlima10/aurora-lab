@@ -133,3 +133,7 @@ Gerenciamento no Debian, porta 81; aplicações em Docker. Instalador e hashes e
 ## Cockpit com autenticação local (11.0.0)
 
 Cockpit/PAM no Debian autorizado; proxy HTTPS Docker preserva acesso 9090 e não depende de senha SSH. Backend restrito 9091. Preparação e Nginx em `docker/server/cockpit/`; configurações e certificados locais incluídos no backup. Veja [COCKPIT.md](COCKPIT.md).
+
+## Importador Garmin (v12)
+
+`docker/server/garmin/` contém o serviço Python separado, a página privada e o conversor de resumos. `compose.opengym.yaml` mantém a rede interna openGym e encaminha `/garmin/` pelo mesmo HTTPS. `mapping.py` converte e mescla sem alterar os registros existentes; `server.py` autentica a sessão openGym, conecta Garmin e escreve com controle de revisão. Tokens, cópia anterior à importação e registro contra duplicatas ficam em `data/garmin/`, fora do Git e incluídos no backup. Uso e limites em `GARMIN.md`.

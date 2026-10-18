@@ -27,8 +27,33 @@ services:
       CF_CONNECTING_IP: ''
       BASE_PATH: ''
       MEDIA_UPLOAD_MAX: 48m
+    volumes:
+      - ./docker/server/garmin/opengym-nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
     networks: [opengym]
     depends_on: [opengym-api]
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
+  opengym-garmin:
+    build: ./docker/server/garmin
+    environment:
+      PUBLIC_ORIGIN: ${OPENGYM_ORIGIN:?configure OPENGYM_ORIGIN}
+      DATA_DIR: /data
+    volumes: ['./data/garmin:/data']
+    networks: [opengym]
+    read_only: true
+    user: '65534:65534'
+    tmpfs: ['/tmp:size=64m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 384m
+    pids_limit: 128
+    healthcheck:
+      test: ['CMD', 'python', '-c', "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)"]
+      interval: 30s
+      timeout: 8s
+      retries: 3
     restart: unless-stopped
     logging:
       driver: json-file
