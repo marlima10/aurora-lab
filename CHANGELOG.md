@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## [6.0.0] - 2026-10-17
+
+- openGym 1.4.1, interface e API em containers próprios e rede dedicada.
+- Passkeys pelo domínio HTTPS da VPN; atalhos em português, monitoramento e backup dos dados.
+- Fitness original preservado, sem migração automática nem envio de dados a IA.
+
 ## [5.0.0] - 2026-10-17
 
 - Home Assistant Container 2026.10.2, imagem fixada por digest, porta 8123.

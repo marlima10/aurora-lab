@@ -1,4 +1,4 @@
-# Aurora Lab 5.0
+# Aurora Lab 6.0
 
 Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 
@@ -178,3 +178,7 @@ Gerenciamento no host e aplicativos Docker separados. Consulte [CasaOS](CASAOS.m
 ## Home Assistant
 
 Container dedicado, porta 8123, dados próprios e HTTPS na VPN. Consulte [Home Assistant](HOMEASSISTANT.md).
+
+## openGym
+
+Interface e API em dois containers, HTTPS privado e dados separados do Fitness. Consulte [openGym](OPENGYM.md).

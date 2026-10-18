@@ -53,7 +53,7 @@ services:
     user: '65534:65534'
     read_only: true
     tmpfs: [/tmp]
-    environment: {SERVER_IP: '${SERVER_IP:-192.168.0.71}', TZ: America/Sao_Paulo}
+    environment: {SERVER_IP: '${SERVER_IP:-192.168.0.71}', TZ: America/Sao_Paulo, OPENGYM_ORIGIN: '${OPENGYM_ORIGIN:-}'}
     volumes:
       - ./docker/server/monitor.py:/app/monitor.py:ro
       - ./secrets/octoprint-api.key:/run/secrets/octoprint-api.key:ro
@@ -69,6 +69,8 @@ services:
     environment: {TZ: America/Sao_Paulo, BACKUP_INTERVAL: '86400'}
     volumes:
       - ./docker/server/backup.py:/app/backup.py:ro
+      - ./data/opengym:/source/opengym:ro
+      - ./compose.opengym.yaml:/source/config/compose.opengym.yaml:ro
       - ./data/homeassistant:/source/homeassistant
       - ./compose.homeassistant.yaml:/source/config/compose.homeassistant.yaml:ro
       - /etc/casaos:/source/casaos-config:ro
