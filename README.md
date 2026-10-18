@@ -1,4 +1,4 @@
-# Aurora Lab 9.0
+# Aurora Lab 10.0
 
 Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 
@@ -186,3 +186,5 @@ Interface e API em dois containers, HTTPS privado e dados separados do Fitness. 
 Na versão 7.0, os atalhos Fitness, planos e exercícios foram retirados da navegação. openGym é o atalho de treinos do portal. Os arquivos legados e registros são preservados para recuperação; não há migração automática.
 
 Na versão 8.0, o botão openGym abre diretamente seu endereço HTTPS; a tela intermediária foi removida.
+
+Ícones separados dos serviços no CasaOS podem ser sincronizados sem duplicar containers, conforme [CASAOS.md](CASAOS.md).
