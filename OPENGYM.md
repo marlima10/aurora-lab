@@ -4,7 +4,7 @@ O repositório indicado, https://github.com/arvids-unavailable/openGym, aponta p
 
 ## Serviços
 
-`compose.opengym.yaml` separa `opengym-api` (Node, sem porta publicada) e `opengym-web` (Nginx e interface), numa rede própria. O HTTP 8081 fica no loopback; Tailscale Serve publica HTTPS privado 8081. Os atalhos Aurora levam a `/opengym.html`, que apresenta o endereço seguro configurado no servidor, inclusive quando o portal foi aberto pelo IP LAN.
+`compose.opengym.yaml` separa `opengym-api` (Node, sem porta publicada) e `opengym-web` (Nginx e interface), numa rede própria. O HTTP 8081 fica no loopback; Tailscale Serve publica HTTPS privado 8081. Os atalhos Aurora levam a `/opengym`, que redireciona imediatamente ao endereço HTTPS configurado no servidor, inclusive quando o portal é aberto pelo IP LAN. O endereço antigo `/opengym.html` também redireciona, sem tela intermediária.
 
 ```sh
 cd /srv/auroralab

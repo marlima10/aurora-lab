@@ -1,4 +1,4 @@
-# Aurora Lab 7.0
+# Aurora Lab 8.0
 
 Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 
@@ -184,3 +184,5 @@ Container dedicado, porta 8123, dados próprios e HTTPS na VPN. Consulte [Home A
 Interface e API em dois containers, HTTPS privado e dados separados do Fitness. Consulte [openGym](OPENGYM.md).
 
 Na versão 7.0, os atalhos Fitness, planos e exercícios foram retirados da navegação. openGym é o atalho de treinos do portal. Os arquivos legados e registros são preservados para recuperação; não há migração automática.
+
+Na versão 8.0, o botão openGym abre diretamente seu endereço HTTPS; a tela intermediária foi removida.
