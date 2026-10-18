@@ -56,7 +56,7 @@ def backup():
         partial.replace(target)
         digest=hashlib.file_digest(target.open('rb'),'sha256').hexdigest()
         target.with_suffix(target.suffix+'.sha256').write_text(digest+'  '+name+'\n')
-        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, CasaOS e codigo/configuracoes; copia local no mesmo SSD'})
+        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, CasaOS, Home Assistant e codigo/configuracoes; copia local no mesmo SSD'})
     print('Backup verificado:',name,flush=True)
 
 while True:

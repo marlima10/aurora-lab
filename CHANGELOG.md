@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## [5.0.0] - 2026-10-17
+
+- Home Assistant Container 2026.10.2, imagem fixada por digest, porta 8123.
+- Dados persistentes e backup consistente do SQLite, atalhos e monitoramento.
+- Proxy HTTPS privado confiável somente pelo loopback.
+
 ## [4.0.0] - 2026-10-17
 
 - CasaOS 0.4.15 na porta 81, com componentes oficiais fixados por SHA-256.
