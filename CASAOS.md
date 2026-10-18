@@ -29,3 +29,9 @@ Home Assistant e openGym são geridos pelo Compose AuroraLAB, com volumes própr
 Pare e desabilite os sete serviços CasaOS/rclone; desligue a rota Tailscale da porta 81. Preserve `/etc/casaos`, `/var/lib/casaos` e `/DATA` para recuperação. O manifesto de arquivos CasaOS está em `/var/lib/casaos/aurora-install-manifest.json`; revise-o antes de remover arquivos. O instalador salva as configurações anteriores em `deploy-state/casaos-stage/host-before-*.tar.gz`. Mantenha Samba do host mascarado enquanto o container ocupa 445. Não use o desinstalador genérico para apagar Docker ou dados dos outros serviços.
 
 Fontes: https://github.com/IceWhaleTech/CasaOS e https://rclone.org/rc/.
+
+## Ícone AuroraLAB
+
+O bloco `x-casaos` em `compose.server.yaml` identifica `web` como serviço principal e define HTTP, porta 80 e `/` como destino. O hostname é o mesmo usado para abrir CasaOS. O ícone representa o stack existente, sem duplicar containers. Pela VPN também é possível abrir o portal pelo endereço HTTPS principal do servidor. Não exclua o aplicativo AuroraLAB pelo CasaOS para remover só seu ícone: isso pode remover o stack completo.
+
+Compatibilidade com CasaOS AppManagement 0.4.10-alpha2: o carregador dessa versão escolhe o Compose padrão do diretório e pode ignorar a lista de overlays do stack. Por isso `compose.yaml` também define os metadados, com porta 8088, atendida tanto no modo portátil como no AuroraServer. Essa mudança afeta o ícone; não aplique a configuração portátil ao ambiente completo pelo CasaOS. Gerencie atualizações do stack pelo fluxo AuroraLAB/Compose.
