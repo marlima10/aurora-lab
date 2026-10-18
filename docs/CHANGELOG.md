@@ -1,5 +1,20 @@
 # Histórico de versões
 
+## [13.0.0] - 2026-10-18
+
+- Documentação centralizada em docs/, com README mantido na raiz e referências de backup atualizadas.
+- Guias revisados contra a base funcional da versão 12, distinguindo modos portátil/servidor, módulos opcionais e contas independentes.
+- Instalação passo a passo, seleção Compose persistente, diagnóstico, migração VPN e reinstalação destrutiva com escopo explícito.
+- Limitações de preparadores com nome fixo do contêiner Tailscale e recuperação de instalação parcial do CasaOS documentadas.
+
+## [12.0.0] - 2026-10-18
+
+- Importação Garmin → openGym em serviço separado, integrado pelo proxy e origem privada HTTPS.
+- Prévia de atividades, seleção e proteção persistente contra duplicatas.
+- Resumos de data, duração e distância; sem inferir séries, cargas, músculos ou trajetos.
+- Volume Garmin privado e incluído no escopo do backup do servidor.
+- Validação sintética separada de login e importação reais do titular.
+
 ## [11.0.0] - 2026-10-18
 
 - Cockpit autentica pelo PAM do Debian, sem exigir senha no SSH.

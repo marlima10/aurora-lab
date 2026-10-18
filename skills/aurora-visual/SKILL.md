@@ -5,7 +5,7 @@ description: Criar e alterar interfaces do Aurora Lab preservando seus component
 
 # Padrão visual do Aurora Lab
 
-Leia ESTRUTURA.md na raiz para localizar os arquivos. Antes de alterar uma tela, examine a página e os estilos que ela carrega; estas orientações registram o visual existente, sem exigir um redesenho.
+Leia docs/ESTRUTURA.md a partir da raiz do projeto para localizar os arquivos. Antes de alterar uma tela, examine a página e os estilos que ela carrega; estas orientações registram o visual existente, sem exigir um redesenho.
 
 ## Fontes do padrão
 

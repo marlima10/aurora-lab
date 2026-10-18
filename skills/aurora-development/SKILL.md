@@ -5,7 +5,7 @@ description: Desenvolver e refatorar o Aurora Lab em PHP, SQLite e JavaScript co
 
 # Padrão de desenvolvimento do Aurora Lab
 
-Leia ESTRUTURA.md na raiz para a árvore, contrato HTTP e comandos. Em trabalho de interface, leia também skills/aurora-visual/SKILL.md. Estas skills ficam versionadas no projeto; não pressupõem instalação global.
+Leia docs/ESTRUTURA.md a partir da raiz do projeto para a árvore, contrato HTTP e comandos. Em trabalho de interface, leia também skills/aurora-visual/SKILL.md. Estas skills ficam versionadas no projeto; não pressupõem instalação global.
 
 ## Organização
 
@@ -30,8 +30,8 @@ Leia ESTRUTURA.md na raiz para a árvore, contrato HTTP e comandos. Em trabalho 
 
 Lance ValidationException para entrada inválida e ConflictException para conflitos de estado. Application centraliza as respostas; registre falhas inesperadas no log sem enviar stack trace ou SQL ao cliente. Services e Repositories não devem usar echo, exit, headers ou superglobais HTTP.
 
-Para mudanças no backend, rode verificação de sintaxe PHP e `php tests/run.php`, ou o comando equivalente no Docker descrito em ESTRUTURA.md. Cubra resultados observáveis: revisões, rollback, merge, planos, catálogo e migração de bases existentes. Acrescente testes quando a mudança trouxer nova regra ou risco de regressão; evite testes que apenas espelhem o código.
+Para mudanças no backend, rode verificação de sintaxe PHP e `php tests/run.php`, ou o comando equivalente no Docker descrito em docs/ESTRUTURA.md. Cubra resultados observáveis: revisões, rollback, merge, planos, catálogo e migração de bases existentes. Acrescente testes quando a mudança trouxer nova regra ou risco de regressão; evite testes que apenas espelhem o código.
 
 Valide Compose ao alterar volumes, build ou FastCGI. Rebuild é necessário para alterações em backend/, pois o código está na imagem. Scripts shell devem manter LF; .gitattributes registra essa regra.
 
-Atualize ESTRUTURA.md quando responsabilidades, caminhos ou execução mudarem. Registro de padrões não autoriza publicar, fazer push ou alterar dados externos sem relação com a solicitação em andamento.
+Atualize docs/ESTRUTURA.md quando responsabilidades, caminhos ou execução mudarem. Registro de padrões não autoriza publicar, fazer push ou alterar dados externos sem relação com a solicitação em andamento.

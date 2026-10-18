@@ -1,192 +1,111 @@
-# Aurora Lab 11.0
+# AuroraLAB 13.0.0
 
-Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
+Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
-Portal pessoal que reúne um dashboard de Home Lab e ferramentas para acompanhar treinos e evolução de peso. A interface usa HTML, CSS e JavaScript; a API Fitness usa PHP e SQLite, com execução pelo Docker Compose.
+Este README acompanha a versão registrada em [`VERSION`](VERSION). Os guias operacionais ficam em [`docs/`](docs/); os padrões de trabalho, em [`skills/`](skills/).
 
-## Funcionalidades
+## Escolha o ambiente
 
-### Fitness
+| Ambiente | Configuração | Conteúdo |
+| --- | --- | --- |
+| Portátil | `compose.yaml` | Nginx, interface e API Fitness PHP/SQLite; sem os serviços do servidor |
+| Servidor Linux | `compose.server.yaml` | Portal, Fitness, OctoPrint, Samba, monitoramento e backup; Tailscale e proxy Cockpit dependem de preparação |
+| Módulos adicionais | Arquivos `compose.*.yaml` | Home Assistant, openGym/Garmin, energia e dispositivo da impressora |
 
-- Perfis para organizar registros por pessoa.
-- Registros de peso e treino, gráficos de evolução e relatórios.
-- Planos de treino A/B/C/D e agenda semanal.
-- Catálogo de exercícios de força e cardio, com links de vídeos do YouTube.
-- Treino guiado com acompanhamento de séries, tempo e descanso.
-- Exportação de relatórios e recursos de importação e mesclagem de registros.
-- Controle de revisão para detectar alterações feitas em outro aparelho.
+Os dois ambientes usam a porta 8088. Escolha um por instalação. O servidor completo usa recursos do Linux amd64 e scripts destinados ao Debian; o portátil pode rodar no Docker Desktop com contêineres Linux.
 
-### Portal Home Lab
+## Execução portátil
 
-O dashboard reúne atalhos e painéis para impressora 3D, câmera, recursos do sistema, rede, armazenamento e backups.
-
-**Dois modos de execução:** o pacote portátil (`compose.yaml`) oferece portal e Fitness. O ambiente completo Linux (`compose.server.yaml`) acrescenta OctoPrint, câmera USB opcional, Samba, monitoramento, backups, Tailscale e Cockpit em contêineres separados. Consulte [instalação AuroraServer](AURORASERVER.md).
-
-## Tecnologias e arquitetura
-
-| Área | Implementação |
-| --- | --- |
-| Frontend | HTML, CSS e JavaScript, sem etapa de build |
-| Interface | Layout responsivo, temas e recursos de PWA |
-| API | PHP 8.2, respostas JSON e endpoint `/fitness-api` |
-| Persistência | SQLite por PDO, migrations e seed inicial |
-| Organização | Controllers, Requests, Services e Repositories |
-| Autoload | Composer com PSR-4, namespace `Aurora` |
-| Execução | Nginx e PHP-FPM em contêineres Docker |
-
-Controllers recebem as requisições, Requests validam os dados, Services aplicam as regras e Repositories executam o SQL. A interface fica no frontend; não são usados templates PHP de Views.
-
-## Requisitos
-
-- Docker Desktop no Windows/macOS, ou Docker Engine com o plugin Compose no Linux.
-- Docker iniciado e configurado para executar contêineres Linux.
-- Internet no primeiro build para baixar as imagens e preparar o ambiente PHP.
-- Porta `8088` disponível no computador.
-
-PHP, Composer, Nginx e SQLite são preparados na imagem. Não é necessário instalá-los separadamente para executar pelo Docker.
-
-## Início rápido
-
-Baixe o código pelo GitHub ou clone o repositório, se tiver Git instalado:
+Com Git e Docker/Compose disponíveis:
 
 ```sh
 git clone https://github.com/marlima10/aurora-lab.git
 cd aurora-lab
-git checkout rafael
+docker compose -f compose.yaml up -d --build
+docker compose -f compose.yaml ps
 ```
 
-Se o projeto já estiver no computador, abra o terminal na pasta que contém `compose.yaml`. Em seguida:
+Abra [o portal](http://localhost:8088/). PHP e Composer são preparados na imagem. Esse modo não instala openGym, CasaOS ou monitoramento de hardware. Os antigos registros Fitness ficam em `data/fitness.sqlite3`; páginas legadas podem ser abertas diretamente em `/fitness.html`, `/fitness-planos.html` e `/fitness-exercicios.html`, embora tenham saído da navegação principal.
 
-```sh
-docker compose up -d --build
-docker compose ps
-```
+Para o servidor Debian, siga a [instalação completa](docs/AURORASERVER.md), inclusive a escolha entre Tailscale no host e no contêiner. Não use o comando do portátil para atualizar uma instalação completa.
 
-Acesse:
+## Serviços e recursos
 
-- [Dashboard](http://localhost:8088/)
-- [Treinos e peso](http://localhost:8088/fitness.html)
-- [Planos de treino](http://localhost:8088/fitness-planos.html)
-- [Catálogo de exercícios](http://localhost:8088/fitness-exercicios.html)
+- Portal responsivo, temas, atalhos e cache PWA.
+- OctoPrint para impressora 3D, catálogo de plugins fixados e câmera USB opcional.
+- Métricas do host, rede, armazenamento e status de backup.
+- Samba autenticado para arquivos de impressão.
+- CasaOS instalado no Debian, com atalhos para serviços existentes.
+- Cockpit com autenticação local Debian e proxy HTTPS, sem habilitar senha no SSH.
+- Home Assistant Container e openGym em serviços separados.
+- Garmin → openGym com prévia, seleção e proteção contra duplicatas.
+- Módulo opcional de energia; disponibilidade depende dos sensores e dispositivos do host.
 
-Na inicialização, o serviço PHP aplica as migrations pendentes e prepara o catálogo inicial de exercícios. Uma instalação obtida do GitHub começa sem os registros pessoais; eles são criados conforme o uso.
+Cada módulo exige sua preparação. Portainer é apenas um destino de alguns atalhos CasaOS; não é instalado pelos arquivos Compose deste repositório.
 
-## Comandos úteis
-
-| Ação | Comando |
-| --- | --- |
-| Ver o estado dos serviços | `docker compose ps` |
-| Ver os logs do PHP | `docker compose logs --tail=100 php` |
-| Ver os logs do Nginx | `docker compose logs --tail=100 web` |
-| Parar os serviços | `docker compose stop` |
-| Iniciar os serviços existentes | `docker compose start` |
-| Recriar os serviços após alterações | `docker compose up -d --build` |
-| Remover os contêineres e a rede do projeto | `docker compose down` |
-| Validar a configuração Compose | `docker compose config --quiet` |
-
-O frontend é montado diretamente de `site/`. Alterações no backend e no Dockerfile exigem um novo build. Ao alterar arquivos públicos usados pela PWA, mantenha as versões e o cache do service worker coerentes, conforme o padrão visual.
-
-## Estrutura do projeto
+## Arquitetura e dados
 
 ```text
 aurora-lab/
-├── backend/
-│   ├── public/           # Entrada HTTP da API
-│   ├── config/           # Configuração do banco
-│   ├── routes/           # Mapeamento das ações da API
-│   ├── src/
-│   │   ├── Http/         # Controllers, Requests e respostas JSON
-│   │   ├── Services/     # Regras de negócio e sincronização
-│   │   ├── Repositories/ # Acesso ao SQLite
-│   │   ├── Database/     # Conexão, transações e migrations
-│   │   └── Exceptions/   # Validação e conflitos
-│   ├── database/         # Migrations e seeds
-│   ├── bin/              # Comandos de manutenção
-│   ├── tests/            # Testes de integração
-│   ├── bootstrap.php     # Composição das dependências
-│   └── composer.json
-├── site/                 # Interface, estilos, scripts e PWA
-├── docker/               # Nginx, imagem PHP e inicialização
-├── data/                 # Banco local; não versionado
-├── skills/               # Padrões visuais e de desenvolvimento
+├── backend/       # API Fitness: Controllers, Requests, Services e Repositories
+├── site/          # HTML, CSS, JavaScript, ícones e PWA
+├── docker/        # Imagens, proxies e preparação dos serviços
+├── docs/          # Instalação, operação, arquitetura e histórico
+├── skills/        # Padrões visuais e de desenvolvimento
+├── data/          # Dados locais; fora do Git
+├── secrets/       # Credenciais locais; fora do Git
+├── backups/       # Cópias locais; fora do Git
+├── deploy-state/  # Registros e materiais locais de implantação; fora do Git
 ├── compose.yaml
-└── ESTRUTURA.md
+├── compose.server.yaml
+├── VERSION
+└── README.md
 ```
 
-Somente `site/` é servido como conteúdo estático. O Nginx encaminha `/fitness-api` para o ponto de entrada do backend, cujo código permanece fora da raiz pública.
+Dados e segredos não acompanham o clone. O servidor usa `data/fitness/fitness.sqlite3`; o portátil usa `data/fitness.sqlite3`. openGym usa arquivos próprios em `data/opengym/`. Preserve esses caminhos e os domínios usados pelas passkeys ao mover uma instalação.
 
-## Dados locais e backup
+## Operação e testes
 
-Os registros ficam em `data/fitness.sqlite3`, montado no contêiner como `/var/lib/fitness/fitness.sqlite3`. O caminho interno pode ser configurado pela variável de ambiente `FITNESS_DB_PATH` do serviço PHP.
-
-A pasta `data/`, os bancos e os backups pessoais ficam fora do Git e do contexto de build. Eles não são enviados ao GitHub. O cache da PWA não substitui um backup do banco.
-
-Para fazer uma cópia consistente, pare os serviços com `docker compose stop`, copie a pasta `data/` inteira para um local seguro e reinicie com `docker compose start`. Antes de atualizar o projeto ou mover a instalação, preserve essa pasta. Para restaurar uma cópia, mantenha os serviços parados durante a substituição de `data/`.
-
-As migrations são registradas em `schema_migrations` e executadas na inicialização do serviço PHP. O seed inicial roda uma vez; exercícios excluídos não são recriados em cada acesso à API. O banco local não sincroniza automaticamente com o servidor RK.
-
-## Testes
-
-Após construir a imagem PHP, execute na raiz:
+No portátil, mantenha `-f compose.yaml` nos comandos. No servidor, registre a combinação de arquivos em `COMPOSE_FILE`, conforme o [guia do servidor](docs/AURORASERVER.md), e use essa mesma combinação em todas as operações.
 
 ```sh
-docker compose run --rm --no-deps --entrypoint php php tests/run.php
+docker compose -f compose.yaml logs --tail=100
+docker compose -f compose.yaml stop
+docker compose -f compose.yaml start
+docker compose -f compose.yaml run --rm --no-deps --entrypoint php php tests/run.php
 ```
 
-A suíte usa bancos SQLite temporários próprios e cobre gravação, importação, merge, conflitos de revisão, planos, catálogo, rollback e migração de uma base legada. O banco pessoal não é usado pelos testes.
-
-Para desenvolvimento sem Docker, com PHP 8.2+, PDO SQLite e Composer disponíveis:
+A suíte PHP cria bancos temporários. Testes do importador Garmin usam dados sintéticos:
 
 ```sh
-cd backend
-composer dump-autoload --optimize
-php tests/run.php
+python3 -m unittest discover -s docker/server/garmin -p 'test_*.py' -v
 ```
 
-## Acesso pela rede local
+Alterações no backend exigem rebuild. Antes de atualizar serviços com dados, siga o procedimento de [backup e atualização](docs/ATUALIZACAO.md). A publicação de uma release não atualiza automaticamente o servidor.
 
-Outro aparelho pode acessar `http://IP-DO-COMPUTADOR:8088`, desde que esteja na mesma rede e o firewall permita a conexão. O computador precisa permanecer ligado, com o Docker e os serviços em execução.
+## Acesso
 
-A versão atual não possui login. Use em uma rede confiável; a publicação na internet exige definir autenticação e proteção de acesso.
+Na LAN, use o IP local do servidor e a porta correspondente. IPs `100.x` e domínios privados Tailscale exigem o cliente conectado à tailnet e permissão para o serviço. A publicação de HTTPS privado via Serve é uma configuração separada.
 
-## Documentação e padrões
+Portal e Fitness não têm login; CasaOS, Cockpit, Home Assistant e openGym possuem autenticação própria. Não publique o portal/Fitness na internet sem definir controle de acesso. Veja [rede, portas e Tailscale](docs/REDE-E-TAILSCALE.md).
 
-- [Estrutura e arquitetura detalhada](ESTRUTURA.md): responsabilidades, contrato da API, persistência e migrations.
-- [Padrão visual](skills/aurora-visual/SKILL.md): identidade, componentes, temas, acessibilidade e cache.
-- [Padrão de desenvolvimento](skills/aurora-development/SKILL.md): camadas, convenções, compatibilidade e validação.
-- [Pacote Docker portátil](LEIA-ME-DOCKER-PORTATIL.md): transferência da instalação e limites das integrações.
+## Documentação
 
-As skills são documentos versionados neste repositório para orientar a evolução do projeto; não dependem de instalação global no Codex.
+| Guia | Conteúdo |
+| --- | --- |
+| [AuroraServer](docs/AURORASERVER.md) | Instalação Linux, configuração, serviços e persistência |
+| [Reinstalação do zero](docs/REINSTALACAO.md) | Exclusão deliberada dos dados e troca da VPN do host pelo contêiner |
+| [Atualização](docs/ATUALIZACAO.md) | Git, backup, implantação, retorno, PR e release |
+| [Estrutura](docs/ESTRUTURA.md) | Arquitetura, API, módulos e caminhos |
+| [Rede e Tailscale](docs/REDE-E-TAILSCALE.md) | LAN, VPN, portas, firewall e conflito de instâncias |
+| [Solução de problemas](docs/SOLUCAO-DE-PROBLEMAS.md) | Erros de Git, Docker, preparação e acesso |
+| [CasaOS](docs/CASAOS.md) | Instalação nova, diagnóstico e atalhos |
+| [Cockpit](docs/COCKPIT.md) | Preparação do backend Debian e proxy HTTPS |
+| [Home Assistant](docs/HOMEASSISTANT.md) | Configuração, acesso e recuperação |
+| [openGym](docs/OPENGYM.md) | Passkeys, preparação, HTTPS e dados |
+| [Garmin](docs/GARMIN.md) | Instalação, importação e limites |
+| [OctoPrint/Python](docs/UPGRADE-PYTHON-OCTOPRINT.md) | Build, plugins e retorno de imagem |
+| [Docker portátil](docs/LEIA-ME-DOCKER-PORTATIL.md) | Ambiente reduzido para outro computador |
+| [Histórico](docs/CHANGELOG.md) | Alterações por versão |
 
-## Implantacao AuroraServer
-
-O ambiente completo separado por servico usa compose.server.yaml; consulte AURORASERVER.md para volumes, restauracao, VPN, plugins e dispositivos USB. O compose.yaml continua disponivel para o pacote portatil original.
-
-
-## Versão 2.0.0
-
-Consulte o [histórico de alterações](CHANGELOG.md) e a [instalação completa no Linux](AURORASERVER.md). A identidade visual e o contrato da API Fitness foram preservados. Dados, senhas e backups são mantidos fora do repositório.
-
-## Energia e autonomia
-
-A versão 3.0 acrescenta bateria clicável, histórico de potência, GPUs, simulador de custo com tarifa configurável e pop-up de economia. Controles autenticados em serviço Docker opcional; consulte AURORASERVER.md. Sensores indisponíveis são identificados; consumo na tomada exige medidor externo.
-
-## CasaOS
-
-Gerenciamento no host e aplicativos Docker separados. Consulte [CasaOS](CASAOS.md).
-
-## Home Assistant
-
-Container dedicado, porta 8123, dados próprios e HTTPS na VPN. Consulte [Home Assistant](HOMEASSISTANT.md).
-
-## openGym
-
-Interface e API em dois containers, HTTPS privado e dados separados do Fitness. Consulte [openGym](OPENGYM.md).
-
-Na versão 7.0, os atalhos Fitness, planos e exercícios foram retirados da navegação. openGym é o atalho de treinos do portal. Os arquivos legados e registros são preservados para recuperação; não há migração automática.
-
-Na versão 8.0, o botão openGym abre diretamente seu endereço HTTPS; a tela intermediária foi removida.
-
-Ícones separados dos serviços no CasaOS podem ser sincronizados sem duplicar containers, conforme [CASAOS.md](CASAOS.md).
-
-Cockpit com autenticação local Debian e proxy HTTPS Docker, compatível com SSH somente por chave. Consulte [COCKPIT.md](COCKPIT.md).
+Padrões: [desenvolvimento](skills/aurora-development/SKILL.md) e [visual](skills/aurora-visual/SKILL.md). As skills ficam versionadas no projeto; não pressupõem instalação global.

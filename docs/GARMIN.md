@@ -14,12 +14,12 @@ IDs Garmin estáveis evitam duplicatas. Um registro persistente também impede r
 
 ## Instalação
 
-Defina `OPENGYM_ORIGIN` no `.env` com o endereço HTTPS privado do openGym. Prepare o volume antes de iniciar:
+Conclua primeiro a preparação de [openGym](OPENGYM.md). Ela define OPENGYM_ORIGIN no `.env` e o arquivo local secrets/opengym.env. Selecione compose.opengym.yaml em COMPOSE_FILE, mantendo os overlays ativos. Prepare o volume antes de iniciar:
 
 ```sh
-install -d -m 700 -o 65534 -g 65534 data/garmin
-docker compose -f compose.server.yaml -f compose.power.yaml -f compose.homeassistant.yaml -f compose.opengym.yaml config --quiet
-docker compose -f compose.server.yaml -f compose.power.yaml -f compose.homeassistant.yaml -f compose.opengym.yaml up -d --build --no-deps opengym-garmin opengym-web
+sudo install -d -m 700 -o 65534 -g 65534 data/garmin
+sudo docker compose config --quiet
+sudo docker compose up -d --build opengym-api opengym-garmin opengym-web
 ```
 
 O template Nginx parte do openGym v1.4.1 e acrescenta `/garmin/`; revisar junto de futuras atualizações upstream. Não publica porta adicional. Container sem root, sistema de arquivos somente leitura e nenhuma capability. A página usa sessão openGym, sem nova chave administrativa; cada perfil possui diretório próprio identificado por hash. POST exige Origin HTTPS configurado para evitar solicitações de outros sites. A API interna não recebe credenciais Garmin.
@@ -29,7 +29,9 @@ A senha e código de verificação não são gravados nem registrados em logs; s
 ## Validação
 
 ```sh
-python -m unittest discover -s docker/server/garmin -p 'test_*.py' -v
+python3 -m unittest discover -s docker/server/garmin -p 'test_*.py' -v
 ```
 
 Testes usam dados sintéticos e API simulada. Login real e primeira importação dependem do titular da conta e devem ser confirmados separadamente. Nenhum dado pessoal é necessário para testar o código.
+
+Para validar o contêiner iniciado, use `sudo docker compose ps opengym-garmin` e `sudo docker compose logs --tail=80 opengym-garmin`. O healthcheck interno testa `/health`; acesso à conta Garmin é uma validação distinta. Confira os imports de test_garmin.py e use um ambiente Python de teste com as dependências necessárias se faltar um módulo; não instale pacotes de teste no Python do sistema indiscriminadamente.
