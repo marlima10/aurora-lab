@@ -189,7 +189,7 @@ class Handler(BaseHTTPRequestHandler):
         self.power_proxy()
 
     def do_GET(self):
-        if self.path.split('?',1)[0] == '/opengym':
+        if self.path.split('?',1)[0] in ('/opengym','/garmin'):
             origin=os.environ.get('OPENGYM_ORIGIN','')
             try:
                 url=urlparse(origin)
@@ -199,7 +199,7 @@ class Handler(BaseHTTPRequestHandler):
             if not valid:
                 self.send_error(503,'Endereco openGym nao configurado');return
             self.send_response(302)
-            self.send_header('Location',origin)
+            self.send_header('Location',origin.rstrip('/')+('/garmin/' if self.path.split('?',1)[0]=='/garmin' else ''))
             self.send_header('Cache-Control','no-store')
             self.send_header('Content-Length','0')
             self.end_headers();return

@@ -1,0 +1,7 @@
+*
+!Dockerfile
+!requirements.txt
+!mapping.py
+!server.py
+!static/
+!static/**
