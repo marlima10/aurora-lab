@@ -1,4 +1,4 @@
-# Aurora Lab 4.0
+# Aurora Lab 5.0
 
 Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 
@@ -174,3 +174,7 @@ A versão 3.0 acrescenta bateria clicável, histórico de potência, GPUs, simul
 ## CasaOS
 
 Gerenciamento no host e aplicativos Docker separados. Consulte [CasaOS](CASAOS.md).
+
+## Home Assistant
+
+Container dedicado, porta 8123, dados próprios e HTTPS na VPN. Consulte [Home Assistant](HOMEASSISTANT.md).

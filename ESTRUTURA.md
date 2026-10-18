@@ -117,3 +117,7 @@ site/power.css e site/power.js ampliam o dashboard sem alterar o contrato Fitnes
 ## CasaOS (4.0.0)
 
 Gerenciamento no Debian, porta 81; aplicações em Docker. Instalador e hashes em `docker/server/casaos/`. Configuração `/etc/casaos` e estado `/var/lib/casaos` incluídos no backup. Veja [CASAOS.md](CASAOS.md).
+
+## Home Assistant (5.0.0)
+
+`compose.homeassistant.yaml`: serviço dedicado, rede host, porta 8123, estado em `data/homeassistant/` e backup SQLite consistente. Preparação inicial preserva configuração existente. Veja [HOMEASSISTANT.md](HOMEASSISTANT.md).

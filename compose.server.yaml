@@ -69,6 +69,8 @@ services:
     environment: {TZ: America/Sao_Paulo, BACKUP_INTERVAL: '86400'}
     volumes:
       - ./docker/server/backup.py:/app/backup.py:ro
+      - ./data/homeassistant:/source/homeassistant
+      - ./compose.homeassistant.yaml:/source/config/compose.homeassistant.yaml:ro
       - /etc/casaos:/source/casaos-config:ro
       - /var/lib/casaos:/source/casaos-state
       - ./data/fitness:/source/fitness
