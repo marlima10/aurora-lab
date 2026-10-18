@@ -1,4 +1,4 @@
-# Aurora Lab 8.0
+# Aurora Lab 9.0
 
 Desenvolvimento do ambiente AuroraServer na branch `rafael` do repositório oficial, preservando o portal e a API Fitness originais. [Alterações da versão 2.0](CHANGELOG.md).
 

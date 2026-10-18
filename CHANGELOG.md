@@ -1,5 +1,10 @@
 # Histórico de versões
 
+## [9.0.0] - 2026-10-18
+
+- Ícone AuroraLAB no CasaOS configurado com serviço web, portas 80/8088 e página inicial.
+- Nome e ícone próprios do portal, sem criar outro stack ou reiniciar aplicativos.
+
 ## [8.0.0] - 2026-10-18
 
 - Removida a tela intermediária openGym; o botão abre diretamente o serviço.

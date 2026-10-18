@@ -116,3 +116,13 @@ services:
     environment: {COCKPIT_SSH_HOST: '${SERVER_IP:-192.168.0.71}'}
     restart: unless-stopped
     logging: *logging
+# Metadata for the existing stack icon; this does not create another application.
+x-casaos:
+  main: web
+  scheme: http
+  port_map: '80'
+  index: /
+  icon: https://raw.githubusercontent.com/marlima10/aurora-lab/main/site/favicon.svg
+  title:
+    en_US: AuroraLAB
+    pt_BR: AuroraLAB
