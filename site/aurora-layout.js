@@ -18,9 +18,6 @@
     ['services', '✣', 'Serviços', '/#services-card'],
     ['storage', '▤', 'Armazenamento', '/#storage-card'],
     ['history', '◴', 'Histórico', '/history.html'],
-    ['fitness', '🏃', 'Treinos e peso', '/fitness.html'],
-    ['plans', '▦', 'Planos de treino', '/fitness-planos.html'],
-    ['exercises', '＋', 'Exercícios', '/fitness-exercicios.html'],
     ['backup', '☁', 'Backup', '/#backup-card'],
     ['diagnostics', '✥', 'Diagnóstico', '/diagnostics.html'],
     ['casaos', '◆', 'CasaOS', `${location.protocol}//${location.hostname}:81/`],
@@ -31,9 +28,9 @@
   function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch (_) { return fallback; } }
   function save(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) { /* Preferências opcionais. */ } }
   function getPrimary() {
-    const chosen = read(shortcutsKey, ['dashboard', 'fitness', 'plans']);
+    const chosen = read(shortcutsKey, ['dashboard', 'opengym', 'services']);
     const valid = Array.isArray(chosen) ? [...new Set(chosen)].filter(id => coreItems.some(item => item.id === id)) : [];
-    return valid.length === 3 ? valid : ['dashboard', 'fitness', 'plans'];
+    return valid.length === 3 ? valid : ['dashboard', 'opengym', 'services'];
   }
   function currentId() {
     const path = location.pathname.replace(/\/$/, '') || '/';
