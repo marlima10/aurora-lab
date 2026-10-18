@@ -1,6 +1,6 @@
 # AuroraServer — instalação e operação no Linux
 
-Guia do ambiente completo da versão 13.0.0. Para apagar uma instalação anterior e todos os seus dados antes de começar, siga primeiro [REINSTALACAO.md](REINSTALACAO.md). Os comandos partem da raiz do repositório. O caminho `~/srv/docker/aurora-lab` é um exemplo; use a pasta real do seu clone. A documentação não comprova que um serviço esteja instalado ou saudável em outra máquina.
+Guia do ambiente completo da versão 14.0.0. Para apagar uma instalação anterior e todos os seus dados antes de começar, siga primeiro [REINSTALACAO.md](REINSTALACAO.md). Os comandos partem da raiz do repositório. O caminho `~/srv/docker/aurora-lab` é um exemplo; use a pasta real do seu clone. A documentação não comprova que um serviço esteja instalado ou saudável em outra máquina.
 
 ## Requisitos e escolha de configuração
 
@@ -26,6 +26,10 @@ sudo sh docker/server/prepare.sh
 O clone usa a branch padrão do repositório. Para desenvolvimento, escolha sua branch explicitamente; a cópia em trabalho nesta revisão usa `marcelo`. Não use `sudo git clone` para contornar uma pasta sem permissão: clone numa pasta do seu usuário.
 
 `prepare.sh` cria os diretórios base, copia `.env.example` apenas quando `.env` não existe e solicita a senha Samba sem eco. Ele preserva dados existentes e não redefine a senha de uma base Samba já inicializada. O usuário Samba continua sendo **rafael**, definido em `entrypoint.sh` e `smb.conf`; o texto do prompt ou o nome do usuário Linux não mudam essa conta.
+
+O preparador valida `.env`, `secrets/octoprint-api.key` e `secrets/samba-users.txt`. Quando um desses caminhos é um diretório vazio criado por um bind mount ausente, ele usa apenas rmdir e depois cria o arquivo correto. Se houver conteúdo, link simbólico, arquivo especial ou diretório ocupado, ele interrompe sem apagar esses dados e informa o caminho. Pare o serviço que monta o caminho antes de reparar e recrie-o depois para atualizar o tipo da montagem.
+
+Arquivo Samba vazio sem uma base passdb.tdb inicializada exige nova senha em terminal interativo; uma base existente não exige redefinição. Arquivos regulares de configuração, chave e senha existentes são preservados. Não use `touch` para contornar a necessidade da senha.
 
 ## 2. Ajustar o ambiente local
 
