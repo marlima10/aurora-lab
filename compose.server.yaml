@@ -73,6 +73,8 @@ services:
       - ./compose.opengym.yaml:/source/config/compose.opengym.yaml:ro
       - ./data/homeassistant:/source/homeassistant
       - ./compose.homeassistant.yaml:/source/config/compose.homeassistant.yaml:ro
+      - /etc/cockpit:/source/cockpit-config:ro
+      - /etc/systemd/system/cockpit.socket.d:/source/cockpit-socket:ro
       - /etc/casaos:/source/casaos-config:ro
       - /var/lib/casaos:/source/casaos-state
       - ./data/fitness:/source/fitness
@@ -111,9 +113,13 @@ services:
     restart: unless-stopped
     logging: *logging
   cockpit:
-    image: quay.io/cockpit/ws:latest
-    ports: ['${BIND_IP:-0.0.0.0}:9090:9090']
-    environment: {COCKPIT_SSH_HOST: '${SERVER_IP:-192.168.0.71}'}
+    image: nginx:stable-alpine
+    ports: ['127.0.0.1:9090:9090', '${SERVER_IP:-192.168.0.71}:9090:9090']
+    extra_hosts: ['host.docker.internal:host-gateway']
+    volumes:
+      - ./docker/server/cockpit/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./secrets/cockpit-tls.crt:/run/secrets/cockpit-tls.crt:ro
+      - ./secrets/cockpit-tls.key:/run/secrets/cockpit-tls.key:ro
     restart: unless-stopped
     logging: *logging
 # Metadata for the existing stack icon; this does not create another application.

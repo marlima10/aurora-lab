@@ -129,3 +129,7 @@ Gerenciamento no Debian, porta 81; aplicações em Docker. Instalador e hashes e
 ## Atalhos CasaOS (10.0.0)
 
 `docker/server/casaos/sync-shortcuts.py` inventaria Docker e cria ícones LinkApp por serviço no usuário CasaOS informado, preservando aplicativos e dados. Assets SVG em `site/icons/services/`. Arquivos locais de preferência e backups não entram no Git.
+
+## Cockpit com autenticação local (11.0.0)
+
+Cockpit/PAM no Debian autorizado; proxy HTTPS Docker preserva acesso 9090 e não depende de senha SSH. Backend restrito 9091. Preparação e Nginx em `docker/server/cockpit/`; configurações e certificados locais incluídos no backup. Veja [COCKPIT.md](COCKPIT.md).

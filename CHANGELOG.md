@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## [11.0.0] - 2026-10-18
+
+- Cockpit autentica pelo PAM do Debian, sem exigir senha no SSH.
+- Acesso HTTPS 9090 mantido em container proxy, com certificado do backend verificado.
+- Configuração nativa e certificados locais incluídos no backup.
+
 ## [10.0.0] - 2026-10-18
 
 - Ícones individuais dos serviços no CasaOS, sem criar containers duplicados.
