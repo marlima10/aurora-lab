@@ -28,14 +28,13 @@
       <a href="#services-card">✣ <span>Serviços</span></a>
       <a href="#storage-card">▤ <span>Armazenamento</span></a>
       <a href="/history.html">◴ <span>Histórico</span></a>
-      <a href="/fitness.html">🏃 <span>Treinos e peso</span></a>
       <a href="#" onclick="openSamba();return false">▱ <span>Arquivos</span></a>
       <a href="#backup-card">☁ <span>Backup</span></a>
       <a href="/diagnostics.html">✥ <span>Diagnóstico</span></a>
       <a href="#" onclick="openPort(8123);return false">⌂ <span>Home Assistant</span></a>
       <a href="#" onclick="openPort(81);return false">◆ <span>CasaOS</span></a>
     </nav>
-    <div class="side-foot"><b>AURORA LAB 6.0</b><span id="sideHost">rk322x-box</span></div>
+    <div class="side-foot"><b>AURORA LAB 7.0</b><span id="sideHost">rk322x-box</span></div>
   </aside>
 
   <button class="nav-scrim" id="navScrim" type="button" aria-label="Fechar menu" hidden></button>
@@ -62,8 +61,7 @@
       <button class="quick q4" onclick="openSamba()"><span>📁</span><div><b>Samba</b><small id="sambaPath">Arquivos compartilhados</small></div><i>→</i></button>
       <button class="quick q5" onclick="openPort(8123)"><span>🏠</span><div><b>Home Assistant</b><small>:8123 · Automação da casa</small></div><i>→</i></button>
       <button class="quick q6" onclick="openPort(81)"><span>☁️</span><div><b>CasaOS</b><small>:81 · Aplicativos e arquivos</small></div><i>→</i></button>
-      <a class="quick q8" href="/opengym.html"><span>💪</span><div><b>openGym</b><small>Treinos com acesso seguro</small></div><i>→</i></a>
-      <a class="quick q7" href="/fitness.html"><span>🏃</span><div><b>Treinos e peso</b><small>Registros e evolução</small></div><i>→</i></a>
+      <button type="button" class="quick q7" onclick="location.href='/opengym.html'"><span>💪</span><div><b>openGym</b><small>Treinos com acesso seguro</small></div><i>→</i></button>
     </section>
 
     <section class="dashboard-grid">
@@ -236,7 +234,7 @@
           <div><small>Cache APT</small><b id="aptcache">--</b></div>
           <div><small>Último dado</small><b id="stamp">--</b></div>
         </div>
-        <div class="backup-health" id="backupHealth" role="status" aria-live="polite">Verificando backup do banco Fitness…</div>
+        <div class="backup-health" id="backupHealth" role="status" aria-live="polite">Verificando backup do servidor…</div>
         <div class="note">Backups completos permanecem fora do webroot por segurança.</div>
       </article>
     </section>
@@ -294,7 +292,7 @@ function updateBackupHealth(){let el=document.getElementById('backupHealth');fet
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork();if(!cam.naturalWidth)connectCamera()}});
 update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
 </script>
-<script src="/aurora-layout.js?v=20261017-v6" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+<script src="/aurora-layout.js?v=20261018-v7" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
   <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
   <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
   <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>

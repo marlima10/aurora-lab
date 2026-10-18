@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## [7.0.0] - 2026-10-18
+
+- Removidos os atalhos Fitness, planos e exercícios da navegação.
+- openGym usa botão com o mesmo estilo dos demais atalhos principais.
+- Preferências antigas de atalhos recebem opções válidas; registros preservados.
+
 ## [6.0.0] - 2026-10-17
 
 - openGym 1.4.1, interface e API em containers próprios e rede dedicada.
