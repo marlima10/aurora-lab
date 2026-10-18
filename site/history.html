@@ -14,4 +14,4 @@ function draw(){const c=$('c'),r=c.getBoundingClientRect(),k=devicePixelRatio||1
 c.onmousemove=e=>{const r=c.getBoundingClientRect();hi=Math.max(0,Math.min(d.length-1,Math.round((e.clientX-r.left-38)/(r.width-48)*(d.length-1))));draw()};c.onmouseleave=()=>{hi=-1;draw()};
 async function go(){if(document.hidden)return;try{d=await json('/api/history.json');draw()}catch(e){console.error(e)}}
 addEventListener('resize',draw);document.addEventListener('visibilitychange',go);go();setInterval(go,60000);
-</script><script src="/aurora-layout.js?v=20261018-v7" defer></script></body></html>
+</script><script src="/aurora-layout.js?v=20261018-v8" defer></script></body></html>

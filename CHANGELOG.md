@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## [8.0.0] - 2026-10-18
+
+- Removida a tela intermediária openGym; o botão abre diretamente o serviço.
+- Redirecionamento pelo servidor, incluindo compatibilidade com o endereço antigo.
+- Cache PWA não armazena o redirecionamento externo.
+
 ## [7.0.0] - 2026-10-18
 
 - Removidos os atalhos Fitness, planos e exercícios da navegação.

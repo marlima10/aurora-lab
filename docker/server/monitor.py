@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import urlparse
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
 
@@ -188,6 +189,20 @@ class Handler(BaseHTTPRequestHandler):
         self.power_proxy()
 
     def do_GET(self):
+        if self.path.split('?',1)[0] == '/opengym':
+            origin=os.environ.get('OPENGYM_ORIGIN','')
+            try:
+                url=urlparse(origin)
+                valid=(url.scheme=='https' and url.hostname and url.hostname.endswith('.ts.net') and url.port==8081 and not url.username and not url.password and not any(ord(c)<32 for c in origin))
+            except ValueError:
+                valid=False
+            if not valid:
+                self.send_error(503,'Endereco openGym nao configurado');return
+            self.send_response(302)
+            self.send_header('Location',origin)
+            self.send_header('Cache-Control','no-store')
+            self.send_header('Content-Length','0')
+            self.end_headers();return
         if self.path.split('?', 1)[0].startswith('/api/power'):
             self.power_proxy()
             return
