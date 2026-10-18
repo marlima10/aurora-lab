@@ -1,4 +1,4 @@
-# Python do OctoPrint na versão 2.0
+# OctoPrint — imagem Python, atualização e retorno
 
 A imagem do ambiente completo usa Python 3.12 com OctoPrint 1.11.8, substituindo a base Python 3.10. Os 12 plugins permanecem nas versões de `plugins.lock.json`; as fontes são baixadas por commit e verificadas por SHA-256 no build.
 
@@ -8,17 +8,19 @@ O supervisor s6-overlay 3.2.3.2 tem downloads amd64 verificados por SHA-256, reg
 
 Power Failure Recovery usa `sysconfig` para localizar os módulos Python. HomeAssistant permanece desativado até configurar MQTT e compatibilidade. O monitor e os demais serviços usam suas próprias imagens; a atualização não modifica o Python do host.
 
+Os comandos partem da raiz e usam COMPOSE_FILE com os arquivos ativos da instalação, inclusive compose.printer.yaml quando necessário. Veja [AURORASERVER.md](AURORASERVER.md).
+
 ## Atualização de uma instalação existente
 
 Antes de substituir a imagem, confirme que não há impressão em andamento e faça um backup consistente de `data/octoprint/`, mantendo uma cópia externa. Registre também a imagem anterior para permitir retorno. Exemplo, se o serviço já tiver a imagem atual definida:
 
 ```sh
-old_image=$(sudo docker compose -f compose.server.yaml images -q octoprint)
+old_image=$(sudo docker compose images -q octoprint)
 sudo docker tag "$old_image" auroralab-octoprint:rollback
-sudo docker compose -f compose.server.yaml build octoprint
-sudo docker compose -f compose.server.yaml up -d --no-deps octoprint
-sudo docker compose -f compose.server.yaml logs --tail=100 octoprint
-sudo docker compose -f compose.server.yaml exec octoprint python --version
+sudo docker compose build octoprint
+sudo docker compose up -d --no-deps octoprint
+sudo docker compose logs --tail=100 octoprint
+sudo docker compose exec octoprint python --version
 ```
 
 Valide login, plugins, histórico e conexão com a impressora. Para retorno, crie um arquivo local `compose.rollback.yaml`:
@@ -29,12 +31,18 @@ services:
     image: auroralab-octoprint:rollback
 ```
 
+Acrescente compose.rollback.yaml ao final da lista COMPOSE_FILE no `.env`, mantendo os demais arquivos ativos. Então:
+
 ```sh
-sudo docker compose -f compose.server.yaml -f compose.rollback.yaml up -d --no-deps --no-build octoprint
+sudo docker compose up -d --no-deps --no-build octoprint
 ```
 
 Isso usa a imagem preservada sem substituir os dados atuais. A restauração dos dados é uma operação separada e deve ser realizada com os serviços parados quando necessária.
 
-## Validação realizada
+Ao concluir o retorno ou adotar uma imagem nova, revise a seleção local do overlay rollback para que futuras operações não usem a imagem antiga por engano.
 
-Na implantação Debian 13 amd64, o OctoPrint detectou Python 3.12.15. Foram validados imports e versões dos 12 plugins, inicialização com cópia isolada dos dados, API e proxy HTTP, integridade e hashes do banco de histórico e acesso pela rede local e VPN. Não foi iniciada impressão física. A tag Python 3.12 recebe atualizações de correção; builds futuros podem apresentar outra versão 3.12.x.
+## Registro histórico de validação
+
+O guia anterior registrou que, em uma implantação Debian 13 amd64, o OctoPrint detectou Python 3.12.15. Foram validados imports e versões dos 12 plugins, inicialização com cópia isolada dos dados, API e proxy HTTP, integridade e hashes do banco de histórico e acesso pela rede local e VPN. Não foi iniciada impressão física. A tag Python 3.12 recebe atualizações de correção; builds futuros podem apresentar outra versão 3.12.x.
+
+Esse registro histórico não comprova o estado de outro servidor nem valida um build novo. Registre as versões e resultados obtidos na sua máquina; não inicie impressão física como teste automático de instalação.

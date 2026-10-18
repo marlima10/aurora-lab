@@ -88,7 +88,7 @@ services:
       - ./docker:/source/config/docker:ro
       - ./backend:/source/config/backend:ro
       - ./site:/source/config/site:ro
-      - ./AURORASERVER.md:/source/config/AURORASERVER.md:ro
+      - ./docs:/source/config/docs:ro
       - ./.env:/source/config/.env:ro
       - ./data/power:/source/power:ro
       - ./compose.power.yaml:/source/config/compose.power.yaml:ro
