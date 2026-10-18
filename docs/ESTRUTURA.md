@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 12.0.0
+# Estrutura e arquitetura — AuroraLAB 13.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 

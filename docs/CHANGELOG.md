@@ -1,9 +1,9 @@
 # Histórico de versões
 
-## Não publicado
+## [13.0.0] - 2026-10-18
 
 - Documentação centralizada em docs/, com README mantido na raiz e referências de backup atualizadas.
-- Guias revisados contra o código da versão 12, distinguindo modos portátil/servidor, módulos opcionais e contas independentes.
+- Guias revisados contra a base funcional da versão 12, distinguindo modos portátil/servidor, módulos opcionais e contas independentes.
 - Instalação passo a passo, seleção Compose persistente, diagnóstico, migração VPN e reinstalação destrutiva com escopo explícito.
 - Limitações de preparadores com nome fixo do contêiner Tailscale e recuperação de instalação parcial do CasaOS documentadas.
 

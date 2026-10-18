@@ -1,6 +1,6 @@
 # AuroraServer — instalação e operação no Linux
 
-Guia do ambiente completo da versão 12.0.0. Para apagar uma instalação anterior e todos os seus dados antes de começar, siga primeiro [REINSTALACAO.md](REINSTALACAO.md). Os comandos partem da raiz do repositório. O caminho `~/srv/docker/aurora-lab` é um exemplo; use a pasta real do seu clone. A documentação não comprova que um serviço esteja instalado ou saudável em outra máquina.
+Guia do ambiente completo da versão 13.0.0. Para apagar uma instalação anterior e todos os seus dados antes de começar, siga primeiro [REINSTALACAO.md](REINSTALACAO.md). Os comandos partem da raiz do repositório. O caminho `~/srv/docker/aurora-lab` é um exemplo; use a pasta real do seu clone. A documentação não comprova que um serviço esteja instalado ou saudável em outra máquina.
 
 ## Requisitos e escolha de configuração
 
