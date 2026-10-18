@@ -24,7 +24,8 @@
     ['backup', '☁', 'Backup', '/#backup-card'],
     ['diagnostics', '✥', 'Diagnóstico', '/diagnostics.html'],
     ['casaos', '◆', 'CasaOS', `${location.protocol}//${location.hostname}:81/`],
-    ['homeassistant', '⌂', 'Home Assistant', `${location.protocol}//${location.hostname}:8123/`]
+    ['homeassistant', '⌂', 'Home Assistant', `${location.protocol}//${location.hostname}:8123/`],
+    ['opengym', '💪', 'openGym', '/opengym.html']
   ].map(([id, icon, label, href]) => ({ id, icon, label, href }));
 
   function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch (_) { return fallback; } }

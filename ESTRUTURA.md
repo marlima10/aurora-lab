@@ -121,3 +121,7 @@ Gerenciamento no Debian, porta 81; aplicações em Docker. Instalador e hashes e
 ## Home Assistant (5.0.0)
 
 `compose.homeassistant.yaml`: serviço dedicado, rede host, porta 8123, estado em `data/homeassistant/` e backup SQLite consistente. Preparação inicial preserva configuração existente. Veja [HOMEASSISTANT.md](HOMEASSISTANT.md).
+
+## openGym (6.0.0)
+
+`compose.opengym.yaml`: interface e API em rede Docker própria; HTTPS privado 8081; estado JSON em `data/opengym/`, separado do Fitness. `site/opengym.html` abre o endereço HTTPS fornecido pelo monitor. Preparação em `docker/server/opengym/prepare.py`. Veja [OPENGYM.md](OPENGYM.md).
