@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## [10.0.0] - 2026-10-18
+
+- Ícones individuais dos serviços no CasaOS, sem criar containers duplicados.
+- Interfaces abrem o serviço; componentes internos abrem o Portainer.
+- Sincronizador preserva atalhos existentes, cria backup e permite reexecução.
+
 ## [9.0.0] - 2026-10-18
 
 - Ícone AuroraLAB no CasaOS configurado com serviço web, portas 80/8088 e página inicial.

@@ -35,3 +35,19 @@ Fontes: https://github.com/IceWhaleTech/CasaOS e https://rclone.org/rc/.
 O bloco `x-casaos` em `compose.server.yaml` identifica `web` como serviço principal e define HTTP, porta 80 e `/` como destino. O hostname é o mesmo usado para abrir CasaOS. O ícone representa o stack existente, sem duplicar containers. Pela VPN também é possível abrir o portal pelo endereço HTTPS principal do servidor. Não exclua o aplicativo AuroraLAB pelo CasaOS para remover só seu ícone: isso pode remover o stack completo.
 
 Compatibilidade com CasaOS AppManagement 0.4.10-alpha2: o carregador dessa versão escolhe o Compose padrão do diretório e pode ignorar a lista de overlays do stack. Por isso `compose.yaml` também define os metadados, com porta 8088, atendida tanto no modo portátil como no AuroraServer. Essa mudança afeta o ícone; não aplique a configuração portátil ao ambiente completo pelo CasaOS. Gerencie atualizações do stack pelo fluxo AuroraLAB/Compose.
+
+## Ícone por serviço (10.0.0)
+
+O sincronizador usa os atalhos externos nativos (`LinkApp`) do CasaOS para apresentar cada container existente. Não importa, duplica ou reinicia containers e não muda volumes, credenciais ou redes. AuroraLAB, Portainer e Home Assistant já cadastrados ficam preservados. Quando há mais de uma instância de Home Assistant, a instância Aurora recebe nome próprio.
+
+```sh
+cd /srv/auroralab
+sudo python3 docker/server/casaos/sync-shortcuts.py --user-id 1
+sudo python3 docker/server/casaos/sync-shortcuts.py --user-id 1 --apply
+```
+
+A primeira execução apenas apresenta a proposta. `--apply` preserva links existentes e acrescenta os serviços faltantes, com backup dos arquivos do usuário em `deploy-state/casaos-shortcuts-before-*`. O script grava `link.json` e `app_order.json` no formato do CasaOS-UI 0.4.25. As imagens dos ícones são SVG próprios do AuroraLAB, publicados no repositório oficial. Atualize a página CasaOS após sincronizar.
+
+OctoPrint, Cockpit, Home Assistant e openGym abrem suas telas. Energia e monitoramento abrem os painéis Aurora. Componentes sem interface própria abrem o Portainer para gerenciamento dos containers. Os atalhos não exibem estado vivo do Docker; confira o estado real no Portainer ou monitoramento. Novos containers podem ser incorporados executando o sincronizador novamente.
+
+A configuração de atalhos já está coberta pelo backup de `/var/lib/casaos`. Para reverter, restaure os dois JSON do backup correspondente, preservando os dados atuais antes. Remover um atalho LinkApp remove apenas o atalho; excluir o aplicativo/stack AuroraLAB nativo pode remover containers.

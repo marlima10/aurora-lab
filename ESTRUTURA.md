@@ -125,3 +125,7 @@ Gerenciamento no Debian, porta 81; aplicações em Docker. Instalador e hashes e
 ## openGym (6.0.0)
 
 `compose.opengym.yaml`: interface e API em rede Docker própria; HTTPS privado 8081; estado JSON em `data/opengym/`, separado do Fitness. Na versão 8, `/opengym` e o endereço legado `/opengym.html` redirecionam pelo monitor ao endereço HTTPS configurado; a tela intermediária foi removida. Preparação em `docker/server/opengym/prepare.py`. Veja [OPENGYM.md](OPENGYM.md).
+
+## Atalhos CasaOS (10.0.0)
+
+`docker/server/casaos/sync-shortcuts.py` inventaria Docker e cria ícones LinkApp por serviço no usuário CasaOS informado, preservando aplicativos e dados. Assets SVG em `site/icons/services/`. Arquivos locais de preferência e backups não entram no Git.
