@@ -8,7 +8,7 @@ const localDate=(date=new Date())=>{let x=new Date(date.getTime()-date.getTimezo
 const today=localDate();
 function validDailyDate(value){if(!/^\d{4}-\d{2}-\d{2}$/.test(String(value||'')))return false;let parsed=new Date(value+'T12:00:00');return !Number.isNaN(parsed.getTime())&&localDate(parsed)===value}
 function uid(){try{if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.crypto.randomUUID()}catch(error){}return 'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)+'-'+Math.random().toString(36).slice(2)}
-function openPort(port,path=''){window.open(location.protocol+'//'+location.hostname+':'+port+path,'_blank')}
+function openPort(port,path=''){const routes={5000:'/octoprint',9090:'/cockpit',8123:'/homeassistant'};window.open(routes[port]||location.protocol+'//'+location.hostname+':'+port+path,'_blank','noopener')}
 function openSamba(){let address='\\\\'+location.hostname+'\\';if(navigator.clipboard)navigator.clipboard.writeText(address).catch(()=>{});alert('Samba: '+address+'\n\nNo Windows, pressione Win+R e cole o endereço.')}
 function openOptional(port,name){if(confirm(name+' será aberto em '+location.hostname+':'+port+'.\n\nSe o serviço ainda não estiver instalado, a página não responderá.'))openPort(port)}
 let people=JSON.parse(localStorage.getItem('mov_people')||'null')||[{id:'rafael',name:'Rafael',height:168,goal:78,startWeight:103.3}];

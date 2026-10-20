@@ -244,7 +244,7 @@
 
 <script src="/mobile-nav.js?v=20261007-1" defer></script>
 <script src="/pwa.js?v=20261007-1" defer></script>
-<script src="/aurora.js"></script>
+<script src="/aurora.js?v=20261020-v16"></script>
 <script>
 let rotation=Number(localStorage.getItem('auroraCameraRotation')||180), H=[], NH=[];
 const val=(v,f='--')=>(v===undefined||v===null||v==='')?f:v;
@@ -293,7 +293,7 @@ function updateBackupHealth(){let el=document.getElementById('backupHealth');fet
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork();if(!cam.naturalWidth)connectCamera()}});
 update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
 </script>
-<script src="/aurora-layout.js?v=20261020-v15" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+<script src="/aurora-layout.js?v=20261020-v16" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
   <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
   <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
   <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>

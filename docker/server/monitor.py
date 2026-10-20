@@ -143,6 +143,28 @@ def loop():
             print('Falha na coleta:', type(exc).__name__, flush=True)
         time.sleep(5)
 
+# The configured VPN name keeps certificates valid even when the portal is opened by IP.
+SERVICE_ROUTES = {
+    '/opengym': ('OPENGYM_ORIGIN', 8081, 8081, ''),
+    '/garmin': ('OPENGYM_ORIGIN', 8081, 8081, '/garmin/'),
+    '/homeboard': ('HOMEBOARD_ORIGIN', 8090, 8090, ''),
+    '/octoprint': ('OPENGYM_ORIGIN', 8081, 5000, '/'),
+    '/cockpit': ('OPENGYM_ORIGIN', 8081, 9090, '/'),
+    '/homeassistant': ('OPENGYM_ORIGIN', 8081, 8123, '/'),
+}
+
+def service_redirect_url(path):
+    variable, source_port, target_port, suffix = SERVICE_ROUTES[path]
+    origin = os.environ.get(variable, '')
+    if any(ord(c) < 33 or ord(c) == 127 for c in origin):
+        raise ValueError('Invalid origin')
+    url = urlparse(origin)
+    if not (url.scheme == 'https' and url.hostname and url.hostname.endswith('.ts.net')
+            and url.port == source_port and not url.username and not url.password
+            and url.path in ('', '/') and not url.query and not url.fragment):
+        raise ValueError('Invalid origin')
+    return f'https://{url.hostname}:{target_port}{suffix}'
+
 class Handler(BaseHTTPRequestHandler):
     def power_proxy(self):
         path = self.path.split('?', 1)[0]
@@ -189,21 +211,19 @@ class Handler(BaseHTTPRequestHandler):
         self.power_proxy()
 
     def do_GET(self):
-        if self.path.split('?',1)[0] in ('/opengym','/garmin','/homeboard'):
-            is_homeboard=self.path.split('?',1)[0]=='/homeboard'
-            origin=os.environ.get('HOMEBOARD_ORIGIN' if is_homeboard else 'OPENGYM_ORIGIN','')
+        path = self.path.split('?', 1)[0]
+        if path in SERVICE_ROUTES:
             try:
-                url=urlparse(origin)
-                valid=(url.scheme=='https' and url.hostname and url.hostname.endswith('.ts.net') and url.port==(8090 if is_homeboard else 8081) and not url.username and not url.password and not any(ord(c)<32 for c in origin))
+                target = service_redirect_url(path)
             except ValueError:
-                valid=False
-            if not valid:
-                self.send_error(503,'Endereco openGym nao configurado');return
+                self.send_error(503, 'Origem HTTPS privada nao configurada')
+                return
             self.send_response(302)
-            self.send_header('Location',origin.rstrip('/')+('/garmin/' if self.path.split('?',1)[0]=='/garmin' else ''))
-            self.send_header('Cache-Control','no-store')
-            self.send_header('Content-Length','0')
-            self.end_headers();return
+            self.send_header('Location', target)
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            return
         if self.path.split('?', 1)[0].startswith('/api/power'):
             self.power_proxy()
             return
@@ -227,6 +247,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers(); self.wfile.write(body)
     def log_message(self,*args): pass
 
-threading.Thread(target=loop,daemon=True).start()
-threading.Thread(target=scan_network,daemon=True).start()
-ThreadingHTTPServer(('0.0.0.0',9101),Handler).serve_forever()
+if __name__ == '__main__':
+    threading.Thread(target=loop,daemon=True).start()
+    threading.Thread(target=scan_network,daemon=True).start()
+    ThreadingHTTPServer(('0.0.0.0',9101),Handler).serve_forever()
