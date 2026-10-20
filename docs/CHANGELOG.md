@@ -1,5 +1,13 @@
 # Histórico de versões
 
+## [16.0.0] - 2026-10-20
+
+- Atalhos Cockpit, OctoPrint e Home Assistant redirecionam para o nome HTTPS privado configurado, inclusive quando o portal é aberto por IP/HTTP.
+- Cache PWA atualizado; redirects e transmissão da câmera não entram no cache offline.
+- Guia de ativação da câmera USB por identificador persistente e diagnóstico do stream.
+- Testes HTTP dos redirects, recusa de origens inválidas e indisponibilidade de configuração.
+
+
 ## [15.0.0] - 2026-10-20
 
 - HomeBoard em container independente, fonte upstream fixada, dados incluidos no backup e HTTPS privado.

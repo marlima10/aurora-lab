@@ -21,7 +21,7 @@
     ['backup', '☁', 'Backup', '/#backup-card'],
     ['diagnostics', '✥', 'Diagnóstico', '/diagnostics.html'],
     ['homeboard', '◆', 'HomeBoard', '/homeboard'],
-    ['homeassistant', '⌂', 'Home Assistant', `${location.protocol}//${location.hostname}:8123/`],
+    ['homeassistant', '⌂', 'Home Assistant', '/homeassistant'],
     ['opengym', '💪', 'openGym', '/opengym']
   ].map(([id, icon, label, href]) => ({ id, icon, label, href }));
 

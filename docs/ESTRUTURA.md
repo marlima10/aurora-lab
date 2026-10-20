@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 14.0.0
+# Estrutura e arquitetura — AuroraLAB 16.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -108,3 +108,10 @@ Padrões: [desenvolvimento](../skills/aurora-development/SKILL.md) e [visual](..
 ## HomeBoard e retirada do CasaOS (v15)
 
 `compose.homeboard.yaml` acrescenta HomeBoard na rede Docker com porta local 8090. `docker/server/homeboard/prepare.py` confere a fonte upstream fixada e constroi a imagem sem versionar o arquivo de terceiros. Portal/monitor possuem atalho e status HomeBoard. Dados em `data/homeboard/` e `data/homeboard-photos/`, incluidos no backup; logind e a configuracao XFCE tambem sao copiados. CasaOS foi retirado do escopo atual; seus scripts anteriores ficam como historico/retorno. Administracao de containers permanece no Portainer e do host no Cockpit. Consulte [HOMEBOARD.md](HOMEBOARD.md).
+
+
+## Atalhos HTTPS e câmera USB (16.0.0)
+
+`openPort` encaminha 5000, 9090 e 8123 para `/octoprint`, `/cockpit` e `/homeassistant`. O Nginx do servidor repassa ao monitor, que usa o hostname HTTPS privado de `OPENGYM_ORIGIN` e a porta própria de cada serviço. Isso funciona mesmo com o portal aberto por HTTP/IP e evita certificados incompatíveis com o IP Tailscale. Os serviços precisam estar publicados no Tailscale Serve; o portátil não oferece esses módulos. Origem ausente/inválida retorna 503, sem redirecionar para HTTP. `/homeboard` usa `HOMEBOARD_ORIGIN`; `/garmin` e `/opengym` mantêm seus destinos. Testes isolados: `python3 -m unittest discover -s docker/server -p test_service_links.py` em Linux, sem acesso aos bancos.
+
+A câmera fica no perfil Compose `camera`: configure `CAMERA_DEVICE` com `/dev/v4l/by-id/<camera-externa>-video-index0` e acrescente `camera` a `COMPOSE_PROFILES` no `.env`, preservando os demais perfis. Inicie apenas `docker compose up -d --build camera`. Nunca selecione automaticamente a câmera integrada. O container recebe somente esse dispositivo como `/dev/video0`; `/camera-stream` transmite pelo proxy da mesma origem do portal, sem cache offline. Confirme a captura em `http://127.0.0.1:8080/snapshot` no servidor e o estado `webcam` no monitor. Após desconectar/reconectar USB, pode ser necessário recriar somente `camera` com `docker compose up -d --no-deps --force-recreate camera`. Sem o dispositivo, mantenha esse perfil desativado. Acesso direto à porta 8080 é HTTP; prefira o stream do portal pelo Tailscale.
