@@ -53,7 +53,7 @@ services:
     user: '65534:65534'
     read_only: true
     tmpfs: [/tmp]
-    environment: {SERVER_IP: '${SERVER_IP:-192.168.0.71}', TZ: America/Sao_Paulo, OPENGYM_ORIGIN: '${OPENGYM_ORIGIN:-}'}
+    environment: {SERVER_IP: '${SERVER_IP:-192.168.0.71}', TZ: America/Sao_Paulo, OPENGYM_ORIGIN: '${OPENGYM_ORIGIN:-}', HOMEBOARD_ORIGIN: '${HOMEBOARD_ORIGIN:-}'}
     volumes:
       - ./docker/server/monitor.py:/app/monitor.py:ro
       - ./secrets/octoprint-api.key:/run/secrets/octoprint-api.key:ro
@@ -76,8 +76,11 @@ services:
       - ./compose.homeassistant.yaml:/source/config/compose.homeassistant.yaml:ro
       - /etc/cockpit:/source/cockpit-config:ro
       - /etc/systemd/system/cockpit.socket.d:/source/cockpit-socket:ro
-      - /etc/casaos:/source/casaos-config:ro
-      - /var/lib/casaos:/source/casaos-state
+      - ./data/homeboard:/source/homeboard
+      - ./data/homeboard-photos:/source/homeboard-photos:ro
+      - ./compose.homeboard.yaml:/source/config/compose.homeboard.yaml:ro
+      - /etc/systemd/logind.conf.d:/source/logind-config:ro
+      - /home/rafael/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml:/source/xfce-power.xml:ro
       - ./data/fitness:/source/fitness
       - ./data/octoprint:/source/octoprint
       - ./data/prints:/source/prints:ro
@@ -123,13 +126,3 @@ services:
       - ./secrets/cockpit-tls.key:/run/secrets/cockpit-tls.key:ro
     restart: unless-stopped
     logging: *logging
-# Metadata for the existing stack icon; this does not create another application.
-x-casaos:
-  main: web
-  scheme: http
-  port_map: '80'
-  index: /
-  icon: https://raw.githubusercontent.com/marlima10/aurora-lab/main/site/favicon.svg
-  title:
-    en_US: AuroraLAB
-    pt_BR: AuroraLAB

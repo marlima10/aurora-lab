@@ -1,3 +1,5 @@
+> Atualizacao v15: o ambiente atual usa HomeBoard no lugar do CasaOS. Nao execute a etapa de instalacao CasaOS para reproduzir o estado atual; siga [HOMEBOARD.md](HOMEBOARD.md), incluindo o overlay Compose, backup e acesso Tailscale. As instrucoes CasaOS abaixo ficam como referencia de instalacoes anteriores.
+
 # AuroraServer — instalação e operação no Linux
 
 Guia do ambiente completo da versão 14.0.0. Para apagar uma instalação anterior e todos os seus dados antes de começar, siga primeiro [REINSTALACAO.md](REINSTALACAO.md). Os comandos partem da raiz do repositório. O caminho `~/srv/docker/aurora-lab` é um exemplo; use a pasta real do seu clone. A documentação não comprova que um serviço esteja instalado ou saudável em outra máquina.

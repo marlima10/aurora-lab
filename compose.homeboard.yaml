@@ -1,0 +1,25 @@
+services:
+  homeboard:
+    image: auroralab-homeboard:71da9914a809
+    ports: ['127.0.0.1:8090:8080']
+    environment:
+      HOST: 0.0.0.0
+      PORT: '8080'
+      DATA_DIR: /app/data
+      PHOTO_FOLDER: /apple-photos
+      TZ: America/Sao_Paulo
+      LAN_URLS: ${HOMEBOARD_ORIGIN:-}
+    volumes:
+      - ./data/homeboard:/app/data
+      - ./data/homeboard-photos:/apple-photos:ro
+    user: '1000:1000'
+    read_only: true
+    tmpfs: ['/tmp:size=128m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 768m
+    pids_limit: 128
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
