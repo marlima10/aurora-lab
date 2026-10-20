@@ -1,4 +1,6 @@
-# CasaOS no AuroraServer
+> A partir da v15 o CasaOS foi removido do AuroraServer por escolha do titular. Este guia e historico; nao reinstalar como parte de atualizacao. Novo painel: [HomeBoard](HOMEBOARD.md).
+
+# CasaOS (historico) no AuroraServer
 
 O instalador deste repositório prepara CasaOS 0.4.15 e componentes oficiais fixados em `docker/server/casaos/packages.lock.json`. CasaOS roda no **Debian via systemd**, enquanto seus aplicativos continuam em Docker. O procedimento é específico de amd64; não é uma instalação de CasaOS dentro de um contêiner.
 

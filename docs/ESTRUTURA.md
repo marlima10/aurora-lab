@@ -103,3 +103,8 @@ Testes PHP: `docker compose run --rm --no-deps --entrypoint php php tests/run.ph
 Os testes sintéticos não substituem login real, restore real ou impressão física. Verifique Compose com config --quiet e use fixtures temporárias; não teste gravando dados pessoais.
 
 Padrões: [desenvolvimento](../skills/aurora-development/SKILL.md) e [visual](../skills/aurora-visual/SKILL.md). Procedimentos operacionais: [servidor](AURORASERVER.md), [rede](REDE-E-TAILSCALE.md), [CasaOS](CASAOS.md), [Cockpit](COCKPIT.md), [Home Assistant](HOMEASSISTANT.md), [openGym](OPENGYM.md), [Garmin](GARMIN.md) e [OctoPrint](UPGRADE-PYTHON-OCTOPRINT.md).
+
+
+## HomeBoard e retirada do CasaOS (v15)
+
+`compose.homeboard.yaml` acrescenta HomeBoard na rede Docker com porta local 8090. `docker/server/homeboard/prepare.py` confere a fonte upstream fixada e constroi a imagem sem versionar o arquivo de terceiros. Portal/monitor possuem atalho e status HomeBoard. Dados em `data/homeboard/` e `data/homeboard-photos/`, incluidos no backup; logind e a configuracao XFCE tambem sao copiados. CasaOS foi retirado do escopo atual; seus scripts anteriores ficam como historico/retorno. Administracao de containers permanece no Portainer e do host no Cockpit. Consulte [HOMEBOARD.md](HOMEBOARD.md).

@@ -20,7 +20,7 @@
     ['history', '◴', 'Histórico', '/history.html'],
     ['backup', '☁', 'Backup', '/#backup-card'],
     ['diagnostics', '✥', 'Diagnóstico', '/diagnostics.html'],
-    ['casaos', '◆', 'CasaOS', `${location.protocol}//${location.hostname}:81/`],
+    ['homeboard', '◆', 'HomeBoard', '/homeboard'],
     ['homeassistant', '⌂', 'Home Assistant', `${location.protocol}//${location.hostname}:8123/`],
     ['opengym', '💪', 'openGym', '/opengym']
   ].map(([id, icon, label, href]) => ({ id, icon, label, href }));

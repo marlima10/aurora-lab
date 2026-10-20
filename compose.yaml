@@ -21,13 +21,3 @@ services:
     volumes:
       - ./data:/var/lib/fitness
     restart: unless-stopped
-
-x-casaos:
-  main: web
-  scheme: http
-  port_map: '8088'
-  index: /
-  icon: https://raw.githubusercontent.com/marlima10/aurora-lab/main/site/favicon.svg
-  title:
-    en_US: AuroraLAB
-    pt_BR: AuroraLAB

@@ -1,4 +1,4 @@
-# AuroraLAB 14.0.0
+# AuroraLAB 15.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -35,7 +35,7 @@ Para o servidor Debian, siga a [instalação completa](docs/AURORASERVER.md), in
 - OctoPrint para impressora 3D, catálogo de plugins fixados e câmera USB opcional.
 - Métricas do host, rede, armazenamento e status de backup.
 - Samba autenticado para arquivos de impressão.
-- CasaOS instalado no Debian, com atalhos para serviços existentes.
+- HomeBoard em Docker com acesso HTTPS privado; CasaOS removido do ambiente atual.
 - Cockpit com autenticação local Debian e proxy HTTPS, sem habilitar senha no SSH.
 - Home Assistant Container e openGym em serviços separados.
 - Garmin → openGym com prévia, seleção e proteção contra duplicatas.
@@ -109,3 +109,5 @@ Portal e Fitness não têm login; CasaOS, Cockpit, Home Assistant e openGym poss
 | [Histórico](docs/CHANGELOG.md) | Alterações por versão |
 
 Padrões: [desenvolvimento](skills/aurora-development/SKILL.md) e [visual](skills/aurora-visual/SKILL.md). As skills ficam versionadas no projeto; não pressupõem instalação global.
+
+Painel HomeBoard, preservacao dos aplicativos e politica da tampa: [guia HomeBoard](docs/HOMEBOARD.md).

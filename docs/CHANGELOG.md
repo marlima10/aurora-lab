@@ -1,5 +1,13 @@
 # Histórico de versões
 
+## [15.0.0] - 2026-10-20
+
+- HomeBoard em container independente, fonte upstream fixada, dados incluidos no backup e HTTPS privado.
+- CasaOS removido preservando containers, volumes e /DATA; atalhos e monitoramento passam para HomeBoard.
+- Politica de tampa/inatividade no systemd-logind e XFCE para manter o notebook ligado; bateria critica preservada.
+- Scripts de preparacao/retorno e documentacao da mudanca.
+
+
 ## [14.0.0] - 2026-10-18
 
 - Preparação valida os caminhos de configuração e segredos, substitui apenas diretórios vazios por arquivos e preserva conteúdo existente.
