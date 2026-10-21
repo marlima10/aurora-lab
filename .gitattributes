@@ -13,3 +13,6 @@ Dockerfile text eol=lf
 *.example text eol=lf
 /docker/server/octoprint/root/etc/cont-init.d/* text eol=lf
 /docker/server/octoprint/root/etc/services.d/*/run text eol=lf
+
+# Unified patch context lines legitimately contain a single space.
+/docker/server/opengym/charts.patch text eol=lf whitespace=-blank-at-eol

@@ -3,7 +3,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 HOME=/tmp
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY mapping.py server.py personal_api.py auto_sync.py ./
+COPY mapping.py server.py personal_api.py auto_sync.py backfill.py ./
 COPY static ./static
 USER 65534:65534
 EXPOSE 8080

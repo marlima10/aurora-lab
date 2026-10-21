@@ -1,0 +1,25 @@
+.aurora-training-charts { container-type: inline-size; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; min-width: 0; margin-block: 16px; align-items: start; }
+.aurora-training-charts > .card { grid-column: 1 / -1; grid-row: 1; margin: 0; min-width: 0; }
+.aurora-metrics-range { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.aurora-metrics-range .seg { width: min(100%, 310px); flex: 0 0 auto; }
+.aurora-metrics-range .seg button { white-space: nowrap; }
+.aurora-metrics-grid { display: contents; }
+.aurora-metrics-grid > .card { grid-column: 1 / -1; }
+.aurora-training-charts > p { grid-column: 1 / -1; }
+.aurora-metric { min-width: 0; margin: 0; }
+.aurora-metric-total { font-size: 26px; font-weight: 600; margin-block: 10px; font-variant-numeric: tabular-nums; }
+.aurora-metric-table { max-height: 230px; overflow: auto; margin-block: 8px; }
+.aurora-metric table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.aurora-metric th, .aurora-metric td { padding: 6px; text-align: start; border-bottom: 1px solid var(--sep); }
+.aurora-metric summary { cursor: pointer; padding-block: 8px; }
+.aurora-metric summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+@container (min-width: 600px) {
+ .aurora-metrics-grid > .card:first-child { grid-column: 1 / 7; grid-row: 3; }
+ .aurora-metrics-grid > .card:last-child { grid-column: 7 / -1; grid-row: 3; }
+}
+@container (min-width: 900px) {
+ .aurora-metrics-range { grid-row: 1; }
+ .aurora-training-charts > .card { grid-column: 1 / 5; grid-row: 2; }
+ .aurora-metrics-grid > .card:first-child { grid-column: 5 / 9; grid-row: 2; }
+ .aurora-metrics-grid > .card:last-child { grid-column: 9 / -1; grid-row: 2; }
+}

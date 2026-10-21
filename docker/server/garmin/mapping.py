@@ -33,6 +33,8 @@ def convert(a):
         'end':round((start.timestamp()+duration)*1000),'routineId':None,
         'name':title+' · Garmin','entries':[{'id':eid,'mode':'cardio','sets':[row],'topW':None,'note':note}],
         'prs':[],'vol':0,'note':note,'garminActivity':{'id':aid,'sport':sport}}
+    calories=calories_value(a.get('calories'))
+    if calories is not None: workout['garminActivity']['calories']=calories
     exercise={'id':eid,'n':sport.replace('_',' ')+' (garmin resumo)','custom':True,
         'eq':'custom','tg':'garmin','desc':'Resumo de duração e distância; sem séries ou carga.','bp':'cardio'}
     return {'activity_id':aid,'name':title,'date':day,'minutes':round(duration/60,1),
@@ -55,3 +57,22 @@ def merge_records(state,records,ledger=()):
         if rec['exercise']['id'] not in ex:
             out['customEx'].append(copy.deepcopy(rec['exercise']));ex.add(rec['exercise']['id'])
     return out,added,skipped
+
+def calories_value(value):
+    # Absence is different from a measured zero; never estimate missing energy.
+    if value is None or isinstance(value,bool) or not isinstance(value,(int,float)): return None
+    return value if math.isfinite(value) and 0 <= value <= 200000 else None
+
+
+def enrich_calories(state,records):
+    """Fill missing Garmin calories on existing matching workouts only."""
+    out=copy.deepcopy(state);changed=0
+    source={r['workout']['id']:r for r in records}
+    for workout in out.get('workouts',[]):
+        record=source.get(workout.get('id'));meta=workout.get('garminActivity')
+        if not record or not isinstance(meta,dict) or str(meta.get('id'))!=record['activity_id']: continue
+        if calories_value(meta.get('calories')) is not None: continue
+        value=calories_value(record['workout']['garminActivity'].get('calories'))
+        if value is None: continue
+        meta['calories']=value;changed+=1
+    return out,changed
