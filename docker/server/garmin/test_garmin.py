@@ -105,7 +105,7 @@ class Bridge(unittest.TestCase):
   thread=threading.Thread(target=http.serve_forever,daemon=True);thread.start()
   base='http://127.0.0.1:'+str(http.server_port)
   try:
-   for path,data,origin,code in [('/garmin/status',None,None,401),('/garmin/login',b'{}','https://evil.test',403)]:
+   for path,data,origin,code in [('/garmin/status',None,None,401),('/garmin/login',b'{}','https://evil.test',403),('/garmin/auto',b'{"enabled":true}',server.ORIGIN,401),('/garmin/auto',b'{"enabled":true}','https://evil.test',403)]:
     req=urllib.request.Request(base+path,data=data,headers={'Origin':origin} if origin else {})
     with self.assertRaises(urllib.error.HTTPError) as caught:urllib.request.urlopen(req)
     self.assertEqual(caught.exception.code,code)

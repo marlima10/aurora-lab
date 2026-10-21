@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 17.0.0
+# Estrutura e arquitetura — AuroraLAB 18.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -120,3 +120,6 @@ A câmera fica no perfil Compose `camera`: configure `CAMERA_DEVICE` com `/dev/v
 ## Garmin Personal API
 
 `docker/server/garmin/personal_api.py` concentra o cliente oficial de leitura; `server.py` valida a chave por perfil em `/garmin/personal`, mantém a credencial fora do Git e reutiliza mapeamento/ledger de importações. A interface privada aceita a chave sem solicitar senha Garmin. O conector comunitário continua como opção anterior, sem fallback automático quando a chave oficial falha. Validação: suíte `test_personal_api.py` junto de `test_garmin.py`. Veja [GARMIN.md](GARMIN.md).
+
+
+`docker/server/garmin/auto_sync.py` agenda a leitura do treino mais recente a cada hora e usa o pareamento nativo openGym. Configuração e autorização ficam por perfil no volume Garmin, sem segredo global do backend. `write_records` em server.py centraliza importação manual/automática com a mesma proteção de revisão/duplicatas. O painel expõe ativação, pausa e execução imediata; o container retoma a agenda após reiniciar.

@@ -4,5 +4,6 @@
 !mapping.py
 !server.py
 !personal_api.py
+!auto_sync.py
 !static/
 !static/**

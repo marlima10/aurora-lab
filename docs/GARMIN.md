@@ -6,7 +6,7 @@ Conector AuroraLAB em container separado, com acesso à API oficial Garmin Conne
 
 Conecte o Tailscale, entre no openGym e abra o botão **Garmin → openGym** no portal ou `/garmin/` no mesmo endereço HTTPS do openGym. Use o mesmo navegador da sessão openGym. Para a API oficial, informe sua chave no formulário privado, conforme a seção de migração abaixo. A conexão comunitária anterior fica na opção expansível; somente nela são usados e-mail, senha e eventual código de verificação.
 
-Escolha até um ano por consulta, carregue a prévia e selecione as atividades. Só o botão **Importar selecionadas** grava no openGym. Até 1.000 atividades recentes são examinadas por consulta; a tela avisa se atingir esse limite. Não há sincronização automática ou envio para Garmin.
+Escolha até um ano por consulta, carregue a prévia e selecione as atividades. Só o botão **Importar selecionadas** grava no openGym. Até 1.000 atividades recentes são examinadas por consulta; a tela avisa se atingir esse limite. A importação manual não é automática; a opção de atualização horária está descrita abaixo. Não há envio para Garmin.
 
 Importa resumos de data local, nome, duração e distância (metros convertidos para quilômetros e velocidade canônica em km/h). Não importa séries detalhadas de musculação, repetições, cargas, calorias, frequência cardíaca, mapas ou coordenadas. A duração aparece como resumo cardio neutro, inclusive para musculação; não representa uma série de resistência nem calcula músculos/carga.
 
@@ -50,3 +50,14 @@ As atividades são consultadas em `/activitylist-service/activities/search/activ
 O endpoint de token usa POST sem corpo e `Accept: */*`, como no exemplo cURL oficial. O cliente aceita token em texto simples, string JSON ou objeto OAuth; as consultas de atividades pedem JSON. Recusas ficam identificadas por código HTTP/etapa em `personal-api-status.json`, sem corpo remoto ou credenciais. Os tokens não são gravados em disco.
 
 O tamanho de 25 foi validado na conta real após a API devolver HTTP 500 para páginas de 99/100 registros. O conector não ignora páginas com erro nem registra uma consulta incompleta como pronta. Mantém até 1.000 atividades por consulta e avisa quando atingir o limite.
+
+
+## Atualização automática do treino mais recente
+
+No perfil openGym já autenticado, **Ativar atualização a cada 1 hora** autoriza o conector a usar o pareamento nativo (`POST /api/pair/create` e `/api/pair/redeem`). O código de uso único é resgatado somente no servidor e o token resultante é guardado em `auto-auth.json`, modo 600, separado por perfil. Não há cópia de cookies do navegador, assinatura manual de tokens ou montagem do segredo global da API. O token nativo dá acesso ao perfil (não é um token com escopo reduzido); o conector usa apenas `/api/me` e `/api/data`. `GET /api/me` permite a renovação prevista pelo backend; uma sessão revogada/expirada pausa a automação até reativar pelo perfil autenticado.
+
+A primeira consulta é imediata. Depois, o próprio container Garmin verifica os horários persistidos a cada 15 segundos e executa a próxima consulta 3.600 segundos após o término da anterior. `auto-sync.json` registra perfil, ativação, próximo horário, última execução e resultado. Reiniciar o container conserva a agenda, sem depender de navegador ou de agendamento no Codex. Só a atividade mais recente é consultada (`start=0`, `limit=1`), e só é adicionada se ainda não existir no histórico/registro de IDs. Não atualiza nem sobrescreve treinos existentes e não recupera automaticamente atividades anteriores quando houver várias entre duas consultas: use a importação manual nesses casos.
+
+A gravação reutiliza a API oficial do openGym, revisão/conflito, mesclagem e snapshot anteriores à importação; planos, pesos e outros treinos são mantidos. Operações manuais e automáticas do mesmo perfil não se sobrepõem. Em falha da Garmin/rede não há gravação parcial; a próxima consulta é agendada para uma hora depois e a falha aparece no painel. Uma resposta ambígua de gravação é verificada pela leitura e pelo ID estável na próxima tentativa, evitando duplicatas.
+
+**Pausar atualização** remove o token local pareado e preserva a chave Garmin e os treinos. **Desconectar Garmin** também pausa e remove as credenciais Garmin. Cópias anteriores de backup podem conter esses tokens; a revogação global de sessões no próprio openGym também encerra a autorização do conector. Configuração, chave e autorização pareada ficam no volume Garmin já incluído no backup privado; nunca entram no Git. Testes adicionais: `test_auto_sync.py`.
