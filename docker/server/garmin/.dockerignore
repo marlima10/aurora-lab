@@ -3,5 +3,6 @@
 !requirements.txt
 !mapping.py
 !server.py
+!personal_api.py
 !static/
 !static/**

@@ -13,6 +13,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 from mapping import convert, merge_records
+from personal_api import PersonalAPI, PersonalAPIError, valid_secret
 os.umask(0o077)
 logging.disable(logging.CRITICAL)
 ROOT=Path(os.environ.get('DATA_DIR','/data'))
@@ -58,7 +59,8 @@ class User:
             if self.expires<time.time(): self.preview=[]
             done=set(self.ledger())
             return {'status':self.status,'busy':self.busy,'error':self.error,
-                'connected':(self.path/'tokens'/'garmin_tokens.json').exists(),
+                'connected':(self.path/'personal-api.json').exists() or (self.path/'tokens'/'garmin_tokens.json').exists(),
+                'provider':'personal' if (self.path/'personal-api.json').exists() else 'community' if (self.path/'tokens'/'garmin_tokens.json').exists() else None,
                 'activities':[{k:v for k,v in r.items() if k not in ('workout','exercise')}|{'imported':r['activity_id'] in done} for r in self.preview],
                 'truncated':self.truncated,'invalid':self.invalid}
 
@@ -68,6 +70,7 @@ def user_for(uid):
         return USERS[uid]
 
 def error_message(e):
+    if isinstance(e,PersonalAPIError): return str(e)
     if isinstance(e,(Problem,ValueError)): return e.message if isinstance(e,Problem) else str(e)
     name=type(e).__name__
     if 'TooManyRequests' in name: return 'A Garmin limitou as solicitações. Aguarde antes de tentar novamente.'
@@ -109,13 +112,38 @@ def login(u,email,password):
         client.password=None
         password=None
 
+def connect_personal(u,api_key):
+    try:
+        client=PersonalAPI(api_key)
+        # Validate both authentication and read access before replacing any credential.
+        client.activities(0,1)
+    except PersonalAPIError as error:
+        with u.lock:
+            u.save('personal-api-status.json',{'time':dt.datetime.now(dt.timezone.utc).isoformat(),
+                'ok':False,'http_status':error.http_status,'phase':error.phase})
+        raise
+    with u.lock:
+        u.save('personal-api.json',{'api_key':api_key})
+        (u.path/'personal-api.json').chmod(0o600)
+        u.save('personal-api-status.json',{'time':dt.datetime.now(dt.timezone.utc).isoformat(),'ok':True})
+        u.preview=[];u.expires=0
+
+
 def load(u,first,last):
-    from garminconnect import Garmin
     with u.lock: u.preview=[];u.expires=0;u.invalid=0;u.truncated=False
-    client=Garmin();client.login(str(u.path/'tokens'))
+    personal=u.path/'personal-api.json'
+    if personal.exists():
+        client=PersonalAPI(json.loads(personal.read_text())['api_key'])
+        page_size=25
+        get_page=lambda offset: client.activities(offset,page_size,first,last)
+    else:
+        from garminconnect import Garmin
+        client=Garmin();client.login(str(u.path/'tokens'))
+        page_size=100
+        get_page=lambda offset: client.get_activities(offset,page_size)
     rows=[];invalid=0;truncated=False
-    for offset in range(0,1000,100):
-        page=client.get_activities(offset,100)
+    for offset in range(0,1000,page_size):
+        page=get_page(offset)
         if not isinstance(page,list): raise ValueError('Resposta de atividades não reconhecida.')
         days=[]
         for raw in page:
@@ -123,7 +151,7 @@ def load(u,first,last):
             if first<=day<=last:
                 try: rows.append(convert(raw))
                 except (ValueError,TypeError): invalid+=1
-        if len(page)<100 or (days and min(days)<first): break
+        if len(page)<page_size or (days and min(days)<first): break
     else: truncated=True
     unique={r['activity_id']:r for r in rows}
     with u.lock:
@@ -185,6 +213,10 @@ class Handler(BaseHTTPRequestHandler):
             body=json.loads(raw)
             if not isinstance(body,dict): raise Problem(400,'Solicitação inválida.')
             path=urlsplit(self.path).path
+            if path=='/garmin/personal':
+                api_key=body.get('apiKey')
+                if not valid_secret(api_key): raise Problem(400,'Informe sua chave pessoal Garmin, sem espacos ou quebras de linha.')
+                background(u,lambda:connect_personal(u,api_key));return self.send(202,{'ok':True})
             if path=='/garmin/login':
                 email=body.get('email');password=body.get('password')
                 if not isinstance(email,str) or '@' not in email or len(email)>254 or not isinstance(password,str) or not 1<=len(password)<=1024:
@@ -208,7 +240,7 @@ class Handler(BaseHTTPRequestHandler):
                 with u.lock:
                     if u.busy: raise Problem(409,'Aguarde a operação atual.')
                     token=u.path/'tokens'/'garmin_tokens.json'
-                    token.unlink(missing_ok=True);u.preview=[];u.expires=0;u.status='idle';u.error=''
+                    token.unlink(missing_ok=True);(u.path/'personal-api.json').unlink(missing_ok=True);u.preview=[];u.expires=0;u.status='idle';u.error=''
                 return self.send(200,{'ok':True})
             raise Problem(404,'Página não encontrada.')
         except Exception as e:

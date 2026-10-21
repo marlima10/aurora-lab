@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## [17.0.0] - 2026-10-21
+
+- Integração com a API oficial Garmin Connect Personal, chave privada por perfil e validação de leitura antes de salvar.
+- Troca da chave por token com POST sem corpo, aceitando token em texto/JSON; consultas de atividades continuam em JSON.
+- Diagnóstico de código HTTP/etapa sem credenciais; redirects bloqueados e erros não expõem o corpo remoto.
+- Migração preserva o conector comunitário anterior, os IDs já importados e o fluxo manual de prévia/importação.
+- Testes cobrem autenticação, proteção da chave, negociação do token, isolamento e duplicatas.
+
+
 ## [16.0.0] - 2026-10-20
 
 - Atalhos Cockpit, OctoPrint e Home Assistant redirecionam para o nome HTTPS privado configurado, inclusive quando o portal é aberto por IP/HTTP.
