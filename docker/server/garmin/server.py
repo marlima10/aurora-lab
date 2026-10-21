@@ -12,7 +12,7 @@ import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
-from mapping import convert, merge_records
+from mapping import convert, merge_records, enrich_calories
 from personal_api import PersonalAPI, PersonalAPIError, valid_secret
 from auto_sync import AutoSync, SyncError
 os.umask(0o077)
@@ -188,6 +188,18 @@ def write_records(u,records,headers):
         u.save('imported.json',sorted(set(ledger)|set(added)|set(skipped)))
         return {'added':len(added),'skipped':len(skipped)}
     raise Problem(409,'O perfil mudou durante a importação. Recarregue e tente novamente.')
+
+def backfill_calories(u,records,headers):
+    for attempt in range(3):
+        _,current=request_json('/api/data',headers)
+        merged,count=enrich_calories(current['state'],records)
+        if not count: return {'updated':0}
+        u.save('before-calories.json',current)
+        code,_=request_json('/api/data',headers,{'state':merged,'baseRev':current['rev'],'baseWid':current['state'].get('_wid','')})
+        if code==409: continue
+        return {'updated':count}
+    raise Problem(409,'O perfil mudou. Recarregue antes de atualizar as calorias.')
+
 
 AUTO=AutoSync(ROOT,user_for,request_json,write_records,error_message)
 

@@ -5,5 +5,6 @@
 !server.py
 !personal_api.py
 !auto_sync.py
+!backfill.py
 !static/
 !static/**

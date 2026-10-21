@@ -1,6 +1,6 @@
 # openGym
 
-A versão 12 usa as imagens `opengym-api` e `opengym-web` 1.4.1 do projeto DuarteSantos8/openGym, fixadas por digest em `compose.opengym.yaml`. O overlay também define o importador Garmin separado. Não é o mesmo armazenamento do Fitness Aurora.
+A API usa a imagem oficial 1.4.1 do projeto DuarteSantos8/openGym, fixada por digest. Desde a versão 19, o frontend é reconstruído do mesmo commit upstream com os gráficos Aurora, herdando a imagem oficial fixada por digest; fonte e patch em `docker/server/opengym/`. Consulte [personalização e testes](../docker/server/opengym/README.md). O overlay também define o importador Garmin separado. Não é o mesmo armazenamento do Fitness Aurora.
 
 ## Pré-requisitos
 

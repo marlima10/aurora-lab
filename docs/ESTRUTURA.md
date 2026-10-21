@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 18.0.0
+# Estrutura e arquitetura — AuroraLAB 19.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -123,3 +123,8 @@ A câmera fica no perfil Compose `camera`: configure `CAMERA_DEVICE` com `/dev/v
 
 
 `docker/server/garmin/auto_sync.py` agenda a leitura do treino mais recente a cada hora e usa o pareamento nativo openGym. Configuração e autorização ficam por perfil no volume Garmin, sem segredo global do backend. `write_records` em server.py centraliza importação manual/automática com a mesma proteção de revisão/duplicatas. O painel expõe ativação, pausa e execução imediata; o container retoma a agenda após reiniciar.
+
+
+## Gráficos openGym (19.0.0)
+
+`docker/server/opengym/` reconstrói somente o frontend do commit upstream 1.4.1 fixado, aplicando patch e componentes React versionados. Home e Stats compartilham progresso, tempo de sessão e calorias Garmin. O backend segue a imagem oficial. O importador acrescenta calorias válidas aos novos resumos; enrich_calories/backfill_calories preenchem somente calorias ausentes em treinos Garmin existentes, com controle de revisão e snapshot antes da gravação, sem recriar exclusões ou modificar outras propriedades. A agenda horária mantém o comportamento de importar somente o último treino. Ver [personalização e testes](../docker/server/opengym/README.md).
