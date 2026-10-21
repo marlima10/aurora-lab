@@ -14,6 +14,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 from mapping import convert, merge_records
 from personal_api import PersonalAPI, PersonalAPIError, valid_secret
+from auto_sync import AutoSync, SyncError
 os.umask(0o077)
 logging.disable(logging.CRITICAL)
 ROOT=Path(os.environ.get('DATA_DIR','/data'))
@@ -24,11 +25,11 @@ GUARD=threading.Lock();USERS={}
 class Problem(Exception):
     def __init__(self,code,message): self.code=code;self.message=message
 
-def request_json(path,headers,body=None):
+def request_json(path,headers,body=None,method=None):
     h=dict(headers)
     if body is not None: h.update({'Content-Type':'application/json','Origin':ORIGIN})
     req=urllib.request.Request(API+path,data=json.dumps(body).encode() if body is not None else None,
-        headers=h,method='PUT' if body is not None else 'GET')
+        headers=h,method=method or ('PUT' if body is not None else 'GET'))
     try:
         with urllib.request.urlopen(req,timeout=30) as response: return response.status,json.load(response)
     except urllib.error.HTTPError as e:
@@ -45,6 +46,7 @@ def session(headers):
 
 class User:
     def __init__(self,uid):
+        self.uid=uid
         self.path=ROOT/hashlib.sha256(uid.encode()).hexdigest()
         self.path.mkdir(parents=True,exist_ok=True,mode=0o700)
         self.lock=threading.Lock();self.status='idle';self.error='';self.busy=False
@@ -62,7 +64,7 @@ class User:
                 'connected':(self.path/'personal-api.json').exists() or (self.path/'tokens'/'garmin_tokens.json').exists(),
                 'provider':'personal' if (self.path/'personal-api.json').exists() else 'community' if (self.path/'tokens'/'garmin_tokens.json').exists() else None,
                 'activities':[{k:v for k,v in r.items() if k not in ('workout','exercise')}|{'imported':r['activity_id'] in done} for r in self.preview],
-                'truncated':self.truncated,'invalid':self.invalid}
+                'truncated':self.truncated,'invalid':self.invalid,'auto':AUTO.view(self)}
 
 def user_for(uid):
     with GUARD:
@@ -71,7 +73,7 @@ def user_for(uid):
 
 def error_message(e):
     if isinstance(e,PersonalAPIError): return str(e)
-    if isinstance(e,(Problem,ValueError)): return e.message if isinstance(e,Problem) else str(e)
+    if isinstance(e,(Problem,SyncError,ValueError)): return e.message if isinstance(e,(Problem,SyncError)) else str(e)
     name=type(e).__name__
     if 'TooManyRequests' in name: return 'A Garmin limitou as solicitações. Aguarde antes de tentar novamente.'
     if 'Authentication' in name: return 'A Garmin recusou o acesso. Confira o login e o código de verificação.'
@@ -167,20 +169,27 @@ def import_selected(u,ids,headers):
         if len(records)!=len(selected): raise Problem(400,'Seleção inválida.')
         u.busy=True
     try:
-        ledger=u.ledger()
-        for attempt in range(3):
-            _,current=request_json('/api/data',headers)
-            state=current.get('state')
-            merged,added,skipped=merge_records(state,records,ledger)
-            if not added: return {'added':0,'skipped':len(skipped)}
-            u.save('before-import.json',current)
-            code,_=request_json('/api/data',headers,{'state':merged,'baseRev':current['rev'],'baseWid':state.get('_wid','')})
-            if code==409: continue
-            u.save('imported.json',sorted(set(ledger)|set(added)))
-            return {'added':len(added),'skipped':len(skipped)}
-        raise Problem(409,'O perfil mudou durante a importação. Recarregue e tente novamente.')
+        return write_records(u,records,headers)
     finally:
         with u.lock: u.busy=False
+
+def write_records(u,records,headers):
+    ledger=u.ledger()
+    for attempt in range(3):
+        _,current=request_json('/api/data',headers)
+        state=current.get('state')
+        merged,added,skipped=merge_records(state,records,ledger)
+        if not added:
+            if skipped:u.save('imported.json',sorted(set(ledger)|set(skipped)))
+            return {'added':0,'skipped':len(skipped)}
+        u.save('before-import.json',current)
+        code,_=request_json('/api/data',headers,{'state':merged,'baseRev':current['rev'],'baseWid':state.get('_wid','')})
+        if code==409: continue
+        u.save('imported.json',sorted(set(ledger)|set(added)|set(skipped)))
+        return {'added':len(added),'skipped':len(skipped)}
+    raise Problem(409,'O perfil mudou durante a importação. Recarregue e tente novamente.')
+
+AUTO=AutoSync(ROOT,user_for,request_json,write_records,error_message)
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self,*args): pass
@@ -202,7 +211,7 @@ class Handler(BaseHTTPRequestHandler):
             uid,_=session(self.headers)
             if path!='/garmin/status': raise Problem(404,'Página não encontrada.')
             self.send(200,user_for(uid).view())
-        except Exception as e: self.send(e.code if isinstance(e,Problem) else 502,{'error':error_message(e)})
+        except Exception as e: self.send(e.code if isinstance(e,(Problem,SyncError)) else 502,{'error':error_message(e)})
     def do_POST(self):
         try:
             length=int(self.headers.get('Content-Length','0'))
@@ -235,17 +244,29 @@ class Handler(BaseHTTPRequestHandler):
                 first=dt.date.fromisoformat(body.get('first',''));last=dt.date.fromisoformat(body.get('last',''))
                 if first>last or (last-first).days>366: raise Problem(400,'Escolha um período de até um ano.')
                 background(u,lambda:load(u,first.isoformat(),last.isoformat()));return self.send(202,{'ok':True})
+            if path=='/garmin/auto':
+                enabled=body.get('enabled')
+                if not isinstance(enabled,bool):raise Problem(400,'Escolha ativar ou pausar.')
+                view=AUTO.enable(u,headers) if enabled else AUTO.disable(u)
+                if enabled:threading.Thread(target=AUTO.run,args=(u,),daemon=True).start()
+                return self.send(200,{'ok':True,'auto':view})
+            if path=='/garmin/sync':
+                AUTO.schedule_now(u)
+                threading.Thread(target=AUTO.run,args=(u,),daemon=True).start()
+                return self.send(202,{'ok':True})
             if path=='/garmin/import': return self.send(200,import_selected(u,body.get('ids'),headers))
             if path=='/garmin/disconnect':
                 with u.lock:
                     if u.busy: raise Problem(409,'Aguarde a operação atual.')
                     token=u.path/'tokens'/'garmin_tokens.json'
+                    u.save('auto-sync.json',AUTO.config(u)|{'enabled':False,'next_run':None});(u.path/'auto-auth.json').unlink(missing_ok=True)
                     token.unlink(missing_ok=True);(u.path/'personal-api.json').unlink(missing_ok=True);u.preview=[];u.expires=0;u.status='idle';u.error=''
                 return self.send(200,{'ok':True})
             raise Problem(404,'Página não encontrada.')
         except Exception as e:
-            self.send(e.code if isinstance(e,Problem) else 400 if isinstance(e,(ValueError,TypeError)) else 502,{'error':error_message(e)})
+            self.send(e.code if isinstance(e,(Problem,SyncError)) else 400 if isinstance(e,(ValueError,TypeError)) else 502,{'error':error_message(e)})
 
 if __name__=='__main__':
     ROOT.mkdir(parents=True,exist_ok=True,mode=0o700)
+    AUTO.start()
     ThreadingHTTPServer(('0.0.0.0',8080),Handler).serve_forever()

@@ -1,5 +1,15 @@
 # Histórico de versões
 
+## [18.0.0] - 2026-10-21
+
+- Atualização opcional a cada hora do treino Garmin mais recente, com primeira consulta imediata após ativação.
+- Pareamento nativo openGym por perfil e renovação da sessão; autorização privada sem segredo global do backend.
+- Agenda e resultados persistentes, controles de pausa/execução imediata e retomada após reiniciar o container.
+- Mesma proteção de revisão/duplicatas nas importações manuais e automáticas, inclusive recuperação após resposta de gravação perdida.
+- Automação começa desativada e depende da ativação no painel autenticado. Treinos anteriores continuam na importação manual.
+- 32 testes cobrem autenticação, isolamento, conflitos, renovação, reinício, falhas e preservação do histórico.
+
+
 ## [17.0.0] - 2026-10-21
 
 - Integração com a API oficial Garmin Connect Personal, chave privada por perfil e validação de leitura antes de salvar.
