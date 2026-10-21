@@ -1,10 +1,10 @@
 # Garmin → openGym
 
-Conector comunitário `garminconnect` 0.3.19 em container separado. Não é um plugin oficial do openGym ou da Garmin. Não requer criação de aplicativo Strava. Mudanças no login Garmin podem interromper o acesso.
+Conector AuroraLAB em container separado, com acesso à API oficial Garmin Connect Personal e manutenção opcional do conector comunitário `garminconnect` 0.3.19. Não é um plugin publicado pela Garmin ou pelo openGym. Não requer aplicativo Strava.
 
 ## Uso
 
-Conecte o Tailscale, entre no openGym e abra o botão **Garmin → openGym** no portal ou `/garmin/` no mesmo endereço HTTPS do openGym. Use o mesmo navegador da sessão openGym. Informe e-mail e senha Garmin apenas nessa página privada; se solicitado, informe o código de verificação dentro de três minutos.
+Conecte o Tailscale, entre no openGym e abra o botão **Garmin → openGym** no portal ou `/garmin/` no mesmo endereço HTTPS do openGym. Use o mesmo navegador da sessão openGym. Para a API oficial, informe sua chave no formulário privado, conforme a seção de migração abaixo. A conexão comunitária anterior fica na opção expansível; somente nela são usados e-mail, senha e eventual código de verificação.
 
 Escolha até um ano por consulta, carregue a prévia e selecione as atividades. Só o botão **Importar selecionadas** grava no openGym. Até 1.000 atividades recentes são examinadas por consulta; a tela avisa se atingir esse limite. Não há sincronização automática ou envio para Garmin.
 
@@ -35,3 +35,18 @@ python3 -m unittest discover -s docker/server/garmin -p 'test_*.py' -v
 Testes usam dados sintéticos e API simulada. Login real e primeira importação dependem do titular da conta e devem ser confirmados separadamente. Nenhum dado pessoal é necessário para testar o código.
 
 Para validar o contêiner iniciado, use `sudo docker compose ps opengym-garmin` e `sudo docker compose logs --tail=80 opengym-garmin`. O healthcheck interno testa `/health`; acesso à conta Garmin é uma validação distinta. Confira os imports de test_garmin.py e use um ambiente Python de teste com as dependências necessárias se faltar um módulo; não instale pacotes de teste no Python do sistema indiscriminadamente.
+
+
+## API oficial pessoal — migração
+
+Referências consultadas em 21/10/2026: [chave e autenticação](https://developer.garmin.com/gc-developer-program/personal/personal-api/), [FAQ](https://developer.garmin.com/gc-developer-program/personal/personal-faq/) e [OpenAPI](https://developer.garmin.com/gc-developer-program/personal/swagger-docs/). A chave é criada pelo titular no Garmin Connect e mostrada uma única vez. Nunca envie pelo chat/Git. No painel privado `/garmin/`, entre no perfil openGym existente e informe a chave no campo **Chave pessoal Garmin**. Use a mesma conta Garmin do histórico anterior.
+
+**Validar e salvar chave** faz POST ao endpoint oficial `/personalapitoken-service/personal-api/personal-api-key/token`, com `Authorization: ApiKey ...`, e valida a leitura de uma atividade antes de substituir a credencial. Uma falha preserva a chave anterior e os dados. A chave validada fica em `data/garmin/<hash>/personal-api.json`, modo 600, no volume privado do perfil; status e logs não devolvem a chave. O navegador limpa o campo ao enviar e não a guarda em localStorage. O volume/backup pode conter essa chave; proteja os backups. A conexão comunitária anterior permanece disponível até **Desconectar**, que remove ambas as credenciais locais, mantendo importações e registro de duplicatas. Revogação na Garmin é separada.
+
+O token de acesso vale até 24 horas ou até a expiração da chave, o que ocorrer primeiro; não há refresh token. O conector obtém novo token em memória a cada operação de consulta. Uma chave de um ano precisa ser renovada pelo titular antes do vencimento. Somente o host HTTPS `personal.connectapi.garmin.com` é usado; redirects são recusados. O conector não consulta endpoints de saúde, sono ou localização.
+
+As atividades são consultadas em `/activitylist-service/activities/search/activities`, com filtros locais `startDate`/`endDate`, paginação de 25 registros na API oficial e ordem decrescente por `startLocal`. Mantém o limite de 1.000 registros por consulta e um ano por período. A prévia usa o mesmo `activityId`, conversão e registro persistente do conector anterior: atividades existentes/depois apagadas não reaparecem como novas. Salvar a chave/carregar a prévia não grava treinos no openGym. A importação continua manual, após selecionar as atividades; não inventa cargas ou séries. O funcionamento real depende da validação da chave do titular; testes sintéticos não comprovam acesso à conta real.
+
+O endpoint de token usa POST sem corpo e `Accept: */*`, como no exemplo cURL oficial. O cliente aceita token em texto simples, string JSON ou objeto OAuth; as consultas de atividades pedem JSON. Recusas ficam identificadas por código HTTP/etapa em `personal-api-status.json`, sem corpo remoto ou credenciais. Os tokens não são gravados em disco.
+
+O tamanho de 25 foi validado na conta real após a API devolver HTTP 500 para páginas de 99/100 registros. O conector não ignora páginas com erro nem registra uma consulta incompleta como pronta. Mantém até 1.000 atividades por consulta e avisa quando atingir o limite.
