@@ -1,0 +1,22 @@
+body { isolation: isolate; background: transparent; }
+body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(rgba(3,10,15,.66),rgba(3,10,15,.3)),url('/aurora-background.jpg') center center / cover no-repeat; }
+:root[data-theme="light"] body::before { background-image: linear-gradient(rgba(248,250,248,.55),rgba(248,250,248,.35)),url('/aurora-background.jpg'); }
+#app .card { background: color-mix(in srgb,var(--surface) 91%,transparent); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); }
+.aurora-home-panels { display: grid; gap: 14px; min-width: 0; }
+.aurora-home-panel { min-width: 0; }
+.aurora-home-panel > .card { margin: 0; }
+.aurora-home-panel .aurora-metric { margin-top: 10px; }
+.aurora-home-panel.arranging { border: 1px dashed var(--label-3); border-radius: 16px; padding: 8px; }
+.aurora-home-panel.dragging { outline: 2px solid var(--acc); opacity: .75; }
+.aurora-arrange-toolbar,.aurora-panel-handlebar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.aurora-arrange-toolbar { justify-content: space-between; }
+.aurora-arrange-toolbar button,.aurora-panel-handlebar button { min-height: 44px; min-width: 44px; border-radius: 10px; background: var(--surface); padding: 8px 12px; font-size: 13px; }
+.aurora-arrange-toggle { color: var(--acc); }
+.aurora-panel-handlebar { flex-wrap: nowrap; margin-bottom: 8px; }
+.aurora-panel-handle { display: flex; align-items: center; gap: 8px; flex: 1; text-align: start; cursor: grab; touch-action: none; user-select: none; }
+.aurora-panel-handle:active { cursor: grabbing; }
+.aurora-panel-handle span { overflow-wrap: anywhere; }
+.aurora-panel-handlebar button:disabled { opacity: .35; cursor: default; }
+.aurora-panel-announcement:empty { display: none; }
+.aurora-panel-announcement { font-size: 13px; background: var(--surface); padding: 8px; border-radius: 8px; }
+@media (prefers-reduced-transparency: reduce) { #app .card { background: var(--surface); backdrop-filter: none; } }

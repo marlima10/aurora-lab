@@ -18,7 +18,7 @@ for(const [name,View] of [['home',Home],['stats',Stats]]) it(name+' renders prog
  act(()=>root.render(<View/>))
  expect(host.textContent).toContain('Exercise progress');expect(host.textContent).toContain('Tempo de exercício');expect(host.textContent).toContain('Calorias gastas')
  expect(host.querySelector('[aria-label="Tempo de exercício"]').textContent).toContain('60');expect(host.querySelector('[aria-label="Calorias gastas"]').textContent).toContain('450')
- expect(host.querySelectorAll('section[aria-label="Gráficos de treino"]')).toHaveLength(1)
+ expect(host.querySelectorAll(name === 'home' ? '[data-home-panel="progress"]' : 'section[aria-label="Gráficos de treino"]')).toHaveLength(1)
 })
 it('shows real zero, missing coverage and daily accessible table',()=>{
  act(()=>root.render(<TrainingMetrics S={{workouts:[workout('one',0),workout('two',null)]}}/>))

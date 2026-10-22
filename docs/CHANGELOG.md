@@ -154,3 +154,10 @@ Distribuição portátil original do portal e Fitness, com Nginx, PHP-FPM e SQLi
 - Gráfico de progresso existente também na página inicial; tempo de exercício e calorias Garmin nas duas páginas, com filtros de período, totais por dia, cobertura e tabela acessível.
 - Frontend reconstruído de fonte upstream fixada, com patch reproduzível, tema e cache PWA preservados.
 - Calorias válidas nos novos resumos Garmin; enriquecimento das calorias ausentes no histórico com controle de revisão, preservando edições e exclusões. Dados ausentes não são estimados nem tratados como zero.
+
+
+## 20.0.0 — Fundo e organização do openGym
+
+- Imagem fornecida pelo titular como fundo, com tratamento de contraste por tema e cache offline.
+- Painéis independentes no Início, reorganizados por arraste, toque, teclado ou botões. Preferência sincronizada por perfil e restauração da ordem padrão.
+- Controles de treino preservados; organização somente no modo dedicado. Nenhuma alteração nos treinos, calorias ou agenda Garmin.
