@@ -17,7 +17,7 @@ services:
       driver: json-file
       options: {max-size: 10m, max-file: '3'}
   opengym-web:
-    image: auroralab-opengym-web:19.0.0
+    image: auroralab-opengym-web:20.0.0
     build: ./docker/server/opengym
     ports: ['127.0.0.1:8081:80']
     environment:

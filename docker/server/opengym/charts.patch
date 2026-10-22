@@ -1,3 +1,15 @@
+diff --git a/frontend/public/sw.js b/frontend/public/sw.js
+index f6822658..b93520b5 100644
+--- a/frontend/public/sw.js
++++ b/frontend/public/sw.js
+@@ -62,6 +62,7 @@ async function precache() {
+   // a blank page. A chunk that will not cache fails the install instead, which keeps the working
+   // build and its cache exactly where they are. Images, icons and the manifest stay best-effort —
+   // a missing icon is not a broken app.
++  refs.push('aurora-background.jpg') // Best-effort offline background; source photo is unchanged.
+   const code = refs.filter(u => /\.(?:js|css)(?:\?|$)/.test(u))
+   // Fetched by hand rather than with `cache.add`, for the same reason index.html is: `add` takes
+   // a REDIRECT for an answer, and an auth proxy in front answers every request with its login
 diff --git a/frontend/src/components/LineChart.jsx b/frontend/src/components/LineChart.jsx
 index 546b4e41..1f4bf252 100644
 --- a/frontend/src/components/LineChart.jsx
@@ -26,30 +38,91 @@ index 546b4e41..1f4bf252 100644
    const hoverDates = hoverSource.map(p => p.d || isoOf(new Date(p.t)))
    const showYear = new Set(hoverDates.map(iso => new Date(iso + 'T12:00:00').getFullYear())).size > 1
 diff --git a/frontend/src/views/Home.jsx b/frontend/src/views/Home.jsx
-index 0ffeec0f..995f6a9a 100644
+index 0ffeec0f..7d9dd323 100644
 --- a/frontend/src/views/Home.jsx
 +++ b/frontend/src/views/Home.jsx
-@@ -6,6 +6,8 @@ import { fmtNum, fmtDate, todayISO, isoOf, weekStartOf, weekDayOffset, DAYS, DAY
+@@ -6,6 +6,9 @@ import { fmtNum, fmtDate, todayISO, isoOf, weekStartOf, weekDayOffset, DAYS, DAY
  import { t, tn, dateLocale } from '../lib/i18n.js'
  import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, starterPlanSheet, bwDeltaColor, weighInsSheet } from '../sheets.jsx'
  import LineChart from '../components/LineChart.jsx'
 +import { ExerciseProgress } from './Stats.jsx'
 +import TrainingMetrics from '../components/TrainingMetrics.jsx'
++import HomePanels from '../components/HomePanels.jsx'
  import Icon from '../components/Icon.jsx'
  import QueueRow from '../components/QueueRow.jsx'
  import { queueOf, queueView, weekTally, pinState } from '../lib/queue.js'
-@@ -187,6 +189,11 @@ export default function Home() {
-       </div>
-     )}
+@@ -106,7 +109,8 @@ export default function Home() {
+       <button className="iconbtn" onClick={() => nav('/settings')} aria-label={trouble ? t('Settings') + ', ' + t('Connection problem') : t('Settings')}><Icon name="gear" />{trouble && <span className="tab-dot" aria-hidden="true" />}</button>
+     </div>
  
-+    <section aria-label="Gráficos de treino" className="aurora-training-charts">
-+      <ExerciseProgress />
-+      <TrainingMetrics S={S} />
-+    </section>
-+
-     {S.showWeightCard !== false && <div className="card">
+-    <div className="card">
++    <HomePanels panels={[
++      { id: 'agenda', title: 'Agenda de treinos', content: (<div className="card">
+       {/* A coach week runs by order, not by weekday, so its progress row stands in for the
+           seven dots (components/QueueRow.jsx). The today row below stays as it is: the queue's
+           next session reaches it through effectiveRoutineIds like any planned routine. */}
+@@ -156,11 +160,8 @@ export default function Home() {
+           {t('Choose a different workout')}
+         </Button>
+       </div>}
+-    </div>
+-
+-    {/* Jump to the gym check-in cards (QR membership codes). Shown here as a quick tap on
+-        arrival at the gym; folds away per user via the "Gym check-in" switch in Settings. */}
+-    {S.checkIn !== false && (
++    </div>) },
++      { id: 'checkin', title: 'Check-in', content: (S.checkIn !== false && (
+       <div className="card tappable" style={{ cursor: 'pointer' }} {...tappable(() => nav('/checkin'))}>
+         <div className="row between">
+           <div className="row" style={{ gap: 9 }}>
+@@ -173,9 +174,8 @@ export default function Home() {
+           <Icon name="chevronRight" className="chev" />
+         </div>
+       </div>
+-    )}
+-
+-    {!S.routines.length && !S.active && (
++    )) },
++      { id: 'welcome', title: 'Boas-vindas', content: (!S.routines.length && !S.active && (
+       <div className="card">
+         <div className="row" style={{ gap: 10, marginBottom: 6 }}>
+           <span className="lrow-i"><Icon name="calendar" /></span>
+@@ -185,9 +185,11 @@ export default function Home() {
+         <Button variant="primary" icon="clipboard" onClick={starterPlanSheet}>{t('Load starter plan')}</Button>
+         <div style={{ height: 8 }} /><Button onClick={() => nav('/plan')}>{t('Build my own plan')}</Button>
+       </div>
+-    )}
+-
+-    {S.showWeightCard !== false && <div className="card">
++    )) },
++      { id: 'progress', title: 'Progresso por exercício', content: <ExerciseProgress /> },
++      { id: 'minutes', title: 'Tempo de exercício', content: <TrainingMetrics S={S} only="minutes" /> },
++      { id: 'calories', title: 'Calorias gastas', content: <TrainingMetrics S={S} only="calories" /> },
++      { id: 'weight', title: 'Peso corporal', content: (S.showWeightCard !== false && <div className="card">
        <div className="row between bw-head" style={{ marginBottom: 6 }}>
          <h2 style={{ margin: 0 }}>{t('Body weight')}</h2>
+         <div className="row" style={{ gap: 8 }}>
+@@ -221,9 +223,8 @@ export default function Home() {
+       </> : <div className="muted small">{S.weighIn === false
+         ? t('No weigh-ins yet. Log your weight to start the curve.')
+         : t("No weigh-ins yet. Log your weight to start the curve (we also ask before every workout).")}</div>}
+-    </div>}
+-
+-    <div className="card tappable" style={{ cursor: 'pointer' }} {...tappable(() => calendarSheet())}>
++    </div>) },
++      { id: 'streak', title: 'Sequência de treinos', content: (<div className="card tappable" style={{ cursor: 'pointer' }} {...tappable(() => calendarSheet())}>
+       <div className="row between">
+         <div>
+           <div className="row" style={{ gap: 7, fontSize: 22, fontWeight: 600, letterSpacing: '-.021em' }}>
+@@ -234,6 +235,7 @@ export default function Home() {
+         </div>
+         <Icon name="calendar" className="chev" style={{ fontSize: 20 }} />
+       </div>
+-    </div>
++    </div>) },
++    ]} />
+   </div>
+ }
 diff --git a/frontend/src/views/Stats.ex-range.test.jsx b/frontend/src/views/Stats.ex-range.test.jsx
 index 0089eba6..15ebe252 100644
 --- a/frontend/src/views/Stats.ex-range.test.jsx

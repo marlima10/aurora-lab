@@ -5,19 +5,19 @@ import { trainingMetrics } from '../lib/training-metrics.js'
 import './training-metrics.css'
 
 const number = value => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(value)
-export default function TrainingMetrics({ S }) {
+export default function TrainingMetrics({ S, only = null }) {
   const [days, setDays] = useState(30)
   const today = new Date().toLocaleDateString('sv-SE')
   const data = useMemo(() => trainingMetrics(S.workouts, days, new Date(today + 'T12:00:00')), [S.workouts, days, today])
   const choices = [{value: 7, label: '7 dias'}, {value: 30, label: '30 dias'}, {value: 90, label: '90 dias'}, {value: 0, label: 'Todos'}]
   return <>
     <div className="aurora-metrics-range">
-      <span className="small muted">Período de tempo e calorias</span>
+      <span className="small muted">{only === 'minutes' ? 'Período de tempo' : only === 'calories' ? 'Período de calorias' : 'Período de tempo e calorias'}</span>
       <Segmented value={days} onChange={setDays} options={choices} />
     </div>
     <div className="aurora-metrics-grid">
       {[{key: 'minutes', title: 'Tempo de exercício', unit: 'min', count: data.durationCount, color: 'var(--blue)', empty: 'Nenhum tempo de exercício registrado neste período.'},
-        {key: 'calories', title: 'Calorias gastas', unit: 'kcal', count: data.calorieCount, color: 'var(--orange)', empty: 'Sem calorias informadas pelo Garmin neste período.'}].map(metric => {
+        {key: 'calories', title: 'Calorias gastas', unit: 'kcal', count: data.calorieCount, color: 'var(--orange)', empty: 'Sem calorias informadas pelo Garmin neste período.'}].filter(metric => !only || metric.key === only).map(metric => {
         const points = data[metric.key], sum = points.reduce((total, point) => total + point.y, 0)
         return <section className="card aurora-metric" aria-label={metric.title} key={metric.key}>
           <h2>{metric.title}</h2>
