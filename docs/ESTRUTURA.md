@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 20.0.0
+# Estrutura e arquitetura — AuroraLAB 21.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -122,14 +122,19 @@ A câmera fica no perfil Compose `camera`: configure `CAMERA_DEVICE` com `/dev/v
 `docker/server/garmin/personal_api.py` concentra o cliente oficial de leitura; `server.py` valida a chave por perfil em `/garmin/personal`, mantém a credencial fora do Git e reutiliza mapeamento/ledger de importações. A interface privada aceita a chave sem solicitar senha Garmin. O conector comunitário continua como opção anterior, sem fallback automático quando a chave oficial falha. Validação: suíte `test_personal_api.py` junto de `test_garmin.py`. Veja [GARMIN.md](GARMIN.md).
 
 
-`docker/server/garmin/auto_sync.py` agenda a leitura do treino mais recente a cada hora e usa o pareamento nativo openGym. Configuração e autorização ficam por perfil no volume Garmin, sem segredo global do backend. `write_records` em server.py centraliza importação manual/automática com a mesma proteção de revisão/duplicatas. O painel expõe ativação, pausa e execução imediata; o container retoma a agenda após reiniciar.
+`docker/server/garmin/auto_sync.py` agenda a leitura dos 5 treinos mais recentes a cada hora e usa o pareamento nativo openGym. Configuração e autorização ficam por perfil no volume Garmin, sem segredo global do backend. `write_records` em server.py centraliza importação manual/automática com a mesma proteção de revisão/duplicatas. O painel expõe ativação, pausa e execução imediata; o container retoma a agenda após reiniciar.
 
 
 ## Gráficos openGym (19.0.0)
 
-`docker/server/opengym/` reconstrói somente o frontend do commit upstream 1.4.1 fixado, aplicando patch e componentes React versionados. Home e Stats compartilham progresso, tempo de sessão e calorias Garmin. O backend segue a imagem oficial. O importador acrescenta calorias válidas aos novos resumos; enrich_calories/backfill_calories preenchem somente calorias ausentes em treinos Garmin existentes, com controle de revisão e snapshot antes da gravação, sem recriar exclusões ou modificar outras propriedades. A agenda horária mantém o comportamento de importar somente o último treino. Ver [personalização e testes](../docker/server/opengym/README.md).
+`docker/server/opengym/` reconstrói somente o frontend do commit upstream 1.4.1 fixado, aplicando patch e componentes React versionados. Home e Stats compartilham progresso, tempo de sessão e calorias Garmin. O backend segue a imagem oficial. O importador acrescenta calorias válidas aos novos resumos; enrich_calories/backfill_calories preenchem somente calorias ausentes em treinos Garmin existentes, com controle de revisão e snapshot antes da gravação, sem recriar exclusões ou modificar outras propriedades. A agenda horária mantém o comportamento de consultar os 5 treinos mais recentes. Ver [personalização e testes](../docker/server/opengym/README.md).
 
 
 ## Fundo e painéis openGym (20.0.0)
 
 O frontend personalizado inclui a foto original em public/aurora-background.jpg e estilos de fundo para temas claro/escuro. HomePanels e home-panels.js organizam cada cartão do Início com arraste por ponteiro e controles acessíveis. A preferência auroraHomePanels usa o estado e a sincronização por perfil existentes; não há mudança na API ou nos treinos. TrainingMetrics aceita um filtro de métrica para minutos/calorias independentes no Início; Estatísticas mantém o conjunto anterior. O service worker acrescenta a foto ao cache opcional. Veja o README da personalização e testes HomePanels.test.jsx.
+
+
+## Janela Garmin (21.0.0)
+
+AutoSync usa ACTIVITY_LIMIT=5, preservando intervalo de 3600 segundos, pareamento e agenda persistida. Respostas acima do limite e lotes com atividades inválidas falham antes de gravar. Novos registros são enviados em ordem cronológica, mantendo deduplicação e proteção de exclusões. A interface e o status público informam o limite.
