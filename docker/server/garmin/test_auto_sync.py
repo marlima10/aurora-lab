@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 os.environ.setdefault('PUBLIC_ORIGIN','https://test.ts.net:8081')
 import server
-from auto_sync import AutoSync,SyncError,INTERVAL
+from auto_sync import AutoSync,SyncError,INTERVAL,ACTIVITY_LIMIT
 from test_garmin import SAMPLE,STATE
 
 class AutoSyncTests(unittest.TestCase):
@@ -20,7 +20,7 @@ class AutoSyncTests(unittest.TestCase):
         class Client:
             def __init__(inner,key):self.assertEqual(key,'synthetic-key')
             def activities(inner,start,limit):
-                self.assertEqual((start,limit),(0,1));return self.latest
+                self.assertEqual((start,limit),(0,5));return self.latest
         self.auto=AutoSync(self.root,lambda uid:self.u,self.api,server.write_records,server.error_message,client_factory=Client,clock=lambda:self.now)
     def tearDown(self):server.ROOT=self.old;self.temp.cleanup()
     def api(self,path,headers,body=None,method=None):
@@ -81,7 +81,7 @@ class AutoSyncTests(unittest.TestCase):
         with self.assertRaises(SyncError):self.enable()
         self.assertFalse((self.u.path/'auto-auth.json').exists());self.assertEqual(self.write_count,0)
     def test_bad_page_and_network_error_preserve_profile_and_retry_later(self):
-        self.enable();self.latest=[SAMPLE,SAMPLE];before=copy.deepcopy(self.state);self.execute_sync()
+        self.enable();self.latest=[SAMPLE]*6;before=copy.deepcopy(self.state);self.execute_sync()
         self.assertEqual(self.state,before);self.assertEqual(self.write_count,0)
         self.assertEqual(self.auto.config(self.u)['next_run'],self.now+INTERVAL)
         self.assertEqual(self.auto.config(self.u)['last_status'],'error');self.assertEqual(self.u.ledger(),[])
@@ -113,5 +113,28 @@ class AutoSyncTests(unittest.TestCase):
     def test_profile_config_cannot_select_another_user(self):
         self.enable();self.u.save('auto-sync.json',self.auto.config(self.u)|{'uid':'other'})
         self.auto.tick();self.assertEqual(self.write_count,0)
+
+    def test_five_latest_batch_imports_oldest_first_and_skips_existing(self):
+        self.latest=[SAMPLE|{'activityId':100+i,'startTimeLocal':f'2026-10-{22-i:02} 12:00:00','startTimeGMT':f'2026-10-{22-i:02} 15:00:00','calories':200+i} for i in range(5)]
+        self.enable();self.assertEqual(self.execute_sync(),{'added':5,'skipped':0})
+        self.assertEqual(self.write_count,1);self.assertEqual(self.auto.view(self.u)['activity_limit'],5)
+        self.assertEqual(self.auto.view(self.u)['latest_date'],'2026-10-22')
+        added=self.state['workouts'][1:];self.assertEqual([w['d'] for w in added],sorted(w['d'] for w in added))
+        self.assertTrue(all('calories' in w['garminActivity'] for w in added))
+        self.now+=INTERVAL;self.assertEqual(self.execute_sync(),{'added':0,'skipped':5});self.assertEqual(self.write_count,1)
+        self.assertEqual(self.state['routines'],STATE['routines']);self.assertEqual(self.state['bodyweight'],STATE['bodyweight'])
+    def test_mix_of_existing_deleted_and_new_does_not_resurrect_or_duplicate(self):
+        self.latest=[SAMPLE|{'activityId':100+i} for i in range(5)]
+        from mapping import convert
+        self.state['workouts'].append(convert(self.latest[0])['workout']);self.u.save('imported.json',['101'])
+        self.enable();self.assertEqual(self.execute_sync(),{'added':3,'skipped':2});self.assertEqual(self.write_count,1)
+        self.assertEqual(len(self.state['workouts']),5);self.assertEqual(len({w['id'] for w in self.state['workouts']}),5)
+    def test_any_invalid_activity_preserves_entire_profile_and_ledger(self):
+        self.latest=[SAMPLE,SAMPLE|{'activityId':2,'duration':0}];before=copy.deepcopy(self.state)
+        self.enable();self.execute_sync();self.assertEqual(self.state,before);self.assertEqual(self.write_count,0);self.assertEqual(self.u.ledger(),[])
+        self.assertEqual(self.auto.view(self.u)['last_status'],'error')
+    def test_empty_page_and_fewer_than_five_are_supported(self):
+        self.enable();self.latest=[];self.assertEqual(self.execute_sync(),{'added':0,'skipped':0})
+        self.now+=INTERVAL;self.latest=[SAMPLE,SAMPLE|{'activityId':2}];self.assertEqual(self.execute_sync(),{'added':2,'skipped':0})
 
 if __name__=='__main__':unittest.main()

@@ -1,4 +1,4 @@
-"""Hourly latest-activity sync using a native, renewable openGym paired session."""
+"""Hourly recent-activities sync using a native, renewable openGym paired session."""
 import datetime as dt
 import hashlib
 import json
@@ -9,6 +9,7 @@ from personal_api import PersonalAPI, PersonalAPIError, valid_secret
 from mapping import convert
 
 INTERVAL = 3600
+ACTIVITY_LIMIT = 5
 
 class SyncError(Exception):
     def __init__(self,code,message):self.code=code;self.message=message
@@ -28,7 +29,7 @@ class AutoSync:
 
     def view(self,u):
         c=self.config(u)
-        return {k:c.get(k) for k in ('last_run','last_status','last_error','last_added','last_skipped','latest_date','next_run')}|{'enabled':c.get('enabled') is True,'interval_seconds':INTERVAL}
+        return {k:c.get(k) for k in ('last_run','last_status','last_error','last_added','last_skipped','latest_date','next_run')}|{'enabled':c.get('enabled') is True,'interval_seconds':INTERVAL,'activity_limit':ACTIVITY_LIMIT}
 
     def enable(self,u,headers):
         with u.lock:
@@ -82,11 +83,11 @@ class AutoSync:
                 if not valid_secret(renewed):raise SyncError(502,'Resposta de renovacao openGym invalida.')
                 u.save('auto-auth.json',{'token':renewed});headers={'Authorization':'Bearer '+renewed}
             key=self.read(u,'personal-api.json').get('api_key')
-            rows=self.client_factory(key).activities(0,1)
-            if len(rows)>1:raise SyncError(502,'A Garmin devolveu uma pagina inesperada.')
-            records=[convert(rows[0])] if rows else []
+            rows=self.client_factory(key).activities(0,ACTIVITY_LIMIT)
+            if not isinstance(rows,list) or len(rows)>ACTIVITY_LIMIT:raise SyncError(502,'A Garmin devolveu uma pagina inesperada.')
+            records=sorted((convert(row) for row in rows),key=lambda r:(r['workout']['start'],r['activity_id']))
             result=self.write(u,records,headers) if records else {'added':0,'skipped':0}
-            c.update(last_status='ok',last_error='',last_added=result['added'],last_skipped=result['skipped'],latest_date=records[0]['date'] if records else None)
+            c.update(last_status='ok',last_error='',last_added=result['added'],last_skipped=result['skipped'],latest_date=records[-1]['date'] if records else None,activity_limit=ACTIVITY_LIMIT)
         except Exception as error:
             c.update(last_status='error',last_error=self.error_text(error),last_added=0,last_skipped=0)
             if getattr(error,'code',None)==401 or (isinstance(error,PersonalAPIError) and error.http_status in (401,403)):

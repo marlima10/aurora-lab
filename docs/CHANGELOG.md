@@ -161,3 +161,9 @@ Distribuição portátil original do portal e Fitness, com Nginx, PHP-FPM e SQLi
 - Imagem fornecida pelo titular como fundo, com tratamento de contraste por tema e cache offline.
 - Painéis independentes no Início, reorganizados por arraste, toque, teclado ou botões. Preferência sincronizada por perfil e restauração da ordem padrão.
 - Controles de treino preservados; organização somente no modo dedicado. Nenhuma alteração nos treinos, calorias ou agenda Garmin.
+
+
+## 21.0.0 — Sincronização dos últimos 5 treinos Garmin
+
+- Janela automática ampliada para os 5 treinos mais recentes, mantendo consulta a cada hora, autorização existente, calorias e proteção contra duplicatas/exclusões.
+- Validação integral do lote antes da gravação e envio das novas atividades em ordem cronológica.
