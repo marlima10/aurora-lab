@@ -53,7 +53,7 @@ def check_archive(source, expected_sha256, probe=None):
                     if normalized.parts[0]=='opengym': profiles+=1
             if not (root/'fitness/fitness.sqlite3').is_file() or databases < 1 or profiles < 1: raise ValueError('Dados essenciais ausentes no backup')
             apps = {}
-            for app in ('manyfold','mealie','actual'):
+            for app in ('manyfold','mealie','actual','auth'):
                 if (root/'config'/('compose.'+app+'.yaml')).exists():
                     candidates=list((root/app).rglob('*'))
                     db_count=0

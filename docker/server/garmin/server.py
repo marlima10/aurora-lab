@@ -38,6 +38,9 @@ def request_json(path,headers,body=None,method=None):
 
 def session(headers):
     forwarded={k:headers[k] for k in ('Cookie','Authorization') if headers.get(k)}
+    if os.environ.get('AURORA_SSO_ENABLED')=='1':
+        for name in ('X-Aurora-Identity','X-Aurora-Proxy-Secret'):
+            if headers.get(name):forwarded[name]=headers[name]
     if not forwarded: raise Problem(401,'Entre no openGym neste navegador e volte a esta página.')
     _,result=request_json('/api/me',forwarded)
     user=result.get('user') or {}

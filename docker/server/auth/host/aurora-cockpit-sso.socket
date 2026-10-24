@@ -1,0 +1,14 @@
+[Unit]
+Description=Private Unix socket for AuroraLAB Cockpit SSO
+Documentation=https://cockpit-project.org/guide/latest/cockpit-ws.8.html
+
+[Socket]
+ListenStream=/run/auroralab-cockpit/sso.sock
+SocketMode=0660
+SocketUser=root
+SocketGroup=aurora-sso
+DirectoryMode=0750
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,16 @@
+[Unit]
+Description=Cockpit local session for the administrator authorized by AuroraLAB SSO
+Requires=aurora-cockpit-sso.socket
+After=aurora-cockpit-sso.socket
+
+[Service]
+User=@LOCAL_USER@
+PAMName=cockpit
+Group=@LOCAL_USER@
+Environment=XDG_CONFIG_DIRS=/etc/auroralab-cockpit-sso
+Sockets=aurora-cockpit-sso.socket
+ExecStart=/usr/lib/cockpit/cockpit-ws --for-tls-proxy --local-session=/usr/bin/cockpit-bridge
+KillMode=mixed
+TimeoutStopSec=10
+# No TCP listener: systemd passes the private AF_UNIX listening socket.
+# Existing sudo/polkit policy is preserved; this does not grant root or NOPASSWD.

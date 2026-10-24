@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/aurora.css"><title>Aurora Lab · Histórico</title><link rel="stylesheet" href="/aurora-layout.css?v=20261007-1"></head><body><div class="wrap"><div class="top"><div class="brand">📈 AURORA LAB · HISTÓRICO</div><a class="btn" href="/">← Dashboard</a></div>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/aurora.css"><title>Aurora Lab · Histórico</title><link rel="stylesheet" href="/aurora-layout.css?v=20261024-v24"></head><body><div class="wrap"><div class="top"><div class="brand">📈 AURORA LAB · HISTÓRICO</div><a class="btn" href="/">← Dashboard</a></div>
 <div class="card"><div id="legend" class="chips" style="margin-bottom:12px"></div><canvas id="c" style="width:100%;height:380px;display:block;cursor:crosshair"></canvas><div class="muted" id="when" style="margin-top:8px">Últimas 24h · passe o mouse para ver os valores</div></div></div>
 <script src="/aurora.js?v=20261024-v23"></script><script>
 const S=[['cpu','CPU','%','#39e58c'],['memory','Memória','%','#3996ff'],['temp','Temperatura','°C','#ff9d24'],['disk','Disco','%','#8c5cff']];let d=[],hi=-1;
@@ -14,4 +14,4 @@ function draw(){const c=$('c'),r=c.getBoundingClientRect(),k=devicePixelRatio||1
 c.onmousemove=e=>{const r=c.getBoundingClientRect();hi=Math.max(0,Math.min(d.length-1,Math.round((e.clientX-r.left-38)/(r.width-48)*(d.length-1))));draw()};c.onmouseleave=()=>{hi=-1;draw()};
 async function go(){if(document.hidden)return;try{d=await json('/api/history.json');draw()}catch(e){console.error(e)}}
 addEventListener('resize',draw);document.addEventListener('visibilitychange',go);go();setInterval(go,60000);
-</script><script src="/aurora-layout.js?v=20261024-v23" defer></script></body></html>
+</script><script src="/aurora-layout.js?v=20261024-v24" defer></script></body></html>

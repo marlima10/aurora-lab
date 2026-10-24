@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 24.0.0 — revisão do portal e login único opcional
+
+Cabeçalhos de segurança em todas as rotas do Nginx, limite de tentativas em POST (energia e API Fitness), aviso na chave de energia quando o portal está em HTTP, movimento reduzido em todas as páginas e textos do Fitness atualizados de Armbian para servidor. Autenticação central opcional por e-mail e chave de 151 caracteres, gerador administrativo, permissões e adaptadores para os oito aplicativos; preparação privada e backup do novo banco. Ativação separada, sem migração automática de produção. [Descrição completa](RELEASE-24.md) · [Revisão técnica](REVISAO-24.md).
+
 ## 23.0.0 — novos aplicativos independentes
 
 Manyfold 0.153.0, Mealie 3.29.0 e Actual Budget 26.10.0: containers, redes e dados separados, HTTPS privado, contas protegidas, atalhos e backup/restore. [Descrição detalhada](RELEASE-23.md).

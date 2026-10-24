@@ -12,8 +12,8 @@
 <link rel="stylesheet" href="/aurora.css?v=20261007-2">
 <link rel="stylesheet" href="/portal-health.css?v=20261007-1">
 <title>Aurora Lab · Dashboard</title>
-<link rel="stylesheet" href="/aurora-layout.css?v=20261007-1">
-<link rel="stylesheet" href="/power.css?v=20261024-v22">
+<link rel="stylesheet" href="/aurora-layout.css?v=20261024-v24">
+<link rel="stylesheet" href="/power.css?v=20261024-v24">
 </head>
 <body>
 <div class="app">
@@ -290,7 +290,7 @@ async function update(){
   cpu.textContent=val(d.cpu,0)+'%';mem.textContent=val(d.memory,0)+'%';disk.textContent=val(d.disk,0)+'%';temp.textContent=val(d.temperature,0)+'°C';
   cpuSub.textContent=val(d.cores)+' núcleos · load '+val(d.load);memSub.textContent=val(d.memory_used,0)+' / '+val(d.memory_total,0)+' MB';diskSub.textContent=val(d.disk_used)+' / '+val(d.disk_total);tempSub.textContent='CPU / SoC';
   gauge('cpu',d.cpu,d.cpu,70,90);gauge('mem',d.memory,d.memory,80,90);gauge('disk',d.disk,d.disk,t.disk?.warn??80,t.disk?.crit??90);gauge('temp',+d.temperature,+d.temperature,t.temperature?.warn??75,t.temperature?.crit??85);
-  osInfo.textContent=val(d.os,'Armbian / Debian');kernelInfo.textContent=val(d.kernel);archInfo.textContent=val(d.arch);cpuInfo.textContent=val(d.cpu_model,(val(d.cores)+' cores'));ramdetail.textContent=val(d.memory_used,0)+' / '+val(d.memory_total,0)+' MB';swapdetail.textContent=val(d.swap_used,0)+' / '+val(d.swap_total,0)+' MB';diskdetail.textContent=val(d.disk_used)+' / '+val(d.disk_total)+' · livre '+val(d.disk_free);
+  osInfo.textContent=val(d.os,'Debian');kernelInfo.textContent=val(d.kernel);archInfo.textContent=val(d.arch);cpuInfo.textContent=val(d.cpu_model,(val(d.cores)+' cores'));ramdetail.textContent=val(d.memory_used,0)+' / '+val(d.memory_total,0)+' MB';swapdetail.textContent=val(d.swap_used,0)+' / '+val(d.swap_total,0)+' MB';diskdetail.textContent=val(d.disk_used)+' / '+val(d.disk_total)+' · livre '+val(d.disk_free);
   netIface.textContent=val(d.interface);gateway.textContent=val(d.gateway);topNetwork.textContent=d.interface?d.interface:'Conectado';networkStatus.textContent='● '+(d.interface?'Conectado':'Rede');
   let sv=[['🖨️','OctoPrint',d.octoprint,':5000'],['📷','Câmera (MJPEG)',d.webcam,':8080'],['🌐','Nginx (Portal)',d.nginx,':80'],['📁','Samba (Arquivos)',d.samba,':445'],['🛠️','Cockpit (Sistema)',d.cockpit,':9090'],['🏡','HomeBoard',d.homeboard,':8090 · HTTPS'],['🏠','Home Assistant',d.homeassistant,':8123'],['💪','openGym',d.opengym,':8081 · HTTPS'],['🔒','Tailscale (VPN)',d.tailscale,val(d.tailscale_ip)]];
   for(const [key,icon,label,port] of [['manyfold','🧊','Manyfold',3214],['mealie','🍽️','Mealie',9925],['actual','💰','Actual Budget',5006]])if(key in d)sv.push([icon,label,d[key],':'+port+' · HTTPS']);
@@ -311,7 +311,7 @@ function updateBackupHealth(){let el=document.getElementById('backupHealth');fet
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork();if(!cam.naturalWidth)connectCamera()}});
 update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
 </script>
-<script src="/aurora-layout.js?v=20261024-v23" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+<script src="/aurora-layout.js?v=20261024-v24" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
   <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
   <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
   <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>
@@ -326,11 +326,12 @@ update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadH
     <div class="power-brightness"><input id="powerBrightness" type="range" min="5" max="100" step="5" value="50" disabled><output id="powerBrightnessValue" for="powerBrightness">—</output></div>
     <label class="field" for="powerAdminKey">Chave administrativa do painel<input id="powerAdminKey" type="password" autocomplete="off" spellcheck="false" placeholder="Informe para autorizar alterações"></label>
     <p class="power-small">A chave é fornecida ao administrador. Não use a senha do Debian. Ela fica somente na memória desta aba enquanto aberta.</p>
+    <p class="power-warning" id="powerHttpWarning" role="note" hidden><span aria-hidden="true">⚠</span> Você está em HTTP: a chave trafega sem criptografia na rede local. Para alterar com mais segurança, abra o portal pelo endereço HTTPS do Tailscale.</p>
     <details><summary>Mais formas de economizar</summary><ul><li>Configure o apagamento da tela após 2–5 minutos no Debian.</li><li>Prefira cabo de rede quando disponível. Não desative o Wi-Fi que mantém seu acesso.</li><li>A NVIDIA está sendo monitorada; o painel não altera drivers nem força o desligamento da GPU.</li><li>Suspensão 00h–07h: desativada até testar o RTC com acesso físico. Não suspender durante impressão, backup ou atualização.</li></ul></details>
     <div class="power-feedback" id="powerFeedback" role="status" aria-live="polite"></div>
     <div class="power-dialog-actions"><button class="power-btn" id="powerCancel" type="button">Fechar</button><button class="power-btn primary" id="powerApply" type="submit" disabled>Aplicar economia</button></div>
   </form>
 </dialog>
-<script src="/power.js?v=20261024-v22" defer></script>
+<script src="/power.js?v=20261024-v24" defer></script>
 <script src="/operations.js?v=20261024-v23" defer></script>
 </body></html>

@@ -1,0 +1,145 @@
+# Optional: activate only after the native identity mappings and isolated rehearsal pass.
+# Requires Docker Compose >=2.24.4 for !reset / !override. Never use this to remove data.
+services:
+  auth:
+    build: ./docker/server/auth
+    image: auroralab-auth:24.0.0
+    environment:
+      AUTH_ORIGIN: https://${AURORA_PRIVATE_HOST:?configure private HTTPS host}
+      AUTH_APP_CONFIG: /run/secrets/sso-apps.json
+    volumes:
+      - ./data/auth:/data
+      - ./secrets/sso/apps.json:/run/secrets/sso-apps.json:ro
+    networks: [auth]
+    user: '65534:65534'
+    read_only: true
+    tmpfs: ['/tmp:size=16m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7777/health',timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
+  auth-gateway:
+    build: ./docker/server/auth/gateway
+    image: auroralab-auth-gateway:24.0.0
+    ports:
+      - '0.0.0.0:80:8088'
+      - '0.0.0.0:8088:8088'
+      - '127.0.0.1:18080:8080'
+      - '127.0.0.1:3214:3214'
+      - '127.0.0.1:9925:9925'
+      - '127.0.0.1:5006:5006'
+      - '127.0.0.1:8081:8081'
+      - '127.0.0.1:5000:5000'
+      - '127.0.0.1:8123:8123'
+      - '127.0.0.1:8090:8090'
+      - '127.0.0.1:9090:9090'
+    extra_hosts: ['host.docker.internal:host-gateway']
+    volumes:
+      - ./secrets/sso/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+      - /run/auroralab-cockpit:/run/auroralab-cockpit:ro
+    networks: [auth, default, manyfold, mealie, actual, opengym]
+    depends_on:
+      auth: {condition: service_healthy}
+    read_only: true
+    tmpfs: ['/tmp:size=32m', '/var/cache/nginx:size=32m', '/var/run:size=1m']
+    mem_limit: 128m
+    pids_limit: 64
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
+  ha-sso:
+    build:
+      context: ./docker/server/auth
+      dockerfile: Dockerfile.homeassistant
+    image: auroralab-homeassistant-sso:24.0.0
+    environment: {HA_NATIVE_UPSTREAM: 'http://172.31.248.1:18123'}
+    env_file: ./secrets/sso/homeassistant.env
+    networks:
+      auth:
+      ha-sso: {ipv4_address: 172.31.248.2}
+    user: '65534:65534'
+    read_only: true
+    tmpfs: ['/tmp:size=16m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 192m
+    pids_limit: 64
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
+  web:
+    ports: !reset []
+    volumes:
+      - ./secrets/sso/portal-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  monitor:
+    environment:
+      AURORA_MONITOR_SECRET_FILE: /run/secrets/sso-monitor.key
+    volumes:
+      - ./secrets/sso/monitor.key:/run/secrets/sso-monitor.key:ro
+  manyfold:
+    ports: !reset []
+    env_file: ./secrets/sso/manyfold.env
+    volumes:
+      - ./docker/server/auth/adapters/manyfold.rb:/usr/src/app/config/initializers/aurora_sso.rb:ro
+  mealie:
+    ports: !reset []
+    build:
+      context: ./docker/server/auth
+      dockerfile: Dockerfile.mealie
+    image: auroralab-mealie-sso:24.0.0
+    env_file: ./secrets/sso/mealie.env
+    environment:
+      REVERSE_PROXY_AUTH_ENABLED: 'true'
+      REVERSE_PROXY_AUTH_HEADER: X-Aurora-Identity
+      REVERSE_PROXY_AUTH_SIGNUP_ENABLED: 'false'
+      REVERSE_PROXY_AUTH_SECRET_HEADER: X-Mealie-Reverse-Proxy-Secret
+  actual:
+    ports: !reset []
+    environment:
+      ACTUAL_LOGIN_METHOD: header
+      ACTUAL_ALLOWED_LOGIN_METHODS: header
+      ACTUAL_TRUSTED_AUTH_PROXIES: '10.0.0.0/8,172.16.0.0/12,192.168.0.0/16'
+  opengym-web:
+    ports: !reset []
+  opengym-api:
+    build:
+      context: ./docker/server/auth
+      dockerfile: Dockerfile.opengym
+    image: auroralab-opengym-api-sso:24.0.0
+    env_file: ./secrets/sso/opengym.env
+    environment: {AURORA_SSO_ENABLED: '1'}
+  opengym-garmin:
+    environment: {AURORA_SSO_ENABLED: '1'}
+  octoprint:
+    ports: !reset []
+    env_file: ./secrets/sso/octoprint.env
+    volumes:
+      - ./docker/server/auth/adapters/octoprint_aurora.py:/octoprint/octoprint/plugins/aurora_identity.py:ro
+  homeboard:
+    ports: !reset []
+    build:
+      context: ./docker/server/auth
+      dockerfile: Dockerfile.homeboard
+    image: auroralab-homeboard-sso:24.0.0
+    env_file: ./secrets/sso/homeboard.env
+    environment: {AURORA_SSO_ENABLED: '1'}
+  cockpit:
+    ports: !reset []
+  camera:
+    ports: !override ['127.0.0.1:8080:8080']
+  backup:
+    volumes:
+      - ./data/auth:/source/auth:ro
+      - ./compose.auth.yaml:/source/config/compose.auth.yaml:ro
+networks:
+  auth: {internal: true}
+  ha-sso:
+    internal: true
+    ipam:
+      config: [{subnet: 172.31.248.0/29}]

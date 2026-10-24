@@ -104,7 +104,7 @@
 
   function start(detail) {
     if (!window.fitnessCanSaveToSql?.()) {
-      alert('O banco SQL do Armbian está indisponível. Aguarde a sincronização antes de iniciar um treino guiado.');
+      alert('O banco SQL do servidor está indisponível. Aguarde a sincronização antes de iniciar um treino guiado.');
       return;
     }
     const plan = detail?.plan;

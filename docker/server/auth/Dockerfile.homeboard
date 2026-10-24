@@ -1,0 +1,10 @@
+FROM auroralab-homeboard:71da9914a809 AS upstream
+FROM python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f AS patch
+WORKDIR /patch
+COPY adapters/patch_homeboard.py adapters/homeboard-auth.sha256 ./
+COPY --from=upstream /app/lib/auth.mjs /patch/auth.mjs
+RUN python patch_homeboard.py /patch/auth.mjs
+
+FROM upstream
+COPY --from=patch /patch/auth.mjs /app/lib/auth.mjs
+COPY adapters/aurora-auth.mjs /app/lib/aurora-auth.mjs

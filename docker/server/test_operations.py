@@ -49,11 +49,11 @@ class OperationsTests(unittest.TestCase):
         with tarfile.open(p,'r:gz') as t: rows=[(m,t.extractfile(m).read()) for m in t if m.isfile()]
         with tarfile.open(p,'w:gz') as t:
             for m,value in rows:t.addfile(m,io.BytesIO(value))
-            for app in ('manyfold','mealie','actual'):
+            for app in ('manyfold','mealie','actual','auth'):
                 value=b'services: {}';m=tarfile.TarInfo('config/compose.'+app+'.yaml');m.size=len(value);t.addfile(m,io.BytesIO(value))
                 m=tarfile.TarInfo('sqlite-snapshots/'+app+'/fixture.sqlite3');value=(self.root/'source.sqlite3').read_bytes();m.size=len(value);t.addfile(m,io.BytesIO(value))
-        h=hashlib.sha256(p.read_bytes()).hexdigest();result=check_archive(p,h);self.assertEqual(set(result['apps_verified']),{'manyfold','mealie','actual'})
-        with tarfile.open(p,'r:gz') as t:rows=[(m,t.extractfile(m).read()) for m in t if m.isfile() and not m.name.startswith('sqlite-snapshots/actual/')]
+        h=hashlib.sha256(p.read_bytes()).hexdigest();result=check_archive(p,h);self.assertEqual(set(result['apps_verified']),{'manyfold','mealie','actual','auth'})
+        with tarfile.open(p,'r:gz') as t:rows=[(m,t.extractfile(m).read()) for m in t if m.isfile() and not m.name.startswith('sqlite-snapshots/auth/')]
         with tarfile.open(p,'w:gz') as t:
             for m,value in rows:t.addfile(m,io.BytesIO(value))
         h=hashlib.sha256(p.read_bytes()).hexdigest();self.assertRaises(ValueError,check_archive,p,h)

@@ -77,6 +77,14 @@ class Bridge(unittest.TestCase):
   with patch.object(server,'request_json',return_value=(200,{'user':{'id':'one'}})):
    uid,h=server.session({'Cookie':'synthetic','X-User':'other'})
   self.assertEqual(uid,'one');self.assertEqual(h,{'Cookie':'synthetic'})
+ def test_sso_identity_is_forwarded_only_when_explicitly_enabled(self):
+  headers={'X-Aurora-Identity':'existing-profile','X-Aurora-Proxy-Secret':'fixture-private-proxy-secret-000000000'}
+  with patch.dict(os.environ,{'AURORA_SSO_ENABLED':'0'}):
+   with self.assertRaises(server.Problem):server.session(headers)
+  with patch.dict(os.environ,{'AURORA_SSO_ENABLED':'1'}):
+   with patch.object(server,'request_json',return_value=(200,{'user':{'id':'existing-profile'}})) as call:
+    uid,forwarded=server.session(headers)
+   self.assertEqual(uid,'existing-profile');self.assertEqual(forwarded,headers);call.assert_called_once_with('/api/me',headers)
  def test_login_mfa_token_save_without_password_persistence(self):
   u=self.user();clients=[]
   class Fake:

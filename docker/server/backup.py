@@ -43,7 +43,7 @@ def backup():
         required={'fitness/fitness.sqlite3'}
         history='octoprint/octoprint/data/printhistory/history.db'
         if (pathlib.Path('/source')/history).exists(): required.add(history)
-        for app in ('manyfold','mealie','actual'):
+        for app in ('manyfold','mealie','actual','auth'):
             if (pathlib.Path('/source')/app).exists() and not any(db.startswith(app+'/') for db in databases): raise RuntimeError('Banco de aplicativo adicional ausente')
         if not required.issubset(databases): raise RuntimeError('Banco esperado ausente')
         partial=target.with_suffix(target.suffix+'.partial')

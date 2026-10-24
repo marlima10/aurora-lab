@@ -1,0 +1,5 @@
+FROM ghcr.io/mealie-recipes/mealie@sha256:78eb28b8776d0bad40c5e605c72b3f4f5976793e491558c7dcbdfc04c835d4bc
+USER root
+COPY adapters/aurora_mealie.py /opt/mealie/lib/python3.14/site-packages/aurora_mealie.py
+COPY adapters/patch_mealie.py /tmp/patch_mealie.py
+RUN python /tmp/patch_mealie.py /opt/mealie/lib/python3.14/site-packages/mealie/app.py && rm /tmp/patch_mealie.py
