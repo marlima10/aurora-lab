@@ -1,6 +1,6 @@
 """Synthetic HA protocol tests, executed in the pinned HA runtime; no personal database."""
 import json
-from aiohttp import web
+from aiohttp import web, FormData
 from aiohttp.test_utils import AioHTTPTestCase, TestServer
 from ha_proxy import create_app
 
@@ -19,15 +19,23 @@ class HomeAssistantIdentityTests(AioHTTPTestCase):
             ws = web.WebSocketResponse()
             await ws.prepare(request)
             await ws.send_json({'type':'auth_required','ha_version':'fixture'})
-            auth = await ws.receive_json()
+            first = await ws.receive()
+            if first.type != web.WSMsgType.TEXT:
+                return ws
+            auth = json.loads(first.data)
             user = {'owner-token':OWNER,'other-token':OTHER}.get(auth.get('access_token'))
             if not user:
                 await ws.send_json({'type':'auth_invalid'})
                 await ws.close()
                 return ws
             await ws.send_json({'type':'auth_ok','ha_version':'fixture'})
+            last_id = 0
             async for message in ws:
                 data = json.loads(message.data)
+                if data['id'] <= last_id:
+                    await ws.send_json({'id':data['id'],'type':'result','success':False,'error':{'code':'id_reuse'}})
+                    continue
+                last_id = data['id']
                 result = {'id':user} if data.get('type') == 'auth/current_user' else {'native_user':user}
                 await ws.send_json({'id':data['id'],'type':'result','success':True,'result':result})
             return ws
@@ -37,7 +45,10 @@ class HomeAssistantIdentityTests(AioHTTPTestCase):
             self.assertNotIn('Cookie', request.headers)
             self.native_calls += 1
             if request.path == '/auth/token':
+                self.assertEqual(request.headers.get('Accept-Encoding'), 'identity')
                 data = await request.post()
+                if data.get('action') == 'revoke' and 'grant_type' not in data:
+                    return web.Response(status=200)
                 return web.json_response({'access_token':data.get('refresh_token','owner-token'), 'refresh_token':'fixture-refresh'})
             return web.json_response({'ok':True,'alias':request.headers.get('X-Forwarded-For')})
 
@@ -80,6 +91,37 @@ class HomeAssistantIdentityTests(AioHTTPTestCase):
         response=await self.client.post('/auth/token',headers=self.headers(),data={'refresh_token':'owner-token'})
         self.assertEqual(response.status,200)
         self.assertEqual((await response.json())['access_token'],'owner-token')
+
+    async def test_native_revocation_accepts_empty_success_response(self):
+        response=await self.client.post('/auth/token',headers=self.headers(),data={'action':'revoke','token':'fixture-refresh'})
+        self.assertEqual(response.status,200)
+        self.assertEqual(await response.read(),b'')
+
+    async def test_browser_multipart_token_and_revocation_with_lowercase_encoding(self):
+        for fields in ({'refresh_token':'owner-token'}, {'action':'revoke','token':'fixture-refresh'}):
+            form = FormData(default_to_multipart=True)
+            for key, value in fields.items():
+                form.add_field(key, value)
+            response = await self.client.post('/auth/token', headers=self.headers() | {'accept-encoding':'gzip, deflate'}, data=form)
+            self.assertEqual(response.status,200)
+            if 'action' in fields:
+                self.assertEqual(await response.read(),b'')
+            else:
+                self.assertEqual((await response.json())['access_token'],'owner-token')
+
+    async def test_revocation_field_cannot_bypass_refresh_owner_validation(self):
+        response=await self.client.post('/auth/token',headers=self.headers(),data={'action':'revoke','grant_type':'refresh_token','refresh_token':'other-token'})
+        self.assertEqual(response.status,400)
+
+    async def test_browser_websocket_compression_does_not_leak_to_native_handshake(self):
+        async with self.client.ws_connect('/api/websocket',headers=self.headers(),compress=15) as ws:
+            await ws.receive_json()
+            await ws.send_json({'type':'auth','access_token':'owner-token'})
+            self.assertEqual((await ws.receive_json())['type'],'auth_ok')
+            await ws.send_json({'id':1,'type':'get_states'})
+            result=await ws.receive_json()
+            self.assertTrue(result['success'])
+            self.assertEqual(result['result']['native_user'],OWNER)
 
     async def test_websocket_rejects_a_different_native_user(self):
         async with self.client.ws_connect('/api/websocket',headers=self.headers()) as ws:

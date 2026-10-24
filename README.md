@@ -1,12 +1,14 @@
-# AuroraLAB 24.0.0
+# AuroraLAB 25.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
 Este README acompanha a versão registrada em [`VERSION`](VERSION). Os guias operacionais ficam em [`docs/`](docs/); os padrões de trabalho, em [`skills/`](skills/).
 
-## Login único opcional
+## Login único e gestão de usuários
 
-A release 24 acrescenta autenticação por e-mail e chave de 151 caracteres, cadastro administrativo e adaptadores para os aplicativos. A ativação é separada e exige migração validada; atualizar o código não muda os acessos atuais. Consulte [preparação e migração](docs/LOGIN-UNICO.md), [revisão técnica](docs/REVISAO-24.md) e [release 24](docs/RELEASE-24.md).
+A release 25 conclui a migração validada do AuroraServer para o login por e-mail e chave de 151 caracteres. Uma sessão abre os oito aplicativos com suas identidades existentes. O administrador encontra o atalho **👥 Gestão de usuários** na página principal. A chave administrativa existente foi preservada.
+
+Outras instalações continuam exigindo ativação explícita do overlay e validação das identidades; atualizar o código sozinho não migra serviços. Consulte [preparação e migração](docs/LOGIN-UNICO.md), [release 25](docs/RELEASE-25.md) e a [revisão original dos adaptadores](docs/REVISAO-24.md).
 
 ## Escolha o ambiente
 
@@ -33,7 +35,7 @@ Abra [o portal](http://localhost:8088/). PHP e Composer são preparados na image
 
 Para o servidor Debian, siga a [instalação completa](docs/AURORASERVER.md), inclusive a escolha entre Tailscale no host e no contêiner. Não use o comando do portátil para atualizar uma instalação completa.
 
-Novidades desta versão: [descrição detalhada da release 23](docs/RELEASE-23.md).
+Novidades desta versão: [descrição detalhada da release 25](docs/RELEASE-25.md).
 
 ## Serviços e recursos
 
@@ -44,7 +46,7 @@ Novidades desta versão: [descrição detalhada da release 23](docs/RELEASE-23.m
 - Métricas do host, rede, armazenamento e status de backup.
 - Samba autenticado para arquivos de impressão.
 - HomeBoard em Docker com acesso HTTPS privado; CasaOS removido do ambiente atual.
-- Cockpit com autenticação local Debian e proxy HTTPS, sem habilitar senha no SSH.
+- Cockpit com sessão local Debian pelo gateway SSO privado, preservando sudo/polkit e SSH somente por chave.
 - Home Assistant Container e openGym em serviços separados.
 - Garmin → openGym com prévia, seleção, consulta automática dos cinco últimos treinos e resumo no Início.
 - Metas semanais por perfil, alertas no portal e teste isolado de restauração após o backup diário.

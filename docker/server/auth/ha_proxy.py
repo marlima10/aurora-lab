@@ -34,7 +34,7 @@ def identity(headers, secret):
 
 
 def headers_for(headers):
-    return {k: v for k, v in headers.items() if k.lower() not in HOP and not k.lower().startswith('x-aurora-') and k.lower() != 'cookie'}
+    return {k.lower(): v for k, v in headers.items() if k.lower() not in HOP and not k.lower().startswith(('x-aurora-', 'sec-websocket-')) and k.lower() != 'cookie'}
 
 
 async def authorize_socket(socket, auth, wanted):
@@ -95,11 +95,19 @@ def create_app(upstream, secret):
                 await browser.send_json(hello)
                 try:
                     message = await browser.receive_json(timeout=15)
-                    if message.get('type') != 'auth' or not await authorize_socket(backend, message, wanted):
+                    # Validate ownership on a separate socket. HA requires increasing command
+                    # IDs; an internal probe on the browser channel would consume its ID space.
+                    if message.get('type') != 'auth' or not await token_matches(message.get('access_token'), wanted, headers):
                         await browser.send_json({'type':'auth_invalid', 'message':'Entre no perfil autorizado pelo AuroraLAB.'})
                         await browser.close()
                         return browser
-                    await browser.send_json({'type':'auth_ok', 'ha_version':hello.get('ha_version')})
+                    await backend.send_json(message)
+                    native_auth = await backend.receive_json(timeout=15)
+                    if native_auth.get('type') != 'auth_ok':
+                        await browser.send_json({'type':'auth_invalid', 'message':'A sessão nativa não está válida.'})
+                        await browser.close()
+                        return browser
+                    await browser.send_json(native_auth)
 
                     async def pump(source, destination):
                         async for message in source:
@@ -126,13 +134,17 @@ def create_app(upstream, secret):
         # Bounded request body; native limits still apply downstream.
         body = await request.read()
         if request.path == '/auth/token':
-            headers['Accept-Encoding'] = 'identity'
+            headers['accept-encoding'] = 'identity'
         async with app['client'].request(request.method, target, headers=headers, data=body, allow_redirects=False) as response:
             response_headers = {k: v for k, v in response.headers.items() if k.lower() not in HOP}
             if request.path == '/auth/token' and response.status == 200:
                 raw = await response.content.read(65537)
                 if len(raw) > 65536:
                     raise web.HTTPBadGateway(text='Unexpected token response')
+                if not raw:
+                    # Native revocation returns an empty 200 for both URL-encoded
+                    # and browser multipart forms. No access token is disclosed.
+                    return web.Response(body=raw, status=response.status, headers=response_headers)
                 payload = json.loads(raw)
                 if not await token_matches(payload.get('access_token'), wanted, headers):
                     return web.json_response({'error':'invalid_grant'}, status=400, headers={'Cache-Control':'no-store'})
