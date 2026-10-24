@@ -5,7 +5,7 @@
   const money = n => Number.isFinite(n) ? n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '—';
   const profiles = { eco: 'Economia máxima', balanced: 'Equilibrado', performance: 'Desempenho', custom: 'Personalizado' };
   const statusNames = { Discharging: 'Na bateria', Charging: 'Carregando', Full: 'Carga completa', 'Not charging': 'Na tomada', Unknown: 'Estado indisponível' };
-  let latest = null, loading = false, lastFocus = null, adminKey = '';
+  let latest = null, loading = false, lastFocus = null, adminKey = '', centralSession = null;
   const configKey = 'aurora.energy.estimate.v1';
   const formFields = ['powerTariff', 'powerAwake', 'powerSleep', 'powerNightHours'];
   let preferences = {};
@@ -115,11 +115,11 @@
     if (!$('powerDialog').open) syncControls(controls);
   }
   function syncControls(controls) {
-    document.querySelectorAll('input[name="powerProfileChoice"]').forEach(radio => { radio.disabled = !controls.profiles_available; radio.checked = radio.value === controls.profile; });
-    $('powerBrightness').disabled = !controls.brightness_available;
+    document.querySelectorAll('input[name="powerProfileChoice"]').forEach(radio => { radio.disabled = !controls.profiles_available || (centralSession && !centralSession.admin); radio.checked = radio.value === controls.profile; });
+    $('powerBrightness').disabled = !controls.brightness_available || (centralSession && !centralSession.admin);
     $('powerBrightness').value = controls.brightness_percent ?? 50;
     $('powerBrightnessValue').textContent = number(controls.brightness_percent, 0) + '%';
-    $('powerApply').disabled = !controls.profiles_available && !controls.brightness_available;
+    $('powerApply').disabled = (!controls.profiles_available && !controls.brightness_available) || (centralSession && !centralSession.admin);
     $('powerControlNote').textContent = controls.manager ? 'Outro gerenciador está ativo: os perfis de CPU ficam bloqueados para evitar conflito.' : 'Economia máxima reduz os picos da CPU e desativa o turbo. Rede, Docker e USB permanecem ativos.';
   }
   async function refresh() {
@@ -162,6 +162,7 @@
   $('powerSettingsForm').addEventListener('submit', async event => {
     event.preventDefault();
     if (!latest) return;
+    if (centralSession && !centralSession.admin) { $('powerFeedback').textContent = 'Somente o administrador pode alterar estas configurações.'; return; }
     const feedback = $('powerFeedback'), key = $('powerAdminKey').value.trim() || adminKey;
     if (!key) { feedback.dataset.state = 'error'; feedback.textContent = 'Informe a chave administrativa do painel para aplicar alterações.'; $('powerAdminKey').focus(); return; }
     const controls = latest.controls || {}, payload = {};
@@ -178,8 +179,21 @@
       feedback.dataset.state = 'ok'; feedback.textContent = 'Configurações aplicadas no servidor e salvas para as próximas inicializações.';
       await refresh();
     } catch (error) { feedback.dataset.state = 'error'; feedback.textContent = error.message === 'Failed to fetch' ? 'Falha de conexão. Confira o estado do servidor antes de tentar novamente.' : error.message; }
-    finally { if (latest) $('powerApply').disabled = false; }
+    finally { if (latest) syncControls(latest.controls || {}); }
   });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  const insecureOrigin = location.protocol === 'http:' && !['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  if (insecureOrigin && $('powerHttpWarning')) $('powerHttpWarning').hidden = false;
+  // The optional gateway injects the native energy credential only after server-side admin checks.
+  fetch('/auth/session', { cache: 'no-store', credentials: 'same-origin' }).then(async response => {
+    if (!response.ok || !response.headers.get('Content-Type')?.includes('application/json')) return;
+    const session = await response.json();
+    if (typeof session.admin !== 'boolean' || !session.email) return;
+    centralSession = session; adminKey = session.admin ? 'central-session' : '';
+    const label = $('powerAdminKey').closest('label');
+    label.hidden = true;
+    if (label.nextElementSibling) label.nextElementSibling.textContent = session.admin ? 'Autorizado pela sua sessão central. Nenhuma segunda chave é necessária.' : 'Alterações disponíveis somente ao administrador do portal.';
+    if (latest) syncControls(latest.controls || {});
+  }).catch(() => {});
   updateCost(); refresh(); setInterval(refresh, 10000);
 })();

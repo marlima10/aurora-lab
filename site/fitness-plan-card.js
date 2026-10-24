@@ -59,7 +59,7 @@
       }
     } catch (error) {
       disableStart();
-      message.textContent = 'Não foi possível consultar a agenda no banco SQL. Verifique a conexão com o Armbian.';
+      message.textContent = 'Não foi possível consultar a agenda no banco SQL. Verifique a conexão com o servidor.';
     }
   }
 

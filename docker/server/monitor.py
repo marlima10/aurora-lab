@@ -1,6 +1,7 @@
 from alerts import AlertStore
 import datetime as dt
 import json
+import hmac
 import os
 import pathlib
 import shutil
@@ -16,6 +17,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
+
+# Optional SSO overlay protects the direct monitor port as well as the public gateway.
+MONITOR_SECRET_FILE = os.environ.get('AURORA_MONITOR_SECRET_FILE')
+MONITOR_SECRET = pathlib.Path(MONITOR_SECRET_FILE).read_text().strip() if MONITOR_SECRET_FILE else None
+if MONITOR_SECRET_FILE and (not MONITOR_SECRET or len(MONITOR_SECRET) < 32):
+    raise RuntimeError('Configure the private monitor proxy secret before enabling SSO')
 
 PROC = pathlib.Path('/host/proc')
 STATE = pathlib.Path('/state')
@@ -220,9 +227,13 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(payload)
 
     def do_POST(self):
+        if MONITOR_SECRET and not hmac.compare_digest(self.headers.get('X-Aurora-Monitor-Secret','').encode(),MONITOR_SECRET.encode()):
+            self.send_error(403); return
         self.power_proxy()
 
     def do_GET(self):
+        if MONITOR_SECRET and not hmac.compare_digest(self.headers.get('X-Aurora-Monitor-Secret','').encode(),MONITOR_SECRET.encode()):
+            self.send_error(403); return
         path = self.path.split('?', 1)[0]
         if path in SERVICE_ROUTES:
             try:

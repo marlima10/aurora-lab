@@ -16,3 +16,6 @@ Dockerfile text eol=lf
 
 # Unified patch context lines legitimately contain a single space.
 /docker/server/opengym/charts.patch text eol=lf whitespace=-blank-at-eol
+
+# Authentication adapters, Dockerfiles and host units are deployed on Linux.
+/docker/server/auth/** text eol=lf

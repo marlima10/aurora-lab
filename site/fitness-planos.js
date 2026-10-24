@@ -115,13 +115,13 @@
     });
   }
   function render() { renderPeople(); renderCards(); renderSchedule(); renderEditor(); }
-  async function saveState(previous, successMessage = 'Alterações gravadas no banco SQLite do Armbian.') {
+  async function saveState(previous, successMessage = 'Alterações gravadas no banco SQLite do servidor.') {
     if (saving) {
       if (previous) { state = previous; render(); }
       setStatus('Aguarde a gravação atual no SQL terminar antes de fazer outra alteração.', 'saving');
       return false;
     }
-    saving = true; setStatus('Gravando alterações no SQL do Armbian…', 'saving');
+    saving = true; setStatus('Gravando alterações no SQL do servidor…', 'saving');
     try {
       const response = await fetch('/fitness-api', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'save_plans', personId, expectedRevision: state.revision, plans: state.plans, schedule: state.schedule }) });
       const result = await response.json();
@@ -147,11 +147,11 @@
       state = { revision: data.revision, plans: data.plans, schedule: data.schedule };
       if (state.plans.length === 0 && seedIfEmpty) {
         const empty = clone(state); state = starterState(data.revision); render();
-        if (!await saveState(empty, 'Fichas iniciais gravadas no banco SQL do Armbian.')) { state = null; render(); return; }
+        if (!await saveState(empty, 'Fichas iniciais gravadas no banco SQL do servidor.')) { state = null; render(); return; }
       }
       if (state.plans.length !== 4) throw new Error('O SQL precisa ter as quatro fichas A, B, C e D. Recarregue para sincronizar.');
       render();
-      if (data.plans.length > 0) setStatus('Fichas e agenda carregadas do banco SQL do Armbian.', 'saved');
+      if (data.plans.length > 0) setStatus('Fichas e agenda carregadas do banco SQL do servidor.', 'saved');
     } catch (error) {
       state = null; render(); setStatus(`${error.message} O editor não grava planos offline.`, 'error');
     }
@@ -240,7 +240,7 @@
       await loadPersonPlans();
       $('#addScheduleDay').disabled = !state;
     } catch (error) {
-      setStatus(`${error.message} A página depende do SQL do Armbian para ler e salvar.`, 'error');
+      setStatus(`${error.message} A página depende do SQL do servidor para ler e salvar.`, 'error');
     }
   }
   init();

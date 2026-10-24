@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 23.0.0
+# Estrutura e arquitetura — AuroraLAB 24.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -154,3 +154,21 @@ PowerService mantém data/power/daily-energy.json, até 90 datas America/Sao_Pau
 Três overlays opcionais acrescentam os aplicativos, redes e volumes independentes. Manyfold usa a imagem padrão com SQLite e Redis separado; Mealie e Actual usam SQLite local. docker/server/apps/ contém preparação idempotente, bootstrap restrito à instalação nova e images.lock.json. Dados em data/manyfold, data/manyfold-redis, data/mealie e data/actual; credenciais somente em secrets/.
 
 Os overlays estendem os mounts do backup e as flags MANYFOLD_ENABLED/MEALIE_ENABLED/ACTUAL_ENABLED do monitor. O coletor adiciona status somente dos módulos ativos; novos redirects usam o mesmo hostname HTTPS privado validado. Portal/menu/PWA acrescentam atalhos, sem mudar os aplicativos existentes. restore_check.py exige banco de cada módulo declarado por seu Compose arquivado. Detalhes em APPS.md e RELEASE-23.md.
+
+
+## Cabeçalhos de segurança e limites do Nginx (24.0.0)
+
+`docker/server/nginx-security-headers.conf` é montado em `/etc/nginx/aurora-security-headers.conf` pelo serviço `web` e incluído no bloco `server` e em todo `location` que declara `add_header`, porque o Nginx não herda os cabeçalhos do `server` quando o `location` define algum próprio. Um novo `location` com `add_header` precisa repetir o `include`; `test_nginx_security.py` falha caso contrário. `server_tokens` fica desligado.
+
+POST em `/api/power` e `/fitness-api` tem limite por IP (`aurora_power_post`: 6/min com rajada 5; `aurora_api_post`: 120/min com rajada 40). GET não é limitado, então o polling de status continua livre. O excesso retorna 429 em JSON (`@aurora_rate_limited`), com `Retry-After`. A tela de energia avisa quando é aberta por HTTP fora de localhost; o portal continua funcionando por HTTP. A estrutura de rede e as portas não mudam. Detalhes e passos manuais opcionais: [RELEASE-24.md](RELEASE-24.md).
+
+
+## Autenticação central opcional (24.0.0)
+
+`compose.auth.yaml` acrescenta `auth`, `auth-gateway` e `ha-sso`, configura os adaptadores nativos e retira publicações de portas antigas. Só participa da seleção Compose após migração explícita. `docker/server/auth/` contém Store SQLite, HTTP/CSRF, interface administrativa, renderizador do gateway, preparador privado, Dockerfiles fixados, adaptadores e unidades do socket Unix Cockpit.
+
+`data/auth/auth.sqlite3` guarda hashes de chaves e sessões, cadastros, permissões e auditoria; `secrets/sso/` guarda inventário, segredos de comunicação e chave inicial. Nenhum desses caminhos entra no Git. O preparador não altera a seleção Compose nem os bancos nativos e deixa as integrações bloqueadas até validação. Backup/restore incluem autenticação quando o overlay está ativo.
+
+`/auth/` serve a entrada e a conta; somente o administrador `aurora@server.local` acessa cadastro/geração/revogação. A chave tem 151 caracteres; o cookie central é HTTPS/HttpOnly e não chega aos aplicativos nativos. O gateway protege as nove interfaces (portal e oito apps), vincula identidades existentes e reserva o Fitness legado compartilhado ao administrador. SSH/SMB/clientes de máquina continuam independentes.
+
+O modo anterior, sem o overlay SSO, conserva seus acessos. A rede/portas descritas na seção anterior referem-se a esse modo base. Consulte [LOGIN-UNICO.md](LOGIN-UNICO.md) para migração e retorno e [REVISAO-24.md](REVISAO-24.md) para evidências e limites de homologação.

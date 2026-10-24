@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="/fitness.css?v=20261007-7">
 <link rel="stylesheet" href="/fitness-planos.css?v=20261007-3">
 <title>Aurora Lab · Planos de treino</title>
-<link rel="stylesheet" href="/aurora-layout.css?v=20261007-1"></head>
+<link rel="stylesheet" href="/aurora-layout.css?v=20261024-v24"></head>
 <body>
 <div class="app fitness-app">
   <aside class="sidebar">
@@ -21,9 +21,9 @@
   </aside>
   <button class="nav-scrim" id="navScrim" type="button" aria-label="Fechar menu" hidden></button>
   <main class="main">
-    <header class="topbar fitness-topbar"><div class="mobile-brand"><button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button><span>✦ AURORA LAB</span></div><div class="head-stat"><span>▦</span><div><small>Fitness</small><b>Planos por pessoa</b></div></div><div class="clockbox"><small>Armazenamento</small><b>SQLite · Armbian</b></div><a class="head-stat portal-back" href="/fitness.html"><span>←</span><div><small>Voltar</small><b>Treinos e peso</b></div></a></header>
+    <header class="topbar fitness-topbar"><div class="mobile-brand"><button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button><span>✦ AURORA LAB</span></div><div class="head-stat"><span>▦</span><div><small>Fitness</small><b>Planos por pessoa</b></div></div><div class="clockbox"><small>Armazenamento</small><b>SQLite · Servidor</b></div><a class="head-stat portal-back" href="/fitness.html"><span>←</span><div><small>Voltar</small><b>Treinos e peso</b></div></a></header>
     <div class="plan-content">
-      <div class="plan-sql-status" id="planSqlStatus" data-state="loading" role="status" aria-live="polite">Carregando perfis e planos do banco SQL do Armbian…</div>
+      <div class="plan-sql-status" id="planSqlStatus" data-state="loading" role="status" aria-live="polite">Carregando perfis e planos do banco SQL do servidor…</div>
       <section class="plan-heading"><div><div class="fitness-eyebrow">Biblioteca pessoal</div><h1>Planos por pessoa</h1><p>Organize fichas e dias da semana para cada perfil.</p></div><label>Perfil ativo<select id="planPerson" disabled></select></label></section>
       <div class="plan-toolbar"><a class="fitness-btn" href="/fitness-exercicios.html">＋ Cadastrar exercícios</a></div>
       <section class="plan-layout">
@@ -45,10 +45,10 @@
         <div id="planExerciseList" class="plan-exercise-list"></div>
         <div id="planExerciseEmpty" class="plan-empty" hidden>Nenhum exercício nesta ficha. Use o filtro por grupo muscular para montar o treino.</div>
       </section>
-      <p class="plan-footnote">O editor consulta e grava fichas e agenda diretamente no banco SQLite do Armbian. Se o servidor estiver indisponível, não salva alterações no navegador.</p>
+      <p class="plan-footnote">O editor consulta e grava fichas e agenda diretamente no banco SQLite do servidor. Se o servidor estiver indisponível, não salva alterações no navegador.</p>
     </div>
   </main>
 </div>
-<script src="/mobile-nav.js?v=20261007-1" defer></script><script src="/pwa.js?v=20261007-1" defer></script><script src="/fitness-planos.js?v=20261007-3" defer></script>
-<script src="/aurora-layout.js?v=20261024-v23" defer></script></body>
+<script src="/mobile-nav.js?v=20261007-1" defer></script><script src="/pwa.js?v=20261007-1" defer></script><script src="/fitness-planos.js?v=20261024-v24" defer></script>
+<script src="/aurora-layout.js?v=20261024-v24" defer></script></body>
 </html>

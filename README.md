@@ -1,8 +1,12 @@
-# AuroraLAB 23.0.0
+# AuroraLAB 24.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
 Este README acompanha a versão registrada em [`VERSION`](VERSION). Os guias operacionais ficam em [`docs/`](docs/); os padrões de trabalho, em [`skills/`](skills/).
+
+## Login único opcional
+
+A release 24 acrescenta autenticação por e-mail e chave de 151 caracteres, cadastro administrativo e adaptadores para os aplicativos. A ativação é separada e exige migração validada; atualizar o código não muda os acessos atuais. Consulte [preparação e migração](docs/LOGIN-UNICO.md), [revisão técnica](docs/REVISAO-24.md) e [release 24](docs/RELEASE-24.md).
 
 ## Escolha o ambiente
 
