@@ -1,0 +1,70 @@
+services:
+  manyfold:
+    image: ghcr.io/manyfold3d/manyfold:0.153.0@sha256:f69029a8f21b76de0b1558f175de19009324f96e4ecd80143997e97174c08fa4
+    env_file: ./secrets/manyfold.env
+    environment:
+      DATABASE_ADAPTER: sqlite3
+      DATABASE_NAME: /config/manyfold.sqlite3
+      REDIS_URL: redis://manyfold-redis:6379/1
+      PUID: '1000'
+      PGID: '1000'
+      MULTIUSER: enabled
+      REGISTRATION: disabled
+      FEDERATION: disabled
+      PUBLIC_HOSTNAME: ${AURORA_PRIVATE_HOST:?execute prepare_apps.py}
+      PUBLIC_PORT: '3214'
+      HTTPS_ONLY: enabled
+      WEB_CONCURRENCY: '1'
+      RAILS_MAX_THREADS: '4'
+      DEFAULT_WORKER_CONCURRENCY: '1'
+      PERFORMANCE_WORKER_CONCURRENCY: '1'
+      TZ: America/Sao_Paulo
+    ports: ['127.0.0.1:3214:3214']
+    volumes:
+      - ./data/manyfold/config:/config
+      - ./data/manyfold/library:/models
+      - ./data/manyfold/plugins:/usr/src/app/plugins
+    networks: [manyfold, manyfold-backend]
+    depends_on:
+      manyfold-redis: {condition: service_healthy}
+    mem_limit: 3g
+    cpus: 2.0
+    pids_limit: 256
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, SETUID, SETGID]
+    healthcheck:
+      test: [CMD, ruby, -rnet/http, -e, "u=URI('http://127.0.0.1:3214/health');r=Net::HTTP.start(u.hostname,u.port){|h|h.get(u.path,{'X-Forwarded-Proto'=>'https'})};exit(r.code.to_i==200 ? 0 : 1)"]
+      interval: 30s
+      timeout: 10s
+      start_period: 180s
+      retries: 5
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  manyfold-redis:
+    image: redis:7.4-alpine@sha256:57e4255cc971b1c8d6f8a6ca283ac01bc3ecdd914273ef6bfaede87aaecd6541
+    user: '1000:1000'
+    command: [redis-server, --save, '60', '1', --appendonly, 'no', --maxmemory, 128mb, --maxmemory-policy, noeviction]
+    volumes: ['./data/manyfold-redis:/data']
+    networks: [manyfold-backend]
+    mem_limit: 192m
+    cpus: 0.25
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  monitor:
+    environment: {MANYFOLD_ENABLED: '1'}
+  backup:
+    volumes:
+      - ./data/manyfold:/source/manyfold:ro
+      - ./data/manyfold-redis:/source/manyfold-redis:ro
+      - ./compose.manyfold.yaml:/source/config/compose.manyfold.yaml:ro
+networks:
+  manyfold:
+  manyfold-backend: {internal: true}

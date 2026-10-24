@@ -52,8 +52,19 @@ def check_archive(source, expected_sha256, probe=None):
                     json.loads(dest.read_bytes());jsons+=1
                     if normalized.parts[0]=='opengym': profiles+=1
             if not (root/'fitness/fitness.sqlite3').is_file() or databases < 1 or profiles < 1: raise ValueError('Dados essenciais ausentes no backup')
+            apps = {}
+            for app in ('manyfold','mealie','actual'):
+                if (root/'config'/('compose.'+app+'.yaml')).exists():
+                    candidates=list((root/app).rglob('*'))
+                    db_count=0
+                    for file in candidates:
+                        if file.is_file():
+                            with file.open('rb') as handle:
+                                if handle.read(16)==b'SQLite format 3\x00': db_count+=1
+                    if db_count==0: raise ValueError('Banco adicional ausente na restauracao')
+                    apps[app]={'sqlite_verified':db_count}
             probe_result=probe(root) if probe else None
-        return {'time':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'ok','archive':source.name,'sha256':digest,'files_verified':count,'bytes_restored':total,'sqlite_verified':databases,'json_verified':jsons,'opengym_json_verified':profiles,'isolated':True,'production_modified':False,'application_probe':probe_result,'scope':'Restauracao descartavel dos arquivos, SQLite e JSON; nao testa hardware, VPN ou todos os servicos.'}
+        return {'time':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'ok','archive':source.name,'sha256':digest,'files_verified':count,'bytes_restored':total,'sqlite_verified':databases,'json_verified':jsons,'opengym_json_verified':profiles,'isolated':True,'production_modified':False,'apps_verified':apps,'application_probe':probe_result,'scope':'Restauracao descartavel dos arquivos, SQLite e JSON; nao testa hardware, VPN ou todos os servicos.'}
 
 def save_report(path, report):
     path=Path(path);tmp=path.with_suffix('.tmp');tmp.write_text(json.dumps(report,ensure_ascii=False),encoding='utf-8');tmp.chmod(0o644);tmp.replace(path)

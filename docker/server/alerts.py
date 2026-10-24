@@ -14,7 +14,7 @@ class AlertStore:
     def update(self, status, backup, now, restore=None):
         self.started = self.started if self.started is not None else now
         desired = {}
-        names = {'octoprint':'OctoPrint','webcam':'Câmera USB','nginx':'Portal','samba':'Arquivos Samba','cockpit':'Cockpit','homeboard':'HomeBoard','homeassistant':'Home Assistant','opengym':'openGym'}
+        names = {'octoprint':'OctoPrint','webcam':'Câmera USB','nginx':'Portal','samba':'Arquivos Samba','cockpit':'Cockpit','homeboard':'HomeBoard','homeassistant':'Home Assistant','opengym':'openGym','manyfold':'Manyfold','mealie':'Mealie','actual':'Actual Budget'}
         for key, name in names.items():
             if status.get(key) == 'offline': desired['service:'+key] = ('critical',name+' está indisponível.')
         disk = status.get('disk')

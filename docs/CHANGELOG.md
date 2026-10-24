@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 23.0.0 — novos aplicativos independentes
+
+Manyfold 0.153.0, Mealie 3.29.0 e Actual Budget 26.10.0: containers, redes e dados separados, HTTPS privado, contas protegidas, atalhos e backup/restore. [Descrição detalhada](RELEASE-23.md).
+
 ## 22.0.0 — metas, sincronização e operação
 
 Metas semanais por perfil, resumo Garmin no Início, alertas persistentes do servidor, verificação de restauração após backup e histórico diário/mensal de energia. [Descrição completa](RELEASE-22.md).

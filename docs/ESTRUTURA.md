@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 22.0.0
+# Estrutura e arquitetura — AuroraLAB 23.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -147,3 +147,10 @@ AutoSync usa ACTIVITY_LIMIT=5, preservando intervalo de 3600 segundos, pareament
 `alerts.py`, montado no monitor, persiste transições em data/monitor/alerts.json sem Docker socket. /api/alerts.json expõe eventos sanitizados ao portal; operações não são comandos remotos. `restore_check.py` valida restauração em diretório temporário privado e o backup grava data/backup-status/restore-check.json, servido pelo monitor como /api/restore-check.json. Os endpoints continuam no acesso privado existente do portal.
 
 PowerService mantém data/power/daily-energy.json, até 90 datas America/Sao_Paulo, com CPU e descarga separadas e segundos de cobertura. /api/power inclui daily_energy; power.js aplica a tarifa local somente como custo parcial das leituras. Histórico não retroativo, sem extrapolação dos períodos ausentes. Consulte [release 22](RELEASE-22.md).
+
+
+## Manyfold, Mealie e Actual Budget (23.0.0)
+
+Três overlays opcionais acrescentam os aplicativos, redes e volumes independentes. Manyfold usa a imagem padrão com SQLite e Redis separado; Mealie e Actual usam SQLite local. docker/server/apps/ contém preparação idempotente, bootstrap restrito à instalação nova e images.lock.json. Dados em data/manyfold, data/manyfold-redis, data/mealie e data/actual; credenciais somente em secrets/.
+
+Os overlays estendem os mounts do backup e as flags MANYFOLD_ENABLED/MEALIE_ENABLED/ACTUAL_ENABLED do monitor. O coletor adiciona status somente dos módulos ativos; novos redirects usam o mesmo hostname HTTPS privado validado. Portal/menu/PWA acrescentam atalhos, sem mudar os aplicativos existentes. restore_check.py exige banco de cada módulo declarado por seu Compose arquivado. Detalhes em APPS.md e RELEASE-23.md.

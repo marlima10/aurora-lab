@@ -1,0 +1,38 @@
+services:
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:v3.29.0@sha256:78eb28b8776d0bad40c5e605c72b3f4f5976793e491558c7dcbdfc04c835d4bc
+    environment:
+      ALLOW_SIGNUP: 'false'
+      DB_ENGINE: sqlite
+      PUID: '1000'
+      PGID: '1000'
+      TZ: America/Sao_Paulo
+      BASE_URL: ${MEALIE_ORIGIN:?execute prepare_apps.py}
+      DEFAULT_GROUP: AuroraLAB
+      DEFAULT_HOUSEHOLD: Casa
+      HOST_IP: ''
+      REVERSE_PROXY_AUTH_ENABLED: 'false'
+      OIDC_AUTH_ENABLED: 'false'
+    ports: ['127.0.0.1:9925:9000']
+    volumes: ['./data/mealie:/app/data']
+    networks: [mealie]
+    mem_limit: 1g
+    cpus: 1.0
+    pids_limit: 128
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/api/app/about',timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 5
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  monitor:
+    environment: {MEALIE_ENABLED: '1'}
+  backup:
+    volumes:
+      - ./data/mealie:/source/mealie:ro
+      - ./compose.mealie.yaml:/source/config/compose.mealie.yaml:ro
+networks:
+  mealie:
