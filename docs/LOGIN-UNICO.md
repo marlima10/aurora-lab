@@ -47,7 +47,7 @@ Antes de ativar:
 - Confirme que a rede `172.31.248.0/29` e o grupo/GID `aurora-sso:64024` não colidem com recursos existentes.
 - Manyfold: conferir o usuário e seus papéis com o middleware ativo em uma cópia isolada.
 - Mealie: conferir usuário existente e acesso sem formulário de senha; cadastro automático deve continuar desativado.
-- Actual: testar cabeçalho nativo no orçamento de ensaio. Autorizar o aplicativo concede acesso à instância compartilhada.
+- Actual: testar cabeçalho nativo no orçamento de ensaio. A imagem adaptada 25 corrige a descoberta de `header` nas duas rotas de métodos da revisão 26.10.0, sem alterar o banco; a verificação de hash recusa fontes diferentes. Confira também no navegador que não aparece um segundo formulário. Autorizar o aplicativo concede acesso à instância compartilhada.
 - openGym/Garmin: confirmar o perfil e treinos existentes e uma chamada de sincronização sem criar perfil novo ou duplicar exercícios. Não teste importação escrevendo em banco pessoal sem backup.
 - OctoPrint: `trustRemoteUser: true`, `remoteUserHeader: X-Aurora-Identity`, `addRemoteUsers: false`, `trustRemoteGroups: false`; preserve API keys internas e permissões nativas. Testar leitura com a impressora desconectada da instância de ensaio; não enviar movimento, aquecimento ou impressão.
 - HomeBoard: testar `viewer` e `editor`, incluindo recusa de escrita para o primeiro.

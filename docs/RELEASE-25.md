@@ -12,7 +12,7 @@ A página principal ganhou o atalho **👥 Gestão de usuários**, com o mesmo p
 | --- | --- |
 | Manyfold | Usuário nativo existente reconhecido e página autenticada de conta acessível. |
 | Mealie | Identidade existente confirmada pela API nativa; interface protegida acessível. |
-| Actual Budget | Autenticação nativa por cabeçalho e acesso à instância compartilhada, sem redefinir sua senha ou dados. |
+| Actual Budget | Autenticação nativa por cabeçalho e descoberta do método ativo para acesso automático à instância compartilhada, sem redefinir sua senha ou dados. |
 | openGym / Garmin | Perfil existente, treinos preservados e sincronização previamente pareada mantida. O navegador abriu o perfil Rafael sem solicitar passkey novamente. |
 | OctoPrint | Leitura autenticada de configurações com o usuário existente, sem comandos físicos. |
 | Home Assistant | Fluxo nativo sem senha, token pertencente ao perfil mapeado e comandos WebSocket válidos; navegador abriu a visão geral como Rafael. |
@@ -20,6 +20,8 @@ A página principal ganhou o atalho **👥 Gestão de usuários**, com o mesmo p
 | Cockpit | Sessão real do usuário Debian Rafael por socket Unix privado; navegador abriu a visão geral sem outro login. Elevação sudo/polkit continua separada. |
 
 ## Correções encontradas durante a migração
+
+- **Actual 26.10.0:** a descoberta do frontend anunciava somente o método antigo salvo no banco, embora o servidor já aceitasse autenticação por cabeçalho. Uma imagem adaptada, sobre o digest original e com verificação SHA-256 do código revisado, anuncia o método `header` em `/account/needs-bootstrap` e `/account/login-methods` quando ele está configurado e permitido. Isso elimina o segundo formulário sem alterar contas, senha ou orçamentos. Outros métodos mantêm o comportamento nativo; revisões desconhecidas são recusadas no build.
 
 - **Home Assistant:** a verificação interna da identidade foi movida para outro WebSocket. Isso evita consumir um ID alto no canal do navegador e quebrar os comandos subsequentes, que precisam de IDs crescentes. Os cabeçalhos `Sec-WebSocket-*` não são repassados entre handshakes independentes. Os formulários do navegador, inclusive multipart, continuam funcionando; a revogação aceita a resposta nativa vazia sem permitir que um token de outro perfil seja devolvido. A consulta do token força `Accept-Encoding: identity` sem duplicação por diferenças de maiúsculas/minúsculas.
 - **HA 2026.10:** a configuração HTTP já migrada foi ajustada no armazenamento nativo conforme o esquema instalado. A porta 18123 fica apenas no loopback e na interface dedicada ao intermediário, confiando somente nesse proxy. O guia deixa explícito que acrescentar `http:` ao YAML pode não alterar essa versão.
@@ -40,6 +42,7 @@ Foram preservados dados, perfis, chave administrativa, configurações e seleç�
 
 - 32 testes de servidor/operação/restore e 15 testes da autenticação central, todos com dados sintéticos.
 - Dez testes isolados de protocolo HA, incluindo perfil incorreto, renovação, revogação, multipart, compressão WebSocket e sequência nativa de comandos.
+- Cinco verificações Actual: hash/contrato revisado e descoberta dos métodos header, password e OpenID.
 - Seis cenários PWA: papéis administrativo/comum, compatibilidade sem SSO, redirects em navegação/arquivos e exclusão de `/auth/`.
 - Compose completo e Nginx válidos; imagens adaptadas construídas com as bases fixadas.
 - Os nove destinos reais recusaram acesso anônimo com redirecionamento ao login e responderam 200 com a sessão central; o monitor direto recusou acesso com 403.

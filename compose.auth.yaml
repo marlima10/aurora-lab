@@ -101,6 +101,10 @@ services:
       REVERSE_PROXY_AUTH_SIGNUP_ENABLED: 'false'
       REVERSE_PROXY_AUTH_SECRET_HEADER: X-Mealie-Reverse-Proxy-Secret
   actual:
+    build:
+      context: ./docker/server/auth
+      dockerfile: Dockerfile.actual
+    image: auroralab-actual-sso:25.0.0
     ports: !reset []
     environment:
       ACTUAL_LOGIN_METHOD: header
