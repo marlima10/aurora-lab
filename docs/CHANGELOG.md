@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 26.0.0 — fila limitada para picos do login único
+
+O autenticador mantém 24 trabalhadores e coloca conexões excedentes em espera, evitando resets e erros 500 nos arquivos carregados em paralelo pelo OctoPrint. Fila TCP de 128 conexões e prazo limitado de espera; sem mudanças em chaves, permissões ou bancos. Teste sintético e ensaio real com 64 requisições simultâneas aprovados. [Descrição completa](RELEASE-26.md).
+
 ## 25.0.0 — migração do login único e gestão no Início
 
 Ativação validada do SSO no AuroraServer com as identidades existentes dos oito aplicativos e atalho administrativo 👥 Gestão de usuários na página principal. Correções de WebSocket/formulários do Home Assistant, socket Unix do Cockpit, cache PWA por papel e monitoramento privado da API OctoPrint. Chave administrativa, dados e SSH somente por chave preservados. Backup com autenticação central e restauração isolada; configuração anterior preservada para retorno. [Descrição completa](RELEASE-25.md).

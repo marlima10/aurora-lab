@@ -16,15 +16,16 @@ APP_PORTS = {'manyfold':3214,'mealie':9925,'actual':5006,'opengym':8081,'octopri
 
 
 class BoundedHTTPServer(ThreadingHTTPServer):
-    """Bound concurrent connections to stay below the container's PID limit."""
+    """Queue browser asset bursts while staying below the container PID limit."""
     daemon_threads = True
+    request_queue_size = 128
 
     def __init__(self, *args, **kwargs):
         self.slots = threading.BoundedSemaphore(24)
         super().__init__(*args, **kwargs)
 
     def process_request(self, request, address):
-        if not self.slots.acquire(blocking=False):
+        if not self.slots.acquire(timeout=15):
             self.shutdown_request(request)
             return
         try:

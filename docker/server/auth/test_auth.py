@@ -5,11 +5,12 @@ import json
 import sqlite3
 import tempfile
 import threading
+import time
 import unittest
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 
-from server import COOKIE, handler
+from server import COOKIE, handler, BoundedHTTPServer
 from store import ADMIN_EMAIL, SESSION_SECONDS, AccessError, Store
 
 
@@ -116,7 +117,7 @@ class AuthenticationTests(Fixture, unittest.TestCase):
 class HttpAuthenticationTests(Fixture, unittest.TestCase):
     def setUp(self):
         super().setUp()
-        self.http = ThreadingHTTPServer(('127.0.0.1', 0), handler(self.store, 'https://portal.example.test'))
+        self.http = BoundedHTTPServer(('127.0.0.1', 0), handler(self.store, 'https://portal.example.test'))
         self.thread = threading.Thread(target=self.http.serve_forever, daemon=True)
         self.thread.start()
 
@@ -173,6 +174,50 @@ class HttpAuthenticationTests(Fixture, unittest.TestCase):
         self.assertEqual(self.request('/auth/apps', headers=headers)[0],403)
         self.assertEqual(self.request('/auth/admin', headers=headers)[0],403)
         self.assertEqual(self.request('/auth/issue', {'email':'new@example.test'},headers)[0],403)
+
+
+class BurstAuthenticationTests(unittest.TestCase):
+    def test_browser_asset_burst_is_queued_without_exceeding_worker_limit(self):
+        from http.server import BaseHTTPRequestHandler
+        barrier = threading.Barrier(64)
+        lock = threading.Lock()
+        active = peak = 0
+        class SlowHandler(BaseHTTPRequestHandler):
+            def log_message(self,*args):
+                pass
+            def do_GET(self):
+                nonlocal active, peak
+                with lock:
+                    active += 1
+                    peak = max(peak,active)
+                try:
+                    time.sleep(0.08)
+                    self.send_response(200)
+                    self.end_headers()
+                    self.wfile.write(b'ok')
+                finally:
+                    with lock:
+                        active -= 1
+        server=BoundedHTTPServer(('127.0.0.1',0),SlowHandler)
+        thread=threading.Thread(target=server.serve_forever,daemon=True)
+        thread.start()
+        def fetch(_):
+            barrier.wait(timeout=10)
+            connection=http.client.HTTPConnection(*server.server_address,timeout=10)
+            try:
+                connection.request('GET','/synthetic-asset')
+                response=connection.getresponse()
+                return response.status,response.read()
+            finally:
+                connection.close()
+        try:
+            with concurrent.futures.ThreadPoolExecutor(64) as pool:
+                responses=list(pool.map(fetch,range(64)))
+            self.assertEqual(responses,[(200,b'ok')]*64)
+            self.assertLessEqual(peak,24)
+            self.assertGreater(peak,1)
+        finally:
+            server.shutdown();server.server_close();thread.join()
 
 
 if __name__ == '__main__':
