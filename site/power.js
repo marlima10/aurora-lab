@@ -35,6 +35,7 @@
     $('powerSavings').textContent = difference !== null && validTariff ? money(difference * tariff) : '—';
     $('powerSavingsKwh').textContent = difference !== null ? number(difference, 2) + ' kWh / 30 dias' : 'Comparação estimada';
     $('powerCostNote').textContent = !validWatts ? 'Informe a potência medida na tomada. Você também pode simular com a leitura de descarga da bateria, sem tratá-la como medição da tomada.' : !validTariff ? 'Informe a tarifa em R$/kWh para calcular os valores. O consumo em kWh já foi calculado.' : !validNight ? 'A tarifa e as potências devem ser positivas; as horas devem estar entre 0 e 24.' : 'Simulação de 30 dias. Não é uma conta medida. Suspensão noturna não está ativada.';
+    if (latest) renderEnergy(latest);
     preferences = Object.fromEntries(formFields.map(id => [id, $(id).value]));
     try { localStorage.setItem(configKey, JSON.stringify(preferences)); } catch (_) { /* Values remain usable in this tab. */ }
   }
@@ -77,8 +78,21 @@
       rows.forEach((row, i) => { if (typeof row[key] !== 'number' || !Number.isFinite(row[key]) || (i && Date.parse(row.time) - Date.parse(rows[i - 1].time) > 90000)) { flush(); if (typeof row[key] !== 'number') return; } points.push((34 + i * 546 / (rows.length - 1)).toFixed(1) + ',' + (125 - row[key] / max * 110).toFixed(1)); }); flush();
     });
   }
+  function renderEnergy(data) {
+    const rows = data.daily_energy || [], tariff=numericInput('powerTariff'), valid=tariff !== null && tariff >= 0 && tariff <= 100;
+    const now = new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Sao_Paulo'}).format(new Date()), month=now.slice(0,7);
+    const current=rows.filter(r=>r.day.startsWith(month)), kwh=current.reduce((n,r)=>n+(r.cpu_seconds>0?r.cpu_kwh:0),0), hours=current.reduce((n,r)=>n+r.cpu_seconds/3600,0);
+    $('energyMonth').textContent='Mês '+month.split('-').reverse().join('/')+': CPU '+(hours>0?number(kwh,5)+' kWh em '+number(hours,1)+' h observadas':'sem medição disponível')+(hours>0 && valid?' · custo parcial '+money(kwh*tariff):' · informe a tarifa para calcular o custo')+'. Cobertura parcial; não é medição da tomada.';
+    $('energyDaily').replaceChildren();
+    for(const row of [...rows].reverse()){
+      const tr=document.createElement('tr');
+      for(const value of [row.day.split('-').reverse().join('/'),row.cpu_seconds>0?number(row.cpu_kwh,5):'—',row.cpu_seconds>0?number(row.cpu_seconds/3600,2):'—',row.battery_seconds>0?number(row.battery_discharge_kwh,5):'—',row.battery_seconds>0?number(row.battery_seconds/3600,2):'—',row.cpu_seconds>0 && valid?money(row.cpu_kwh*tariff):'—']){const td=document.createElement('td');td.textContent=value;tr.append(td);}
+      $('energyDaily').append(tr);
+    }
+  }
   function render(data) {
     latest = data;
+    renderEnergy(data);
     const battery = data.battery || {}, controls = data.controls || {}, cpu = data.cpu || {}, observed = data.observed || {};
     $('powerLive').textContent = 'Atualizado às ' + new Date(data.generated).toLocaleTimeString('pt-BR');
     $('powerBatteryPercent').textContent = battery.present ? number(battery.percent, 0) + '%' : 'Sem bateria';

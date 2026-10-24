@@ -1,4 +1,4 @@
-export const HOME_PANELS = ['agenda', 'checkin', 'welcome', 'progress', 'minutes', 'calories', 'weight', 'streak']
+export const HOME_PANELS = ['agenda', 'checkin', 'welcome', 'progress', 'minutes', 'calories', 'weight', 'streak', 'goals', 'garmin']
 export function panelOrder(saved) {
   const known = new Set(HOME_PANELS)
   const valid = Array.isArray(saved) ? saved.filter(id => known.has(id)) : []

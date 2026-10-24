@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/portal-health.css?v=20261007-1">
 <title>Aurora Lab · Dashboard</title>
 <link rel="stylesheet" href="/aurora-layout.css?v=20261007-1">
-<link rel="stylesheet" href="/power.css?v=20261017-energy-1">
+<link rel="stylesheet" href="/power.css?v=20261024-v22">
 </head>
 <body>
 <div class="app">
@@ -147,6 +147,13 @@
         </div>
         <p class="power-notice">O consumo na tomada precisa de wattímetro ou tomada com medição. A bateria informa sua descarga, e o RAPL acompanha componentes da CPU. A suspensão das 00h às 07h é apenas uma simulação até validar o despertar automático no notebook.</p>
       </article>
+      <article class="panel" id="energy-history-card">
+        <div class="panel-title"><h2>Histórico de energia</h2><span>CPU e bateria · até 90 dias</span></div>
+        <p class="power-note">Energia observada, sem preencher períodos desligados. CPU e descarga da bateria são medidas diferentes e não devem ser somadas. Os valores abaixo não representam a conta total da tomada.</p>
+        <p id="energyMonth" role="status">Aguardando leituras…</p>
+        <div class="energy-history-scroll"><table class="energy-history"><caption>Consumo diário e custo parcial da CPU pela tarifa configurada acima</caption><thead><tr><th>Dia</th><th>CPU kWh</th><th>Horas CPU</th><th>Descarga kWh</th><th>Horas bateria</th><th>Custo CPU</th></tr></thead><tbody id="energyDaily"></tbody></table></div>
+        <p class="power-note">O histórico começa nesta versão; dias antigos não são reconstruídos por estimativa. A tarifa fica salva neste navegador e recalcula todos os valores exibidos.</p>
+      </article>
       <article class="panel printer-panel" id="printer-card">
         <div class="panel-title"><h2>🖨️ Impressora 3D</h2><span class="printer-state" id="printerState">--</span></div>
         <div class="printer-body">
@@ -227,14 +234,21 @@
         <div class="sensor"><span>Load 1 min</span><b id="load">--</b><div><i id="loadBar"></i></div></div>
       </article>
 
+      <article class="panel" id="alerts-card">
+        <div class="panel-title"><h2>Alertas do servidor</h2><span id="serverAlertSummary" role="status">Consultando…</span></div>
+        <div id="serverAlerts" aria-live="polite"></div>
+        <p class="power-note">Serviços indisponíveis, disco acima de 80% (crítico em 90%) e backup com falha ou atrasado. Ocorrências confirmadas por 30 segundos. Os avisos aparecem aqui enquanto o portal estiver aberto.</p>
+        <details><summary>Histórico de alertas e recuperações</summary><div id="serverAlertHistory" class="operations-history"></div></details>
+      </article>
       <article class="panel backup-panel" id="backup-card">
-        <div class="panel-title"><h2>☁ Backup & Dados</h2><span class="safe">Protegido</span></div>
+        <div class="panel-title"><h2>☁ Backup & Dados</h2><span class="safe">Verificação</span></div>
         <div class="backup-grid">
           <div><small>Logs OctoPrint</small><b id="octologs">--</b></div>
           <div><small>Logs sistema</small><b id="systemlogs">--</b></div>
           <div><small>Cache APT</small><b id="aptcache">--</b></div>
           <div><small>Último dado</small><b id="stamp">--</b></div>
         </div>
+        <div class="backup-health" id="restoreHealth" role="status">Consultando teste de restauração…</div>
         <div class="backup-health" id="backupHealth" role="status" aria-live="polite">Verificando backup do servidor…</div>
         <div class="note">Backups completos permanecem fora do webroot por segurança.</div>
       </article>
@@ -313,5 +327,6 @@ update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadH
     <div class="power-dialog-actions"><button class="power-btn" id="powerCancel" type="button">Fechar</button><button class="power-btn primary" id="powerApply" type="submit" disabled>Aplicar economia</button></div>
   </form>
 </dialog>
-<script src="/power.js?v=20261017-energy-1" defer></script>
+<script src="/power.js?v=20261024-v22" defer></script>
+<script src="/operations.js?v=20261024-v22" defer></script>
 </body></html>

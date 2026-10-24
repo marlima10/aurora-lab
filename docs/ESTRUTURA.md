@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 21.0.0
+# Estrutura e arquitetura — AuroraLAB 22.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -138,3 +138,12 @@ O frontend personalizado inclui a foto original em public/aurora-background.jpg 
 ## Janela Garmin (21.0.0)
 
 AutoSync usa ACTIVITY_LIMIT=5, preservando intervalo de 3600 segundos, pareamento e agenda persistida. Respostas acima do limite e lotes com atividades inválidas falham antes de gravar. Novos registros são enviados em ordem cronológica, mantendo deduplicação e proteção de exclusões. A interface e o status público informam o limite.
+
+
+## Operação e metas (22.0.0)
+
+`WeeklyGoals` e `weekly-goals.js` calculam metas por semana local, usando os mesmos registros e métricas existentes. A preferência auroraWeeklyGoals usa update/stampChange/merge nativo. `GarminSummary` consulta /garmin/status e envia /garmin/sync na mesma origem autenticada; o service worker exclui /garmin/ do cache. Os dois cartões integram HomePanels; metas aparecem também em Stats.
+
+`alerts.py`, montado no monitor, persiste transições em data/monitor/alerts.json sem Docker socket. /api/alerts.json expõe eventos sanitizados ao portal; operações não são comandos remotos. `restore_check.py` valida restauração em diretório temporário privado e o backup grava data/backup-status/restore-check.json, servido pelo monitor como /api/restore-check.json. Os endpoints continuam no acesso privado existente do portal.
+
+PowerService mantém data/power/daily-energy.json, até 90 datas America/Sao_Paulo, com CPU e descarga separadas e segundos de cobertura. /api/power inclui daily_energy; power.js aplica a tarifa local somente como custo parcial das leituras. Histórico não retroativo, sem extrapolação dos períodos ausentes. Consulte [release 22](RELEASE-22.md).

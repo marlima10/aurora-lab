@@ -101,5 +101,28 @@ class PowerTests(unittest.TestCase):
         finally:
             server.shutdown();server.server_close();thread.join()
 
+class EnergyHistoryTests(unittest.TestCase):
+    def test_daily_rollover_gaps_separate_scopes_and_restart(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state=pathlib.Path(tmp);service=power.PowerService(state=tmp)
+            battery={'status':'Discharging','power_w':20}
+            service.record_energy('2026-10-23',0,10,battery);service.record_energy('2026-10-23',10,10,battery)
+            self.assertAlmostEqual(service.meter['cpu_kwh'],10*10/3600000)
+            service.record_energy('2026-10-23',1000,10,battery)
+            self.assertEqual(service.meter['cpu_seconds'],10)
+            service.record_energy('2026-10-24',1005,10,battery)
+            self.assertEqual(service.meter['cpu_seconds'],0);self.assertEqual(service.daily['2026-10-23']['battery_seconds'],10)
+            service.record_energy('2026-10-24',1010,None,{'status':'Charging','power_w':20})
+            self.assertEqual(service.meter['battery_seconds'],0)
+            power.write_json(state/'energy.json',service.meter);power.write_json(state/'daily-energy.json',list(service.daily.values()))
+            again=power.PowerService(state=tmp);again.record_energy('2026-10-24',5000,100,battery)
+            self.assertEqual(again.meter['cpu_seconds'],0);self.assertEqual(len(again.daily),2)
+    def test_retention_90_days_and_missing_sensor_not_zero_coverage(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            service=power.PowerService(state=tmp)
+            for n in range(100):
+                day=(power.dt.date(2026,1,1)+power.dt.timedelta(days=n)).isoformat();service.record_energy(day,n*100,None,{})
+            self.assertEqual(len(service.daily),90);self.assertEqual(service.meter['cpu_seconds'],0)
+
 if __name__=='__main__':
     unittest.main()
