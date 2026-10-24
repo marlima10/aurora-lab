@@ -1,3 +1,4 @@
+from alerts import AlertStore
 import datetime as dt
 import json
 import os
@@ -18,6 +19,7 @@ from urllib.error import HTTPError, URLError
 
 PROC = pathlib.Path('/host/proc')
 STATE = pathlib.Path('/state')
+alerts = AlertStore(STATE/'alerts.json')
 lock = threading.Lock()
 latest = {}
 history = []
@@ -134,6 +136,11 @@ def loop():
             value = collect()
             with lock:
                 latest = value
+                try: backup_state = json.loads(text('/backup-status/fitness-backup.json','{}'))
+                except ValueError: backup_state = {}
+                try: restore_state = json.loads(text('/backup-status/restore-check.json','{}'))
+                except ValueError: restore_state = {}
+                alerts.update(value, backup_state, time.time(), restore_state)
                 if time.monotonic()-last_sample >= 60:
                     history.append(dict(time=value['generated'],cpu=value['cpu'],memory=value['memory'],swap=value['swap'],disk=value['disk'],temp=value['temperature'],load=value['load']))
                     history=history[-1440:]
@@ -229,7 +236,11 @@ class Handler(BaseHTTPRequestHandler):
             return
         name=self.path.split('?',1)[0].rsplit('/',1)[-1]
         with lock:
-            if name=='status.json': result=latest.copy()
+            if name=='alerts.json': result=alerts.view(time.time())
+            elif name=='restore-check.json':
+                try: result=json.loads(text('/backup-status/restore-check.json','{}'))
+                except ValueError: result={}
+            elif name=='status.json': result=latest.copy()
             elif name=='history.json': result=list(history)
             elif name=='network.json':
                 result=network_state.copy()

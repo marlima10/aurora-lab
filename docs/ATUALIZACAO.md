@@ -119,3 +119,10 @@ Substitua os caminhos/mensagem e o nome da branch quando diferente. Revise tamb�
 Crie a release oficial após o merge e a revisão aplicável ao projeto. Confira a última versão do repositório oficial, `VERSION`, [CHANGELOG.md](CHANGELOG.md) e o commit de destino. A convenção histórica deste projeto incrementa o primeiro componente (`v12.0.0` → `v13.0.0`); isso é uma convenção local, não uma regra geral de versionamento semântico. Mudança documental em andamento fica em **Não publicado**, sem inventar uma release já lançada.
 
 Não reutilize tags nem substitua releases publicadas para representar conteúdo novo. A release precisa registrar testes realmente realizados e limitações; depois, a implantação no servidor segue este guia.
+
+
+## Verificação de restauração (22.0.0)
+
+O backup executa restore_check.py após gerar e verificar o arquivo. O resultado independente aparece em data/backup-status/restore-check.json e no portal. O teste extrai em diretório privado descartável, confere bytes/SQLite/JSON e nunca restaura sobre data/. Limite descompactado de 20 GiB, sem links ou caminhos inseguros. Garanta espaço para a cópia temporária.
+
+Para um ensaio manual, use uma imagem Python de confiança já instalada com `--network none`, monte somente o arquivo de backup e o verificador em leitura e forneça o SHA-256 do comprovante. Não monte volumes de produção como destino, dispositivos USB ou Docker socket. O resultado não substitui o ensaio completo de todos os aplicativos e hardware; preserve o domínio de passkeys em uma recuperação definitiva. Consulte RELEASE-22.md e o relatório privado da implantação para o ensaio adicional da API.

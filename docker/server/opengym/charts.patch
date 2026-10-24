@@ -1,5 +1,5 @@
 diff --git a/frontend/public/sw.js b/frontend/public/sw.js
-index f6822658..b93520b5 100644
+index f6822658..ccc73076 100644
 --- a/frontend/public/sw.js
 +++ b/frontend/public/sw.js
 @@ -62,6 +62,7 @@ async function precache() {
@@ -10,6 +10,15 @@ index f6822658..b93520b5 100644
    const code = refs.filter(u => /\.(?:js|css)(?:\?|$)/.test(u))
    // Fetched by hand rather than with `cache.add`, for the same reason index.html is: `add` takes
    // a REDIRECT for an answer, and an auth proxy in front answers every request with its login
+@@ -255,7 +256,7 @@ const NET_WAIT_MS = 3000
+ self.addEventListener('fetch', e => {
+   const url = new URL(e.request.url)
+   if (e.request.method !== 'GET' || url.origin !== location.origin) return
+-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith(API)) return    // never cache auth/data
++  if (url.pathname.startsWith('/api/') || url.pathname.startsWith(API) || url.pathname.startsWith('/garmin/')) return    // never cache auth/data
+ 
+   if (isMediaPath(url.pathname)) {
+     e.respondWith(media(e))
 diff --git a/frontend/src/components/LineChart.jsx b/frontend/src/components/LineChart.jsx
 index 546b4e41..1f4bf252 100644
 --- a/frontend/src/components/LineChart.jsx
@@ -37,31 +46,51 @@ index 546b4e41..1f4bf252 100644
    const hoverSource = single ? [points[0]] : points
    const hoverDates = hoverSource.map(p => p.d || isoOf(new Date(p.t)))
    const showYear = new Set(hoverDates.map(iso => new Date(iso + 'T12:00:00').getFullYear())).size > 1
+diff --git a/frontend/src/lib/sw.test.js b/frontend/src/lib/sw.test.js
+index c0185b99..5316ea9e 100644
+--- a/frontend/src/lib/sw.test.js
++++ b/frontend/src/lib/sw.test.js
+@@ -221,3 +221,11 @@ describe('sw.js re-registers a rotated push subscription with the page\'s device
+     expect(await (await (await globalThis.caches.open(DEVICE_CACHE)).match(DEVICE_URL)).text()).toBe('dev1234abcd')
+   })
+ })
++
++it('does not intercept or cache private Garmin GET/POST routes', async () => {
++  await loadSW()
++  for (const method of ['GET','POST']) {
++    const event=await fire('fetch',{request:{url:'https://gym.test/garmin/status',method}})
++    expect(event._res).toBeUndefined()
++  }
++})
 diff --git a/frontend/src/views/Home.jsx b/frontend/src/views/Home.jsx
-index 0ffeec0f..7d9dd323 100644
+index 0ffeec0f..2f837906 100644
 --- a/frontend/src/views/Home.jsx
 +++ b/frontend/src/views/Home.jsx
-@@ -6,6 +6,9 @@ import { fmtNum, fmtDate, todayISO, isoOf, weekStartOf, weekDayOffset, DAYS, DAY
+@@ -6,6 +6,11 @@ import { fmtNum, fmtDate, todayISO, isoOf, weekStartOf, weekDayOffset, DAYS, DAY
  import { t, tn, dateLocale } from '../lib/i18n.js'
  import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, starterPlanSheet, bwDeltaColor, weighInsSheet } from '../sheets.jsx'
  import LineChart from '../components/LineChart.jsx'
 +import { ExerciseProgress } from './Stats.jsx'
 +import TrainingMetrics from '../components/TrainingMetrics.jsx'
 +import HomePanels from '../components/HomePanels.jsx'
++import WeeklyGoals from '../components/WeeklyGoals.jsx'
++import GarminSummary from '../components/GarminSummary.jsx'
  import Icon from '../components/Icon.jsx'
  import QueueRow from '../components/QueueRow.jsx'
  import { queueOf, queueView, weekTally, pinState } from '../lib/queue.js'
-@@ -106,7 +109,8 @@ export default function Home() {
+@@ -106,7 +111,10 @@ export default function Home() {
        <button className="iconbtn" onClick={() => nav('/settings')} aria-label={trouble ? t('Settings') + ', ' + t('Connection problem') : t('Settings')}><Icon name="gear" />{trouble && <span className="tab-dot" aria-hidden="true" />}</button>
      </div>
  
 -    <div className="card">
 +    <HomePanels panels={[
++      { id: 'goals', title: 'Metas semanais', content: <WeeklyGoals S={S} /> },
++      { id: 'garmin', title: 'Sincronização Garmin', content: <GarminSummary key={user?.id || 'guest'} /> },
 +      { id: 'agenda', title: 'Agenda de treinos', content: (<div className="card">
        {/* A coach week runs by order, not by weekday, so its progress row stands in for the
            seven dots (components/QueueRow.jsx). The today row below stays as it is: the queue's
            next session reaches it through effectiveRoutineIds like any planned routine. */}
-@@ -156,11 +160,8 @@ export default function Home() {
+@@ -156,11 +164,8 @@ export default function Home() {
            {t('Choose a different workout')}
          </Button>
        </div>}
@@ -75,7 +104,7 @@ index 0ffeec0f..7d9dd323 100644
        <div className="card tappable" style={{ cursor: 'pointer' }} {...tappable(() => nav('/checkin'))}>
          <div className="row between">
            <div className="row" style={{ gap: 9 }}>
-@@ -173,9 +174,8 @@ export default function Home() {
+@@ -173,9 +178,8 @@ export default function Home() {
            <Icon name="chevronRight" className="chev" />
          </div>
        </div>
@@ -87,7 +116,7 @@ index 0ffeec0f..7d9dd323 100644
        <div className="card">
          <div className="row" style={{ gap: 10, marginBottom: 6 }}>
            <span className="lrow-i"><Icon name="calendar" /></span>
-@@ -185,9 +185,11 @@ export default function Home() {
+@@ -185,9 +189,11 @@ export default function Home() {
          <Button variant="primary" icon="clipboard" onClick={starterPlanSheet}>{t('Load starter plan')}</Button>
          <div style={{ height: 8 }} /><Button onClick={() => nav('/plan')}>{t('Build my own plan')}</Button>
        </div>
@@ -102,7 +131,7 @@ index 0ffeec0f..7d9dd323 100644
        <div className="row between bw-head" style={{ marginBottom: 6 }}>
          <h2 style={{ margin: 0 }}>{t('Body weight')}</h2>
          <div className="row" style={{ gap: 8 }}>
-@@ -221,9 +223,8 @@ export default function Home() {
+@@ -221,9 +227,8 @@ export default function Home() {
        </> : <div className="muted small">{S.weighIn === false
          ? t('No weigh-ins yet. Log your weight to start the curve.')
          : t("No weigh-ins yet. Log your weight to start the curve (we also ask before every workout).")}</div>}
@@ -114,7 +143,7 @@ index 0ffeec0f..7d9dd323 100644
        <div className="row between">
          <div>
            <div className="row" style={{ gap: 7, fontSize: 22, fontWeight: 600, letterSpacing: '-.021em' }}>
-@@ -234,6 +235,7 @@ export default function Home() {
+@@ -234,6 +239,7 @@ export default function Home() {
          </div>
          <Icon name="calendar" className="chev" style={{ fontSize: 20 }} />
        </div>
@@ -123,6 +152,36 @@ index 0ffeec0f..7d9dd323 100644
 +    ]} />
    </div>
  }
+diff --git a/frontend/src/views/Home.queue.test.jsx b/frontend/src/views/Home.queue.test.jsx
+index 455342aa..8b0c899c 100644
+--- a/frontend/src/views/Home.queue.test.jsx
++++ b/frontend/src/views/Home.queue.test.jsx
+@@ -1,4 +1,5 @@
+ // @vitest-environment happy-dom
++vi.mock('../components/GarminSummary.jsx', () => ({ default: () => null }))
+ // A coach week (S.queue) runs by order, not by weekday, so Home swaps the seven dots for a
+ // progress row. Covered here: one chip per session in slot order with its state word, a tap on
+ // an undone chip starting that routine alone, a done chip staying inert, the status line's
+diff --git a/frontend/src/views/Home.startdoor.test.jsx b/frontend/src/views/Home.startdoor.test.jsx
+index 6d026f5e..36fa9002 100644
+--- a/frontend/src/views/Home.startdoor.test.jsx
++++ b/frontend/src/views/Home.startdoor.test.jsx
+@@ -1,4 +1,5 @@
+ // @vitest-environment happy-dom
++vi.mock('../components/GarminSummary.jsx', () => ({ default: () => null }))
+ // The Start button in the tab bar (components/TabBar.jsx) and Home's today row both go straight
+ // into today's planned session the moment there is one, and only fall through to the Start
+ // screen when nothing is planned. So on any day with a routine, a freestyle session and the
+diff --git a/frontend/src/views/Home.weight-card.test.jsx b/frontend/src/views/Home.weight-card.test.jsx
+index d5b1cb6e..046d6d12 100644
+--- a/frontend/src/views/Home.weight-card.test.jsx
++++ b/frontend/src/views/Home.weight-card.test.jsx
+@@ -1,4 +1,5 @@
+ // @vitest-environment happy-dom
++vi.mock('../components/GarminSummary.jsx', () => ({ default: () => null }))
+ import React, { act } from 'react'
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+ import { createRoot } from 'react-dom/client'
 diff --git a/frontend/src/views/Stats.ex-range.test.jsx b/frontend/src/views/Stats.ex-range.test.jsx
 index 0089eba6..15ebe252 100644
 --- a/frontend/src/views/Stats.ex-range.test.jsx
@@ -137,18 +196,19 @@ index 0089eba6..15ebe252 100644
  const press = (scope, label) => act(() => [...scope.querySelectorAll('.seg button')].find(b => b.textContent === label).click())
  
 diff --git a/frontend/src/views/Stats.jsx b/frontend/src/views/Stats.jsx
-index 28fa2910..5d7cea1c 100644
+index 28fa2910..598e374f 100644
 --- a/frontend/src/views/Stats.jsx
 +++ b/frontend/src/views/Stats.jsx
-@@ -8,6 +8,7 @@ import { speedUnitOf, speedLabel, toSpeed } from '../lib/speed.js'
+@@ -8,6 +8,8 @@ import { speedUnitOf, speedLabel, toSpeed } from '../lib/speed.js'
  import { t, exerciseNameFor, exerciseNameClass, getLang } from '../lib/i18n.js'
  import { bwSheet, goalSheet, calendarSheet, dayOverrideSheet, workoutDetailSheet, exerciseHistorySheet, WorkoutRow, bwDeltaColor, weighInsSheet } from '../sheets.jsx'
  import LineChart from '../components/LineChart.jsx'
 +import TrainingMetrics from '../components/TrainingMetrics.jsx'
++import WeeklyGoals from '../components/WeeklyGoals.jsx'
  import Heatmap from '../components/Heatmap.jsx'
  import Icon from '../components/Icon.jsx'
  import BodyMap, { BodyMapLegend } from '../components/BodyMap.jsx'
-@@ -404,7 +405,9 @@ export function WeeklyPlanVolume({ S }) {
+@@ -404,7 +406,9 @@ export function WeeklyPlanVolume({ S }) {
    </div>
  }
  
@@ -159,7 +219,7 @@ index 28fa2910..5d7cea1c 100644
    const nav = useNavigate()
    const S = useStore(s => s.S)
    const [range, setRange] = useState(90)
-@@ -632,10 +635,69 @@ export default function Stats() {
+@@ -632,10 +636,70 @@ export default function Stats() {
    if (showEff) exOpts.push({ value: 'effort', label: t('Effort') })
    if (showMax) exOpts.push({ value: 'max', label: t('Max reps') })
  
@@ -223,13 +283,14 @@ index 28fa2910..5d7cea1c 100644
  
 +    <section aria-label="Gráficos de treino" className="aurora-training-charts">
 +      {progressCard}
++      <WeeklyGoals S={S} />
 +      <TrainingMetrics S={S} />
 +    </section>
 +
      <div className="tiles">
        <div className="tile"><div className="l"><Icon name="dumbbell" />{t('Workouts')}</div><div className="v">{workouts.length}</div></div>
        <div className="tile"><div className="l"><Icon name="calendar" />{t('This month')}</div><div className="v">{monthW}</div></div>
-@@ -693,56 +755,7 @@ export default function Stats() {
+@@ -693,56 +757,7 @@ export default function Stats() {
          </div>}
        </div>
  

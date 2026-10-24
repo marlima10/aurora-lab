@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 22.0.0 — metas, sincronização e operação
+
+Metas semanais por perfil, resumo Garmin no Início, alertas persistentes do servidor, verificação de restauração após backup e histórico diário/mensal de energia. [Descrição completa](RELEASE-22.md).
+
 ## [18.0.0] - 2026-10-21
 
 - Atualização opcional a cada hora do treino Garmin mais recente, com primeira consulta imediata após ativação.

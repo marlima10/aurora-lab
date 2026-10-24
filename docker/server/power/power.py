@@ -8,6 +8,7 @@ import pathlib
 import re
 import threading
 import time
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 PROFILES = {
@@ -56,6 +57,12 @@ class PowerService:
         self.last_history = 0
         self.last_save = 0
         self.last_sample = None
+        self.last_day = None
+        try:
+            rows = json.loads(read(self.state / 'daily-energy.json', '[]'))
+            self.daily = {r['day']: r for r in rows if isinstance(r, dict) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', r.get('day', ''))}
+        except (ValueError, TypeError, KeyError):
+            self.daily = {}
         try:
             self.meter = json.loads(read(self.state / 'energy.json', '{}'))
         except ValueError:
@@ -229,31 +236,46 @@ class PowerService:
         domains = self.rapl(now)
         cpu_w = next((d['power_w'] for d in domains if d['name'].startswith('package-')), None)
         gpus = self.gpus(domains)
-        day = dt.datetime.now().date().isoformat()
-        if self.meter.get('day') != day:
-            self.meter = {'day': day, 'cpu_kwh': 0.0, 'battery_discharge_kwh': 0.0, 'cpu_seconds': 0, 'battery_seconds': 0}
-        elapsed = now - self.last_sample if self.last_sample is not None else 0
-        # Ignore downtime/suspend gaps; do not extrapolate missing samples.
-        if 0 < elapsed <= 30:
-            if cpu_w is not None:
-                self.meter['cpu_kwh'] += cpu_w * elapsed / 3600000
-                self.meter['cpu_seconds'] += elapsed
-            if battery.get('status') == 'Discharging' and battery.get('power_w') is not None:
-                self.meter['battery_discharge_kwh'] += battery['power_w'] * elapsed / 3600000
-                self.meter['battery_seconds'] += elapsed
-        self.last_sample = now
+        try:
+            zone = ZoneInfo('America/Sao_Paulo')
+        except ZoneInfoNotFoundError:
+            zone = dt.timezone(dt.timedelta(hours=-3))
+        day = dt.datetime.now(zone).date().isoformat()
+        self.record_energy(day, now, cpu_w, battery)
         if now - self.last_history >= 60:
             self.history.append({'time': timestamp, 'cpu_w': cpu_w, 'battery_w': battery.get('power_w') if battery.get('status') == 'Discharging' else None})
             self.history = self.history[-1440:]
             self.last_history = now
         self.latest = {'generated': timestamp, 'battery': battery, 'cpu': {'power_w': cpu_w, 'source': 'Intel RAPL / pacote CPU'},
                        'gpus': gpus, 'controls': self.controls(), 'observed': self.meter.copy(), 'history': self.history[-180:],
-                       'wall_power_w': None, 'wall_measurement_available': False}
+                       'wall_power_w': None, 'wall_measurement_available': False,
+                       'daily_energy': [self.daily[k].copy() for k in sorted(self.daily)], 'energy_timezone': 'America/Sao_Paulo', 'energy_retention_days': 90}
         if now - self.last_save >= 60:
             write_json(self.state / 'energy.json', self.meter)
+            write_json(self.state / 'daily-energy.json', [self.daily[k] for k in sorted(self.daily)])
             write_json(self.state / 'history.json', self.history)
             self.last_save = now
         return self.latest
+
+    def record_energy(self, day, now, cpu_w, battery):
+        # Daily CPU and discharge are independent scopes; never add them together.
+        if self.meter.get('day') != day:
+            if self.meter.get('day'):
+                self.daily[self.meter['day']] = self.meter.copy()
+            self.meter = self.daily.get(day, {'day': day, 'cpu_kwh': 0.0, 'battery_discharge_kwh': 0.0, 'cpu_seconds': 0, 'battery_seconds': 0}).copy()
+        elapsed = now - self.last_sample if self.last_sample is not None else 0
+        # No extrapolation across restart, suspend, clock/date rollover or missing sensors.
+        if self.last_day == day and 0 < elapsed <= 30:
+            if cpu_w is not None and math.isfinite(cpu_w) and 0 <= cpu_w <= 500:
+                self.meter['cpu_kwh'] += cpu_w * elapsed / 3600000
+                self.meter['cpu_seconds'] += elapsed
+            watts = battery.get('power_w')
+            if battery.get('status') == 'Discharging' and type(watts) in (int,float) and math.isfinite(watts) and 0 <= watts <= 500:
+                self.meter['battery_discharge_kwh'] += watts * elapsed / 3600000
+                self.meter['battery_seconds'] += elapsed
+        self.last_sample, self.last_day = now, day
+        self.daily[day] = self.meter.copy()
+        self.daily = {k:self.daily[k] for k in sorted(self.daily)[-90:]}
 
     def worker(self):
         saved = read(self.state / 'settings.json')

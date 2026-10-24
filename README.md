@@ -1,4 +1,4 @@
-# AuroraLAB 15.0.0
+# AuroraLAB 22.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -29,6 +29,8 @@ Abra [o portal](http://localhost:8088/). PHP e Composer são preparados na image
 
 Para o servidor Debian, siga a [instalação completa](docs/AURORASERVER.md), inclusive a escolha entre Tailscale no host e no contêiner. Não use o comando do portátil para atualizar uma instalação completa.
 
+Novidades desta versão: [descrição detalhada da release 22](docs/RELEASE-22.md).
+
 ## Serviços e recursos
 
 - Portal responsivo, temas, atalhos e cache PWA.
@@ -38,7 +40,9 @@ Para o servidor Debian, siga a [instalação completa](docs/AURORASERVER.md), in
 - HomeBoard em Docker com acesso HTTPS privado; CasaOS removido do ambiente atual.
 - Cockpit com autenticação local Debian e proxy HTTPS, sem habilitar senha no SSH.
 - Home Assistant Container e openGym em serviços separados.
-- Garmin → openGym com prévia, seleção e proteção contra duplicatas.
+- Garmin → openGym com prévia, seleção, consulta automática dos cinco últimos treinos e resumo no Início.
+- Metas semanais por perfil, alertas no portal e teste isolado de restauração após o backup diário.
+- Histórico diário de CPU/bateria por até 90 dias e resumo mensal de energia.
 - Módulo opcional de energia; disponibilidade depende dos sensores e dispositivos do host.
 
 Cada módulo exige sua preparação. Portainer é apenas um destino de alguns atalhos CasaOS; não é instalado pelos arquivos Compose deste repositório.

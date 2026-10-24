@@ -7,6 +7,7 @@ import sqlite3
 import tarfile
 import tempfile
 import time
+from restore_check import check_archive, save_report
 
 os.umask(0o077)
 
@@ -67,10 +68,16 @@ def backup():
         target.with_suffix(target.suffix+'.sha256').write_text(digest+'  '+name+'\n')
         status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, HomeBoard, Home Assistant, openGym, Garmin e codigo/configuracoes; copia local no mesmo SSD'})
     print('Backup verificado:',name,flush=True)
+    # A restore failure has its own status: do not overwrite a valid backup result.
+    try: result=check_archive(target,digest)
+    except Exception as exc: result={'time':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'error','message':type(exc).__name__,'isolated':True,'production_modified':False}
+    save_report('/status/restore-check.json',result)
+    print('Restauracao isolada:',result['status'],flush=True)
 
-while True:
-    try: backup()
-    except Exception as exc:
-        status({'time':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'error','verified':False,'message':type(exc).__name__})
-        print('Falha no backup:',type(exc).__name__,flush=True)
-    time.sleep(int(os.environ.get('BACKUP_INTERVAL','86400')))
+if __name__ == '__main__':
+    while True:
+        try: backup()
+        except Exception as exc:
+            status({'time':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'error','verified':False,'message':type(exc).__name__})
+            print('Falha no backup:',type(exc).__name__,flush=True)
+        time.sleep(int(os.environ.get('BACKUP_INTERVAL','86400')))
