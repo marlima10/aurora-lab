@@ -79,6 +79,49 @@ class AuthenticationTests(Fixture, unittest.TestCase):
         self.assertRaises(AccessError, self.login, 'person@example.test', key)
         self.assertRaises(AccessError, self.store.revoke, ADMIN_EMAIL, ADMIN_EMAIL)
 
+    def test_delete_hides_user_invalidates_access_and_preserves_grants_for_recovery(self):
+        target='person@example.test'
+        key=self.store.issue(ADMIN_EMAIL,target,{'mealie':target})
+        token,_=self.login(target,key)
+        self.store.delete(ADMIN_EMAIL,target)
+        self.assertNotIn(target,[u['email'] for u in self.store.users(ADMIN_EMAIL)])
+        self.assertRaises(AccessError,self.store.session,token)
+        self.assertRaises(AccessError,self.login,target,key)
+        replacement=self.store.issue(ADMIN_EMAIL,target)
+        restored,_=self.login(target,replacement)
+        self.assertEqual(self.store.session(restored)['grants']['mealie'],target)
+        self.assertIn(target,[u['email'] for u in self.store.users(ADMIN_EMAIL)])
+        self.assertRaises(AccessError,self.login,target,key)
+
+    def test_delete_is_admin_only_and_protects_initial_admin(self):
+        target='person@example.test'
+        self.store.issue(ADMIN_EMAIL,target)
+        self.assertRaises(AccessError,self.store.delete,target,target)
+        self.assertRaises(AccessError,self.store.delete,ADMIN_EMAIL,ADMIN_EMAIL.upper())
+        self.assertRaises(ValueError,self.store.delete,ADMIN_EMAIL,'missing@example.test')
+        self.store.revoke(ADMIN_EMAIL,target)
+        self.store.delete(ADMIN_EMAIL,target)
+        self.assertRaises(ValueError,self.store.delete,ADMIN_EMAIL,target)
+        self.login()
+
+    def test_version26_migration_preserves_existing_key_session_and_is_idempotent(self):
+        path=Path(self.temp.name)/'legacy.sqlite3'
+        key='A'*151;token='B'*64
+        with sqlite3.connect(path) as db:
+            db.executescript('CREATE TABLE users(email TEXT PRIMARY KEY,key_hash TEXT NOT NULL,enabled INTEGER NOT NULL,generation INTEGER NOT NULL DEFAULT 1,created INTEGER NOT NULL); CREATE TABLE sessions(hash TEXT PRIMARY KEY,email TEXT NOT NULL REFERENCES users(email),csrf TEXT NOT NULL,expires INTEGER NOT NULL,generation INTEGER NOT NULL); CREATE TABLE grants(email TEXT NOT NULL REFERENCES users(email),app TEXT NOT NULL,identity TEXT NOT NULL,PRIMARY KEY(email,app));')
+            db.execute('INSERT INTO users VALUES(?,?,1,4,1)',(ADMIN_EMAIL,hashlib.sha256(key.encode()).hexdigest()))
+            db.execute('INSERT INTO sessions VALUES(?,?,?,?,4)',(hashlib.sha256(token.encode()).hexdigest(),ADMIN_EMAIL,'fixture-csrf',20000))
+            db.execute('INSERT INTO grants VALUES(?,?,?)',(ADMIN_EMAIL,'portal',ADMIN_EMAIL))
+        db.close()
+        for _ in range(2):
+            migrated=Store(path,clock=lambda:10000)
+            self.assertTrue(migrated.session(token)['admin'])
+            migrated.authenticate(ADMIN_EMAIL,key,'fixture-migration')
+        with sqlite3.connect(path) as db:
+            self.assertEqual(db.execute('SELECT count(*) FROM schema_migrations WHERE version=1').fetchone()[0],1)
+            self.assertEqual(db.execute('SELECT generation,deleted FROM users').fetchone(),(4,0))
+        db.close()
+
     def test_expiration_logout_and_session_tokens_are_hashed(self):
         token, _ = self.login()
         self.assertNotIn(token.encode(), self.store.path.read_bytes())
@@ -166,12 +209,28 @@ class HttpAuthenticationTests(Fixture, unittest.TestCase):
         headers['Cookie']+='; '+COOKIE+'=shadow'
         self.assertEqual(self.request('/auth/check', headers=headers)[0], 401)
 
+    def test_issue_returns_key_to_admin_and_delete_requires_admin_csrf(self):
+        token,csrf=self.login()
+        headers={'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf}
+        target='person@example.test'
+        status,_,body=self.request('/auth/issue',{'email':target},headers)
+        self.assertEqual(status,200)
+        self.assertRegex(body['key'],r'^[A-Za-z0-9_-]{151}$')
+        user_token,_=self.login(target,body['key'])
+        self.assertEqual(self.request('/auth/delete',{'email':target},{'Cookie':COOKIE+'='+token})[0],403)
+        self.assertEqual(self.request('/auth/delete',{'email':target},headers|{'Origin':'https://attacker.example.test'})[0],403)
+        self.assertEqual(self.request('/auth/delete',{'email':ADMIN_EMAIL},headers)[0],403)
+        self.assertEqual(self.request('/auth/delete',{'email':target},headers)[0],200)
+        self.assertEqual(self.request('/auth/session',headers={'Cookie':COOKIE+'='+user_token})[0],401)
+        self.assertNotIn(body['key'],json.dumps(self.request('/auth/users',headers=headers)[2]))
+
     def test_non_admin_cannot_read_generator_api_or_issue_keys(self):
         key = self.store.issue(ADMIN_EMAIL,'person@example.test')
         token, csrf = self.login('person@example.test',key)
         headers={'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf}
         self.assertEqual(self.request('/auth/users', headers=headers)[0],403)
         self.assertEqual(self.request('/auth/apps', headers=headers)[0],403)
+        self.assertEqual(self.request('/auth/delete', {'email':'person@example.test'},headers)[0],403)
         self.assertEqual(self.request('/auth/admin', headers=headers)[0],403)
         self.assertEqual(self.request('/auth/issue', {'email':'new@example.test'},headers)[0],403)
 

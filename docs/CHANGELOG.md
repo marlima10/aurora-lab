@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 27.0.0 — chave visível e exclusão de usuários
+
+Janela automática com a chave de 151 caracteres e botão de cópia, visualização das chaves recém-geradas durante a mesma sessão da página e renovação mantendo permissões. Exclusão administrativa recuperável, encerramento das sessões, proteção do administrador inicial e migração preservando cadastros anteriores. [Descrição completa](RELEASE-27.md).
+
 ## 26.0.0 — fila limitada para picos do login único
 
 O autenticador mantém 24 trabalhadores e coloca conexões excedentes em espera, evitando resets e erros 500 nos arquivos carregados em paralelo pelo OctoPrint. Fila TCP de 128 conexões e prazo limitado de espera; sem mudanças em chaves, permissões ou bancos. Teste sintético e ensaio real com 64 requisições simultâneas aprovados. [Descrição completa](RELEASE-26.md).
