@@ -52,3 +52,14 @@
 - Mantidos foto de fundo, painéis organizáveis, gráficos, importação Garmin e demais serviços independentes em Docker.
 - Atualização do cache PWA para distribuir os novos recursos do portal e do openGym.
 - Backup privado antes da implantação, cópia externa conferida, testes com dados sintéticos e registros de validação separados do Git. Credenciais e backups não acompanham esta release.
+
+## Validação desta entrega
+
+- 101 testes de interface, regras de metas, mesclagem, organização e cache offline aprovados no Windows e em container Linux sem rede.
+- 18 testes operacionais/links e 11 testes de energia aprovados no Linux; 5 testes de operações também aprovados no Windows e 5 testes dos cálculos de métricas aprovados no Node.
+- Compilações Vite/Docker e configuração Compose/Nginx verificadas.
+- Telas Início/Estatísticas e portal conferidas com sessão existente; visualização de 390 px sem rolagem horizontal.
+- Ensaio com o backup anterior: 499 arquivos, 3 bancos SQLite e 39 JSON restaurados e conferidos; API openGym saudável na cópia isolada, sem rede ou portas publicadas.
+- Primeiro backup após a implantação: 511 arquivos, 3 bancos SQLite e 40 JSON conferidos automaticamente pelo novo verificador.
+- Conteúdo dos treinos comparado por identificador, preservando planos, pesos, exercícios e layout. A sincronização nativa pode normalizar a ordem dos registros sem alterar seu conteúdo.
+- Metas ficam sem valores impostos até o titular configurá-las. Histórico de energia começa nesta versão e aproveita o acumulado já existente do dia; não recria meses passados.
