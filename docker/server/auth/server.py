@@ -191,6 +191,9 @@ def handler(store, origin, assets=None, apps_config=None):
                                 raise ValueError('Escolha uma identidade nativa conhecida.')
                     key = store.issue(session['email'], data.get('email'), data.get('grants'))
                     return self.send(200, {'ok': True, 'key': key, 'length': len(key)})
+                if path == '/auth/delete':
+                    store.delete(session['email'], data.get('email'))
+                    return self.send(200, {'ok': True})
                 if path == '/auth/revoke':
                     store.revoke(session['email'], data.get('email'))
                     return self.send(200, {'ok': True})

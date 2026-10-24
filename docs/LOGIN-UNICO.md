@@ -101,3 +101,9 @@ No modo SSO, o monitor consulta a API OctoPrint em `http://127.0.0.1:15000`, com
 O cache PWA 25 verifica a sessão antes da instalação: usuários comuns não tentam guardar os arquivos Fitness reservados ao administrador. Redirecionamentos de login não são gravados como HTML ou JavaScript offline. `/auth/` continua fora do cache. A instalação portátil sem SSO continua compatível.
 
 A [release 25](RELEASE-25.md) registra a aceitação real e os limites da migração, sem publicar dados ou credenciais.
+
+## Gestão de usuários — release 27
+
+Depois de cadastrar ou renovar, uma janela abre com a chave completa, e-mail destinatário, campo selecionável e botão Copiar chave. Fechar limpa o campo; a lista oferece Ver chave gerada enquanto essa página continua aberta. Recarregar, sair ou navegar limpa a memória da página. Chaves antigas não podem ser recuperadas do hash; use Gerar nova chave para substituí-las. O botão de renovação na lista mantém as permissões atuais e encerra a chave/sessões antigas. A confirmação na própria página permite cancelar antes de qualquer alteração.
+
+Excluir usuário retira o cadastro da lista e encerra seu acesso central, sem apagar perfis ou dados dos aplicativos. A exclusão é lógica e auditada; cadastrar novamente o mesmo e-mail emite outra chave e recupera o cadastro. O administrador inicial é protegido. Rotas de cadastro, exclusão e geração são administrativas e exigem CSRF/origem correta. Não é possível consultar chaves históricas em texto puro.

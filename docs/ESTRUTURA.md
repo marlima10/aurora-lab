@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 26.0.0
+# Estrutura e arquitetura — AuroraLAB 27.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -185,3 +185,7 @@ As particularidades HTTP do HA 2026.10, diretório XDG do Cockpit e suspensão d
 `Dockerfile.actual` reutiliza a imagem Actual 26.10.0 fixada. `adapters/actual-login.mjs` verifica o SHA-256 do bundle nativo e ajusta apenas a descoberta do método configurado nas rotas de bootstrap/métodos, preservando a validação nativa da senha/cabeçalho e os métodos fora do SSO. Não altera bancos nem o frontend compilado. `checks/actual_check.mjs` valida esse contrato com cenários sintéticos.
 
 Na 26, `BoundedHTTPServer` mantém no máximo 24 trabalhadores, mas espera uma vaga por até 15 segundos em vez de encerrar imediatamente a conexão excedente. A fila TCP aceita até 128 conexões pendentes. O prazo de leitura por conexão permanece em 15 segundos e a autorização continua obrigatória; não há cache de permissões. O teste HTTP utiliza a mesma classe da produção e inclui 64 conexões simultâneas, validando respostas e o teto de trabalhadores.
+
+Na release 27, `Store` aplica a migração versionada 1 em `schema_migrations`, acrescentando `users.deleted` sem trocar hashes ou sessões existentes. `/auth/delete` exige administrador, CSRF e origem válida; a exclusão marca o cadastro, desativa sua chave, encerra sessões e preserva vínculos para recuperação. A listagem omite excluídos; emitir outra chave para o mesmo e-mail restaura o cadastro. O administrador inicial não pode ser excluído.
+
+A interface usa diálogos acessíveis para confirmação e exibição da chave. As chaves emitidas nesta página ficam apenas em um `Map` em memória, permitindo “Ver chave gerada” até sair/recarregar. Nunca são salvas em localStorage, banco ou logs. `checks/admin_ui_check.js` usa jsdom 30.1.3 com respostas fictícias e simulação apenas da camada de diálogo, não implementada nessa biblioteca.
