@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 25.0.0 — migração do login único e gestão no Início
+
+Ativação validada do SSO no AuroraServer com as identidades existentes dos oito aplicativos e atalho administrativo 👥 Gestão de usuários na página principal. Correções de WebSocket/formulários do Home Assistant, socket Unix do Cockpit, cache PWA por papel e monitoramento privado da API OctoPrint. Chave administrativa, dados e SSH somente por chave preservados. Backup com autenticação central e restauração isolada; configuração anterior preservada para retorno. [Descrição completa](RELEASE-25.md).
+
 ## 24.0.0 — revisão do portal e login único opcional
 
 Cabeçalhos de segurança em todas as rotas do Nginx, limite de tentativas em POST (energia e API Fitness), aviso na chave de energia quando o portal está em HTTP, movimento reduzido em todas as páginas e textos do Fitness atualizados de Armbian para servidor. Autenticação central opcional por e-mail e chave de 151 caracteres, gerador administrativo, permissões e adaptadores para os oito aplicativos; preparação privada e backup do novo banco. Ativação separada, sem migração automática de produção. [Descrição completa](RELEASE-24.md) · [Revisão técnica](REVISAO-24.md).

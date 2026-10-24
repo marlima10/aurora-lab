@@ -1,0 +1,8 @@
+# Preserve the installed native server; only fix login-method discovery for header SSO.
+FROM ghcr.io/actualbudget/actual:26.10.0@sha256:24645e971da6bb1a1f953d6859e307a0b29be1e8b4130a35b3220c209b5b860c AS upstream
+FROM upstream AS patch
+USER root
+COPY adapters/actual-login.mjs /tmp/aurora-actual-login.mjs
+RUN node /tmp/aurora-actual-login.mjs /app/chunks/app-BgMEdvse.js
+FROM upstream
+COPY --from=patch /app/chunks/app-BgMEdvse.js /app/chunks/app-BgMEdvse.js

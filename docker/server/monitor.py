@@ -89,7 +89,7 @@ def collect():
     key=text('/run/secrets/octoprint-api.key')
     if key:
         def octo(endpoint):
-            request=Request('http://127.0.0.1:5000/api/'+endpoint,headers={'X-Api-Key':key})
+            request=Request(os.environ.get('OCTOPRINT_API_ORIGIN','http://127.0.0.1:5000').rstrip('/')+'/api/'+endpoint,headers={'X-Api-Key':key})
             with urlopen(request,timeout=1) as response: return json.load(response)
         try:
             p=octo('printer'); job=octo('job'); connection=octo('connection')

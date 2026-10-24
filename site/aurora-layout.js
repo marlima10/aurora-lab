@@ -134,5 +134,5 @@
   window.addEventListener('hashchange', renderNav); window.addEventListener('popstate', renderNav);
   setTheme(read(themeKey, document.documentElement.dataset.auroraTheme || 'aurora'));
   renderNav();
-  fetch('/auth/session', {cache:'no-store', credentials:'same-origin'}).then(response => response.ok && (response.headers.get('content-type')||'').includes('application/json') ? response.json() : null).then(value => { if(value?.email){accountSession=value;renderNav();} }).catch(() => {});
+  fetch('/auth/session', {cache:'no-store', credentials:'same-origin'}).then(response => response.ok && (response.headers.get('content-type')||'').includes('application/json') ? response.json() : null).then(value => { if(value?.email){accountSession=value;renderNav();document.dispatchEvent(new CustomEvent('aurora:session',{detail:value}));} }).catch(() => {});
 })();

@@ -3,7 +3,7 @@
 services:
   auth:
     build: ./docker/server/auth
-    image: auroralab-auth:24.0.0
+    image: auroralab-auth:25.0.0
     environment:
       AUTH_ORIGIN: https://${AURORA_PRIVATE_HOST:?configure private HTTPS host}
       AUTH_APP_CONFIG: /run/secrets/sso-apps.json
@@ -28,7 +28,7 @@ services:
     logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
   auth-gateway:
     build: ./docker/server/auth/gateway
-    image: auroralab-auth-gateway:24.0.0
+    image: auroralab-auth-gateway:25.0.0
     ports:
       - '0.0.0.0:80:8088'
       - '0.0.0.0:8088:8088'
@@ -49,7 +49,7 @@ services:
     depends_on:
       auth: {condition: service_healthy}
     read_only: true
-    tmpfs: ['/tmp:size=32m', '/var/cache/nginx:size=32m', '/var/run:size=1m']
+    tmpfs: ['/tmp:size=32m', '/var/cache/nginx:size=32m', '/run:size=1m']
     mem_limit: 128m
     pids_limit: 64
     restart: unless-stopped
@@ -58,7 +58,7 @@ services:
     build:
       context: ./docker/server/auth
       dockerfile: Dockerfile.homeassistant
-    image: auroralab-homeassistant-sso:24.0.0
+    image: auroralab-homeassistant-sso:25.0.0
     environment: {HA_NATIVE_UPSTREAM: 'http://172.31.248.1:18123'}
     env_file: ./secrets/sso/homeassistant.env
     networks:
@@ -80,6 +80,7 @@ services:
   monitor:
     environment:
       AURORA_MONITOR_SECRET_FILE: /run/secrets/sso-monitor.key
+      OCTOPRINT_API_ORIGIN: http://127.0.0.1:15000
     volumes:
       - ./secrets/sso/monitor.key:/run/secrets/sso-monitor.key:ro
   manyfold:
@@ -92,7 +93,7 @@ services:
     build:
       context: ./docker/server/auth
       dockerfile: Dockerfile.mealie
-    image: auroralab-mealie-sso:24.0.0
+    image: auroralab-mealie-sso:25.0.0
     env_file: ./secrets/sso/mealie.env
     environment:
       REVERSE_PROXY_AUTH_ENABLED: 'true'
@@ -100,6 +101,10 @@ services:
       REVERSE_PROXY_AUTH_SIGNUP_ENABLED: 'false'
       REVERSE_PROXY_AUTH_SECRET_HEADER: X-Mealie-Reverse-Proxy-Secret
   actual:
+    build:
+      context: ./docker/server/auth
+      dockerfile: Dockerfile.actual
+    image: auroralab-actual-sso:25.0.0
     ports: !reset []
     environment:
       ACTUAL_LOGIN_METHOD: header
@@ -111,13 +116,13 @@ services:
     build:
       context: ./docker/server/auth
       dockerfile: Dockerfile.opengym
-    image: auroralab-opengym-api-sso:24.0.0
+    image: auroralab-opengym-api-sso:25.0.0
     env_file: ./secrets/sso/opengym.env
     environment: {AURORA_SSO_ENABLED: '1'}
   opengym-garmin:
     environment: {AURORA_SSO_ENABLED: '1'}
   octoprint:
-    ports: !reset []
+    ports: !override ['127.0.0.1:15000:80']
     env_file: ./secrets/sso/octoprint.env
     volumes:
       - ./docker/server/auth/adapters/octoprint_aurora.py:/octoprint/octoprint/plugins/aurora_identity.py:ro
@@ -126,11 +131,12 @@ services:
     build:
       context: ./docker/server/auth
       dockerfile: Dockerfile.homeboard
-    image: auroralab-homeboard-sso:24.0.0
+    image: auroralab-homeboard-sso:25.0.0
     env_file: ./secrets/sso/homeboard.env
     environment: {AURORA_SSO_ENABLED: '1'}
   cockpit:
     ports: !reset []
+    profiles: [legacy-cockpit]
   camera:
     ports: !override ['127.0.0.1:8080:8080']
   backup:

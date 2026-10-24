@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 24.0.0
+# Estrutura e arquitetura — AuroraLAB 25.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -172,3 +172,14 @@ POST em `/api/power` e `/fitness-api` tem limite por IP (`aurora_power_post`: 6/
 `/auth/` serve a entrada e a conta; somente o administrador `aurora@server.local` acessa cadastro/geração/revogação. A chave tem 151 caracteres; o cookie central é HTTPS/HttpOnly e não chega aos aplicativos nativos. O gateway protege as nove interfaces (portal e oito apps), vincula identidades existentes e reserva o Fitness legado compartilhado ao administrador. SSH/SMB/clientes de máquina continuam independentes.
 
 O modo anterior, sem o overlay SSO, conserva seus acessos. A rede/portas descritas na seção anterior referem-se a esse modo base. Consulte [LOGIN-UNICO.md](LOGIN-UNICO.md) para migração e retorno e [REVISAO-24.md](REVISAO-24.md) para evidências e limites de homologação.
+
+
+### Ajustes de operação e interface em 25.0.0
+
+O evento `aurora:session` do layout informa a sessão ao dashboard. `#user-management-shortcut` permanece oculto até a confirmação administrativa e abre `/auth/admin`; a autorização efetiva continua no backend. O cache PWA é específico da versão e não armazena redirects de autenticação; a instalação considera o papel do usuário para os arquivos Fitness legados.
+
+`ha_proxy.py` valida a identidade em um WebSocket separado e mantém a sequência de comandos nativa do navegador. Remove cabeçalhos de compressão do handshake encaminhado e trata respostas vazias de revogação e formulários multipart. `auth-gateway` monta tmpfs em `/run`, preservando o bind mount filho do socket Cockpit. O monitor aceita `OCTOPRINT_API_ORIGIN`, configurado somente para o loopback 15000 no overlay SSO; instalações anteriores mantêm o destino padrão.
+
+As particularidades HTTP do HA 2026.10, diretório XDG do Cockpit e suspensão de dispositivos USB ausentes estão no [guia de migração](LOGIN-UNICO.md). O overlay continua opcional para outras instalações; não habilite o gateway sem validar todos os aplicativos.
+
+`Dockerfile.actual` reutiliza a imagem Actual 26.10.0 fixada. `adapters/actual-login.mjs` verifica o SHA-256 do bundle nativo e ajusta apenas a descoberta do método configurado nas rotas de bootstrap/métodos, preservando a validação nativa da senha/cabeçalho e os métodos fora do SSO. Não altera bancos nem o frontend compilado. `checks/actual_check.mjs` valida esse contrato com cenários sintéticos.
