@@ -43,6 +43,8 @@ def backup():
         required={'fitness/fitness.sqlite3'}
         history='octoprint/octoprint/data/printhistory/history.db'
         if (pathlib.Path('/source')/history).exists(): required.add(history)
+        for app in ('manyfold','mealie','actual'):
+            if (pathlib.Path('/source')/app).exists() and not any(db.startswith(app+'/') for db in databases): raise RuntimeError('Banco de aplicativo adicional ausente')
         if not required.issubset(databases): raise RuntimeError('Banco esperado ausente')
         partial=target.with_suffix(target.suffix+'.partial')
         with tarfile.open(partial,'w:gz') as archive:
@@ -66,7 +68,7 @@ def backup():
         partial.replace(target)
         digest=hashlib.file_digest(target.open('rb'),'sha256').hexdigest()
         target.with_suffix(target.suffix+'.sha256').write_text(digest+'  '+name+'\n')
-        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, HomeBoard, Home Assistant, openGym, Garmin e codigo/configuracoes; copia local no mesmo SSD'})
+        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, HomeBoard, Home Assistant, openGym, Garmin, Manyfold, Mealie, Actual Budget e codigo/configuracoes; copia local no mesmo SSD'})
     print('Backup verificado:',name,flush=True)
     # A restore failure has its own status: do not overwrite a valid backup result.
     try: result=check_archive(target,digest)

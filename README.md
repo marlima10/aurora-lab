@@ -1,4 +1,4 @@
-# AuroraLAB 22.0.0
+# AuroraLAB 23.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -29,9 +29,11 @@ Abra [o portal](http://localhost:8088/). PHP e Composer são preparados na image
 
 Para o servidor Debian, siga a [instalação completa](docs/AURORASERVER.md), inclusive a escolha entre Tailscale no host e no contêiner. Não use o comando do portátil para atualizar uma instalação completa.
 
-Novidades desta versão: [descrição detalhada da release 22](docs/RELEASE-22.md).
+Novidades desta versão: [descrição detalhada da release 23](docs/RELEASE-23.md).
 
 ## Serviços e recursos
+
+- Manyfold (modelos 3D), Mealie (receitas/refeições) e Actual Budget (finanças), em módulos Docker separados: [guia](docs/APPS.md).
 
 - Portal responsivo, temas, atalhos e cache PWA.
 - OctoPrint para impressora 3D, catálogo de plugins fixados e câmera USB opcional.

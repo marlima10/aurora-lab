@@ -31,7 +31,7 @@ class ServiceLinksTests(unittest.TestCase):
         return result
 
     def test_redirects_from_ip_domain_and_lan(self):
-        destinations = {'/octoprint': ':5000/', '/cockpit': ':9090/', '/homeassistant': ':8123/', '/opengym': ':8081', '/garmin': ':8081/garmin/', '/homeboard': ':8090'}
+        destinations = {'/manyfold':':3214/','/mealie':':9925/','/actual':':5006/','/octoprint': ':5000/', '/cockpit': ':9090/', '/homeassistant': ':8123/', '/opengym': ':8081', '/garmin': ':8081/garmin/', '/homeboard': ':8090'}
         for host in ('100.80.213.50', '192.168.0.25', 'example.tail123.ts.net', 'attacker.invalid'):
             for path, suffix in destinations.items():
                 with self.subTest(host=host, path=path):

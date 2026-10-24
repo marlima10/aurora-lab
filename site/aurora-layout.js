@@ -22,7 +22,10 @@
     ['diagnostics', '✥', 'Diagnóstico', '/diagnostics.html'],
     ['homeboard', '◆', 'HomeBoard', '/homeboard'],
     ['homeassistant', '⌂', 'Home Assistant', '/homeassistant'],
-    ['opengym', '💪', 'openGym', '/opengym']
+    ['opengym', '💪', 'openGym', '/opengym'],
+    ['manyfold', '🧊', 'Manyfold', '/manyfold'],
+    ['mealie', '🍽️', 'Mealie', '/mealie'],
+    ['actual', '💰', 'Actual Budget', '/actual']
   ].map(([id, icon, label, href]) => ({ id, icon, label, href }));
 
   function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch (_) { return fallback; } }
