@@ -31,10 +31,14 @@
     return result;
   }
   async function users() {
-    const data=await request('users'); $('users').replaceChildren();
+    $('refresh-users').disabled=true;$('users-state').textContent='Atualizando cadastros…';$('users-state').classList.remove('error');
+    try {
+    const data=await request('users');if(!Array.isArray(data.users))throw Error('Resposta de cadastros inválida.'); $('users').replaceChildren();
+    $('user-count').textContent=String(data.users.length);
+    $('users-state').textContent=data.users.length===1?'1 usuário cadastrado.':data.users.length+' usuários cadastrados.';
     for (const user of data.users) {
       const row=document.createElement('div');row.className='user';
-      const name=document.createElement('span');name.textContent=user.email+(user.enabled?' · Ativo':' · Revogado');row.append(name);
+      const name=document.createElement('span');name.textContent=user.email+(user.email==='aurora@server.local'?' · Administrador principal':'')+(user.enabled?' · Ativo':' · Revogado');row.append(name);
       if (user.email!=='aurora@server.local') {
         const actions=document.createElement('div');actions.className='user-actions';
         function action(label, run, danger=false){const button=document.createElement('button');button.type='button';button.className='secondary'+(danger?' danger':'');button.textContent=label;button.addEventListener('click',async()=>{button.disabled=true;try{await run()}catch(e){status(e.message,true)}finally{button.disabled=false}});actions.append(button);}
@@ -46,6 +50,10 @@
       }
       $('users').append(row);
     }
+    } catch(error) {
+      $('users-state').textContent='Não foi possível atualizar os cadastros. '+error.message+' Use Atualizar lista para tentar novamente.';
+      $('users-state').classList.add('error');
+    } finally { $('refresh-users').disabled=false; }
   }
   async function refresh() {
     try { session=await request('session'); }
@@ -58,6 +66,7 @@
       const link=document.createElement('a');link.href='/'+app;link.textContent=apps[app]+' ↗';$('applications').append(link);
     }
     if (session.admin) {
+      $('account').before($('admin'));
       await users();
       const registry=await request('apps');
       for (const check of $('permissions').querySelectorAll('input[type=checkbox]')) {
@@ -76,6 +85,8 @@
     check.addEventListener('change',()=>{identity.disabled=!check.checked;identity.required=check.checked;});
     row.append(label,identityLabel);$('permissions').append(row);
   }
+  $('refresh-users').addEventListener('click',users);
+  $('issue-form').addEventListener('invalid',()=>status('Confira o e-mail cadastrado e os campos obrigatórios.',true),true);
   $('login-form').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button');button.disabled=true;status('Verificando acesso…');try{await request('login',{email:form.elements.email.value,key:form.elements.key.value});form.elements.key.value='';await refresh();status('Sessão iniciada. Seus aplicativos autorizados estão disponíveis.')}catch(e){status(e.message,true)}finally{button.disabled=false}});
   $('issue-form').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button'),email=form.elements.email.value;const grants={};for(const check of $('permissions').querySelectorAll('input[type=checkbox]:checked'))grants[check.dataset.app]=check.closest('.permission').querySelector('select').value;if(!await confirmAction('Gerar uma chave para '+email+'? Se já existir, a chave e as sessões anteriores serão revogadas.'))return;button.disabled=true;hideKey();try{const result=await request('issue',{email,grants});showKey(email,result.key);status('Chave criada. Copie agora e distribua somente ao titular.');if(email.toLowerCase()===session.email){status('Sua chave foi renovada. Copie agora; entre novamente usando a nova chave.')}else await users()}catch(e){status(e.message,true)}finally{button.disabled=false}});
   $('copy-key').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('new-key').value);$('key-feedback').textContent='Chave copiada.';status('Chave copiada.')}catch{$('new-key').focus();$('new-key').select();$('key-feedback').textContent='Use Ctrl+C ou a opção Copiar do aparelho.';status('Use Ctrl+C ou a opção Copiar do aparelho.')}});

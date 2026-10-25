@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 28.0.0 — lista administrativa visível no topo
+
+Lista e quantidade de usuários no início da área administrativa, antes dos aplicativos e do formulário de permissões. Botão Atualizar lista e estados explícitos de carregamento/erro. Cadastro em seção expansível; chaves, permissões e banco preservados. [Detalhes](RELEASE-28.md).
+
 ## 27.0.0 — chave visível e exclusão de usuários
 
 Janela automática com a chave de 151 caracteres e botão de cópia, visualização das chaves recém-geradas durante a mesma sessão da página e renovação mantendo permissões. Exclusão administrativa recuperável, encerramento das sessões, proteção do administrador inicial e migração preservando cadastros anteriores. [Descrição completa](RELEASE-27.md).

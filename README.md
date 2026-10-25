@@ -1,4 +1,4 @@
-# AuroraLAB 27.0.0
+# AuroraLAB 28.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -13,6 +13,8 @@ Outras instalações continuam exigindo ativação explícita do overlay e valid
 A release 26 corrige o atendimento de picos de requisições do login único, mantendo o limite de trabalhadores. Consulte a [correção e validação](docs/RELEASE-26.md).
 
 A release 27 mostra a chave recém-gerada em uma janela com cópia e permite renovar, revogar ou excluir cadastros pela lista administrativa. [Detalhes](docs/RELEASE-27.md).
+
+A release 28 coloca a lista de usuários no topo para o administrador, com contador, atualização e diagnóstico de carregamento. O cadastro fica separado em uma seção expansível. [Detalhes](docs/RELEASE-28.md).
 
 ## Escolha o ambiente
 
@@ -39,7 +41,7 @@ Abra [o portal](http://localhost:8088/). PHP e Composer são preparados na image
 
 Para o servidor Debian, siga a [instalação completa](docs/AURORASERVER.md), inclusive a escolha entre Tailscale no host e no contêiner. Não use o comando do portátil para atualizar uma instalação completa.
 
-Novidades desta versão: [release 27](docs/RELEASE-27.md); a migração e o novo ícone estão detalhados na [release 25](docs/RELEASE-25.md).
+Novidades desta versão: [release 28](docs/RELEASE-28.md); a migração e o novo ícone estão detalhados na [release 25](docs/RELEASE-25.md).
 
 ## Serviços e recursos
 
