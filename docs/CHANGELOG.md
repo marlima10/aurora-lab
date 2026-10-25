@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 29.0.0 — cadastro concluído e chave entregue
+
+O formulário passa a respeitar a restrição administrativa do Cockpit antes de enviar o cadastro, evitando que a seleção de todos os aplicativos cancele a operação. Erros e progresso aparecem junto ao botão; envio duplicado bloqueado e requisições com prazo limitado. Cadastro, chave de 151 caracteres, login com a chave e exclusão conferidos no navegador com a API e SQLite reais em ambiente descartável. [Detalhes](RELEASE-29.md).
+
 ## 28.0.0 — lista administrativa visível no topo
 
 Lista e quantidade de usuários no início da área administrativa, antes dos aplicativos e do formulário de permissões. Botão Atualizar lista e estados explícitos de carregamento/erro. Cadastro em seção expansível; chaves, permissões e banco preservados. [Detalhes](RELEASE-28.md).

@@ -3,6 +3,8 @@
   const $ = id => document.getElementById(id);
   const apps = { manyfold:'Manyfold', mealie:'Mealie', actual:'Actual Budget', opengym:'openGym', octoprint:'OctoPrint', homeassistant:'Home Assistant', homeboard:'HomeBoard', cockpit:'Cockpit' };
   let session = null;
+  let registrationReady = false;
+  let adminOnlyApps = new Set(['cockpit']);
   const issuedKeys = new Map();
   function status(text, error=false) { $('status').textContent=text; $('status').classList.toggle('error',error); }
   function hideKey() { $('new-key').value=''; $('key-feedback').textContent=''; if($('generated').open)$('generated').close(); }
@@ -24,11 +26,35 @@
   $('confirm-yes').addEventListener('click',()=>finishConfirmation(true));
   $('confirm-no').addEventListener('click',()=>finishConfirmation(false));
   $('confirm-dialog').addEventListener('cancel',event=>{event.preventDefault();finishConfirmation(false);});
+  function registrationStatus(message,error=false) {
+    $('issue-status').textContent=message;$('issue-status').hidden=!message;$('issue-status').classList.toggle('error',error);
+    status(message,error);
+  }
+  function syncRegistrationPermissions() {
+    const target=$('issue-form').elements.email.value.trim().toLowerCase();
+    for(const check of $('permissions').querySelectorAll('input[type=checkbox]')) {
+      const row=check.closest('.permission'),select=row.querySelector('select'),note=row.querySelector('.permission-note');
+      const reserved=adminOnlyApps.has(check.dataset.app)&&target!=='aurora@server.local';
+      const available=check.dataset.available==='true';
+      check.disabled=!registrationReady||!available||reserved;
+      if(check.disabled)check.checked=false;
+      select.disabled=check.disabled||!check.checked;select.required=!select.disabled;
+      note.textContent=reserved?'Reservado ao administrador principal.':!available?'Nenhuma identidade disponível.':'';
+      note.hidden=!note.textContent;
+    }
+  }
   async function request(path, data) {
-    const response=await fetch('/auth/'+path,{method:data?'POST':'GET',cache:'no-store',credentials:'same-origin',headers:data?{'Content-Type':'application/json','X-Aurora-CSRF':session?.csrf||''}:{},body:data?JSON.stringify(data):undefined});
-    const result=await response.json();
-    if (!response.ok) throw Error(result.error||'Não foi possível concluir.');
-    return result;
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),20000);
+    try {
+      const response=await fetch('/auth/'+path,{method:data?'POST':'GET',cache:'no-store',credentials:'same-origin',signal:controller.signal,headers:data?{'Content-Type':'application/json','X-Aurora-CSRF':session?.csrf||''}:{},body:data?JSON.stringify(data):undefined});
+      let result;
+      try { result=await response.json(); } catch { throw Error('Resposta inesperada do servidor (HTTP '+response.status+'). Recarregue a página.'); }
+      if(!response.ok)throw Error(result.error||'Não foi possível concluir (HTTP '+response.status+').');
+      return result;
+    } catch(error) {
+      if(error.name==='AbortError')throw Error('O servidor demorou para responder. Atualize a lista antes de repetir a operação.');
+      throw error;
+    } finally { clearTimeout(timeout); }
   }
   async function users() {
     $('refresh-users').disabled=true;$('users-state').textContent='Atualizando cadastros…';$('users-state').classList.remove('error');
@@ -68,31 +94,57 @@
     if (session.admin) {
       $('account').before($('admin'));
       await users();
+      registrationReady=false;$('issue-form').querySelector('button').disabled=true;
       const registry=await request('apps');
+      adminOnlyApps=new Set(registry.adminOnly||['cockpit']);
       for (const check of $('permissions').querySelectorAll('input[type=checkbox]')) {
         const select=check.closest('.permission').querySelector('select');select.replaceChildren();
         for(const option of registry.apps[check.dataset.app]||[]){const item=document.createElement('option');item.value=option.identity;item.textContent=option.label;select.append(item);}
-        if(!select.options.length){check.disabled=true;check.checked=false;select.disabled=true;}
+        check.dataset.available=String(select.options.length>0);
       }
+      registrationReady=true;syncRegistrationPermissions();$('issue-form').querySelector('button').disabled=false;
     }
   }
   for (const [id,name] of Object.entries(apps)) {
     const row=document.createElement('div');row.className='permission';
-    const label=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.dataset.app=id;
+    const label=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.dataset.app=id;check.disabled=true;
     const text=document.createElement('span');text.textContent=name;label.append(check,text);
     const identityLabel=document.createElement('label');identityLabel.textContent='Identidade existente no aplicativo';
     const identity=document.createElement('select');identity.disabled=true;identityLabel.append(identity);
-    check.addEventListener('change',()=>{identity.disabled=!check.checked;identity.required=check.checked;});
-    row.append(label,identityLabel);$('permissions').append(row);
+    check.addEventListener('change',syncRegistrationPermissions);
+    const note=document.createElement('small');note.className='permission-note';note.hidden=true;
+    row.append(label,identityLabel,note);$('permissions').append(row);
   }
+  $('issue-form').elements.email.addEventListener('input',syncRegistrationPermissions);
+  $('issue-form').elements.email.addEventListener('change',syncRegistrationPermissions);
   $('refresh-users').addEventListener('click',users);
-  $('issue-form').addEventListener('invalid',()=>status('Confira o e-mail cadastrado e os campos obrigatórios.',true),true);
+  $('issue-form').addEventListener('invalid',()=>registrationStatus('Confira o e-mail cadastrado e os campos obrigatórios.',true),true);
   $('login-form').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button');button.disabled=true;status('Verificando acesso…');try{await request('login',{email:form.elements.email.value,key:form.elements.key.value});form.elements.key.value='';await refresh();status('Sessão iniciada. Seus aplicativos autorizados estão disponíveis.')}catch(e){status(e.message,true)}finally{button.disabled=false}});
-  $('issue-form').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button'),email=form.elements.email.value;const grants={};for(const check of $('permissions').querySelectorAll('input[type=checkbox]:checked'))grants[check.dataset.app]=check.closest('.permission').querySelector('select').value;if(!await confirmAction('Gerar uma chave para '+email+'? Se já existir, a chave e as sessões anteriores serão revogadas.'))return;button.disabled=true;hideKey();try{const result=await request('issue',{email,grants});showKey(email,result.key);status('Chave criada. Copie agora e distribua somente ao titular.');if(email.toLowerCase()===session.email){status('Sua chave foi renovada. Copie agora; entre novamente usando a nova chave.')}else await users()}catch(e){status(e.message,true)}finally{button.disabled=false}});
+  $('issue-form').addEventListener('submit',async event=>{
+    event.preventDefault();const form=event.currentTarget,button=form.querySelector('button');
+    if(button.disabled||!registrationReady)return;
+    syncRegistrationPermissions();
+    const email=form.elements.email.value.trim().toLowerCase(),grants={};
+    for(const check of $('permissions').querySelectorAll('input[type=checkbox]:checked')){
+      if(!check.disabled)grants[check.dataset.app]=check.closest('.permission').querySelector('select').value;
+    }
+    button.disabled=true;registrationStatus('Confirme o cadastro na janela aberta.');
+    try {
+      if(!await confirmAction('Gerar uma chave para '+email+'? Se já existir, a chave e as sessões anteriores serão revogadas.')){
+        registrationStatus('Cadastro cancelado.');return;
+      }
+      registrationStatus('Salvando cadastro e gerando a chave…');hideKey();
+      const result=await request('issue',{email,grants});
+      showKey(email,result.key);
+      if(email===session.email)registrationStatus('Sua chave foi renovada. Copie agora; entre novamente com a nova chave.');
+      else {await users();registrationStatus('Cadastro concluído. A chave está na janela aberta; copie antes de sair.');}
+    } catch(error) { registrationStatus(error.message,true); }
+    finally {button.disabled=false;}
+  });
   $('copy-key').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('new-key').value);$('key-feedback').textContent='Chave copiada.';status('Chave copiada.')}catch{$('new-key').focus();$('new-key').select();$('key-feedback').textContent='Use Ctrl+C ou a opção Copiar do aparelho.';status('Use Ctrl+C ou a opção Copiar do aparelho.')}});
   $('clear-key').addEventListener('click',hideKey);
   $('logout').addEventListener('click',async()=>{try{await request('logout',{});hideKey();issuedKeys.clear();session=null;await refresh();status('Sessão central encerrada.')}catch(e){status(e.message,true)}});
   $('generated').addEventListener('cancel',event=>{event.preventDefault();hideKey();});
   window.addEventListener('pagehide',()=>{hideKey();issuedKeys.clear();});
-  refresh().catch(e=>status(e.message,true));
+  refresh().catch(e=>{registrationStatus(e.message,true);});
 })();

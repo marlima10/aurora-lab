@@ -3,7 +3,7 @@
 services:
   auth:
     build: ./docker/server/auth
-    image: auroralab-auth:28.0.0
+    image: auroralab-auth:29.0.0
     environment:
       AUTH_ORIGIN: https://${AURORA_PRIVATE_HOST:?configure private HTTPS host}
       AUTH_APP_CONFIG: /run/secrets/sso-apps.json

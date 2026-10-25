@@ -160,7 +160,7 @@ class AuthenticationTests(Fixture, unittest.TestCase):
 class HttpAuthenticationTests(Fixture, unittest.TestCase):
     def setUp(self):
         super().setUp()
-        self.http = BoundedHTTPServer(('127.0.0.1', 0), handler(self.store, 'https://portal.example.test'))
+        self.http = BoundedHTTPServer(('127.0.0.1', 0), handler(self.store, 'https://portal.example.test',apps_config={'mealie':{'identities':{'person@example.test':'person@example.test'}},'cockpit':{'identities':{'fixture-system':'fixture-system'}}}))
         self.thread = threading.Thread(target=self.http.serve_forever, daemon=True)
         self.thread.start()
 
@@ -208,6 +208,20 @@ class HttpAuthenticationTests(Fixture, unittest.TestCase):
         self.assertEqual(self.request('/auth/check', headers=headers)[0], 403)
         headers['Cookie']+='; '+COOKIE+'=shadow'
         self.assertEqual(self.request('/auth/check', headers=headers)[0], 401)
+
+    def test_registration_policy_blocks_cockpit_without_partial_user_and_accepts_allowed_grants(self):
+        token,csrf=self.login();headers={'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf}
+        status,_,registry=self.request('/auth/apps',headers=headers)
+        self.assertEqual(status,200);self.assertEqual(registry['adminOnly'],['cockpit'])
+        address='person@example.test'
+        status,_,result=self.request('/auth/issue',{'email':address,'grants':{'mealie':address,'cockpit':'fixture-system'}},headers)
+        self.assertEqual(status,403);self.assertNotIn('key',result)
+        self.assertNotIn(address,[u['email'] for u in self.store.users(ADMIN_EMAIL)])
+        status,_,result=self.request('/auth/issue',{'email':address,'grants':{'mealie':address}},headers)
+        self.assertEqual(status,200);self.assertEqual(len(result['key']),151)
+        native,_=self.login(address,result['key'])
+        self.assertEqual(self.store.session(native)['grants']['mealie'],address)
+        self.assertNotIn('cockpit',self.store.session(native)['grants'])
 
     def test_issue_returns_key_to_admin_and_delete_requires_admin_csrf(self):
         token,csrf=self.login()
