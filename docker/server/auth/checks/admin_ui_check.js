@@ -3,7 +3,7 @@ const {JSDOM}=require('jsdom');
 const root=require('node:path').resolve(__dirname,'../static')+'/';
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(root+'index.html','utf8'),{url:'https://fixture.invalid/auth/admin',runScripts:'outside-only',pretendToBeVisual:true});
- const w=dom.window,doc=w.document;let signed=true,calls=0;
+ const w=dom.window,doc=w.document;let signed=true,calls=0,failUsers=false;
  // jsdom does not implement the browser dialog top layer. Model only open/close.
  w.HTMLDialogElement.prototype.showModal=function(){this.open=true};
  w.HTMLDialogElement.prototype.close=function(){this.open=false};
@@ -12,7 +12,7 @@ const root=require('node:path').resolve(__dirname,'../static')+'/';
   const data=options.body?JSON.parse(options.body):null;let status=200,value={};
   switch(new URL(url,w.location).pathname){
    case '/auth/session':status=signed?200:401;value={email:'aurora@server.local',admin:true,csrf:'fixture',grants:{}};break;
-   case '/auth/users':value={users:[...records.values()]};break;
+   case '/auth/users':status=failUsers?503:200;value=failUsers?{error:'fixture unavailable'}:{users:[...records.values()]};break;
    case '/auth/apps':value={apps:{}};break;
    case '/auth/issue':calls++;records.set(data.email,{email:data.email,enabled:true});value={key:String.fromCharCode(65+calls).repeat(151)};break;
    case '/auth/delete':records.delete(data.email);break;
@@ -22,6 +22,12 @@ const root=require('node:path').resolve(__dirname,'../static')+'/';
  };
  const tick=async()=>{for(let i=0;i<8;i++)await new Promise(setImmediate)};
  w.eval(fs.readFileSync(root+'app.js','utf8'));await tick();
+ assert.equal(doc.querySelector('#user-count').textContent,'1');
+ assert.ok(doc.querySelector('#admin').compareDocumentPosition(doc.querySelector('#account')) & w.Node.DOCUMENT_POSITION_FOLLOWING);
+ assert.equal(doc.querySelector('#registration').open,false);
+ failUsers=true;doc.querySelector('#refresh-users').click();await tick();assert.ok(doc.querySelector('#users-state').textContent.includes('Não foi possível'));assert.equal(doc.querySelector('#user-count').textContent,'1');
+ failUsers=false;doc.querySelector('#refresh-users').click();await tick();assert.equal(doc.querySelector('#users-state').textContent,'1 usuário cadastrado.');
+
  const form=doc.querySelector('#issue-form');form.elements.email.value='teste@example.invalid';
  form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
  assert.ok(doc.querySelector('#confirm-dialog').open);assert.equal(calls,0);
@@ -35,5 +41,5 @@ const root=require('node:path').resolve(__dirname,'../static')+'/';
  button('Excluir usuário').click();await tick();doc.querySelector('#confirm-no').click();await tick();assert.ok(records.has('teste@example.invalid'));
  button('Excluir usuário').click();await tick();doc.querySelector('#confirm-yes').click();await tick();assert.ok(!records.has('teste@example.invalid'));assert.equal(doc.querySelectorAll('#users button').length,0);
  doc.querySelector('#logout').click();await tick();assert.ok(doc.querySelector('#admin').hidden);assert.equal(doc.querySelector('#new-key').value,'');
- dom.window.close();console.log('8 DOM scenarios passed: confirmation, key display/focus, reopen, cancel/renew, cancel/delete and logout.');
+ dom.window.close();console.log('10 DOM scenarios passed: top-list/count, retry/error, confirmation, key display/focus, reopen, cancel/renew, cancel/delete and logout.');
 })().catch(e=>{console.error(e);process.exitCode=1});
