@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 28.0.0
+# Estrutura e arquitetura — AuroraLAB 29.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -191,3 +191,7 @@ Na release 27, `Store` aplica a migração versionada 1 em `schema_migrations`, 
 A interface usa diálogos acessíveis para confirmação e exibição da chave. As chaves emitidas nesta página ficam apenas em um `Map` em memória, permitindo “Ver chave gerada” até sair/recarregar. Nunca são salvas em localStorage, banco ou logs. `checks/admin_ui_check.js` usa jsdom 30.1.3 com respostas fictícias e simulação apenas da camada de diálogo, não implementada nessa biblioteca.
 
 Na 28, a interface posiciona `#admin` antes de `#account` depois de confirmar a sessão administrativa. `#users`, `#user-count`, `#users-state` e `#refresh-users` apresentam listagem, contagem e atualização no topo. Uma falha mantém os últimos dados disponíveis e mostra erro/retry na própria seção. O formulário preserva seu ID e contrato em `details#registration`. A captura de `invalid` apresenta uma indicação para campos obrigatórios, sem enviar cadastro incompleto. Não há mudança de esquema ou backend nesta versão.
+
+Na 29, `/auth/apps` informa `adminOnly`, mantendo o contrato `apps` existente. O formulário combina essa política com a disponibilidade de identidades e o e-mail de destino antes de habilitar permissões; campos desabilitados não são enviados. O servidor mantém sua própria recusa a permissões administrativas indevidas, sem mudança na autorização.
+
+`#issue-status` mostra confirmação, progresso e erros junto ao cadastro. O botão fica bloqueado desde a confirmação para evitar envios duplicados e cada requisição tem prazo de 20 s, com orientação para conferir a lista antes de repetir uma operação sem resposta. `checks/ui_fixture.py` executa o handler HTTP e Store/SQLite reais com identidades fictícias em diretório temporário, exclusivamente em 127.0.0.1:8489; seu adaptador modela a terminação TLS/cookie para esse HTTP local. Não encaminha chamadas a produção, não aceita escolher endereço público ou banco e não altera o protocolo seguro em produção.

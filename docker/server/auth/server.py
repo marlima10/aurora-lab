@@ -109,7 +109,7 @@ def handler(store, origin, assets=None, apps_config=None):
                     return self.send(200, {'users': store.users(self.current(admin=True)['email'])})
                 if path == '/auth/apps':
                     self.current(admin=True)
-                    return self.send(200, {'apps': {app: [{'identity':key, 'label':config.get('labels', {}).get(key, key)} for key in config.get('identities', {})]
+                    return self.send(200, {'adminOnly': ['cockpit'], 'apps': {app: [{'identity':key, 'label':config.get('labels', {}).get(key, key)} for key in config.get('identities', {})]
                                                   for app, config in apps_config.items() if app in APP_PORTS}})
                 if path == '/auth/check':
                     session = self.current()

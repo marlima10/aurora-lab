@@ -111,3 +111,11 @@ Excluir usuário retira o cadastro da lista e encerra seu acesso central, sem ap
 ## Listagem administrativa — release 28
 
 Ao entrar como `aurora@server.local`, a lista aparece no topo, com a quantidade de cadastros e Atualizar lista. O administrador inicial também aparece, identificado e protegido. Para cadastrar, expanda Cadastrar usuário ou alterar permissões, preencha e-mail/permissões e confirme a geração. Um e-mail só entra na lista após o servidor confirmar o cadastro. Se o carregamento falhar, a mensagem informa a falha e permite tentar novamente; dados anteriores não são apagados da tela. Usuários comuns continuam sem acesso à listagem ou ao gerador.
+
+## Cadastro sem bloqueio silencioso — release 29
+
+Cockpit é reservado ao administrador principal pela política existente. Para outro e-mail, o formulário deixa essa opção desabilitada, desmarca uma seleção antiga e explica a restrição. Os outros aplicativos continuam disponíveis conforme o inventário. O servidor mantém a validação mesmo se alguém alterar a página manualmente.
+
+Após confirmar, o formulário informa que está salvando e, no sucesso, abre a chave de 151 caracteres e atualiza a listagem. Se houver falha de permissão, sessão ou resposta, a mensagem aparece junto ao botão de cadastro. Uma espera acima de 20 segundos é interrompida com orientação para consultar a lista antes de repetir, pois o servidor pode ter concluído uma operação cuja resposta não chegou. Não há repetição automática nem armazenamento adicional de chaves.
+
+O ensaio completo pode ser executado com `python docker/server/auth/checks/ui_fixture.py`. Use somente o endereço local informado; o administrador fictício usa a letra F repetida 151 vezes. Não reutilize essa credencial fora do ensaio. O servidor de teste usa dados temporários, identidades fictícias e não se conecta ao AuroraServer.

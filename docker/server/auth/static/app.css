@@ -5,3 +5,5 @@ dialog#generated{width:min(620px,calc(100vw - 28px));max-height:85vh;overflow:au
 dialog#confirm-dialog{width:min(520px,calc(100vw - 28px));color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:24px}dialog#confirm-dialog::backdrop{background:#030914c9}#confirm-message{line-height:1.6;overflow-wrap:anywhere}
 
 .users-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.users-heading h3{display:flex;gap:10px;align-items:center}#users-state{color:var(--cyan);line-height:1.5}#users-state.error{color:var(--orange)}#registration{margin-top:24px;border:1px solid var(--line);padding:16px;border-radius:8px}#registration summary{cursor:pointer;font-weight:700;color:var(--cyan);line-height:1.5}.user{padding:16px 0}
+
+.issue-status{margin:0;padding:13px;border:1px solid var(--cyan);border-radius:8px;color:var(--cyan);line-height:1.5;overflow-wrap:anywhere}.issue-status.error{color:var(--orange);border-color:var(--orange);background:#ff9d2e0d}.permission-note{display:block;margin-top:8px;color:var(--muted);line-height:1.5}.permission:has(input:disabled) label:first-child{color:var(--muted)}
