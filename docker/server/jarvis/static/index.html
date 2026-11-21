@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#030914"><title>Jarvis · AuroraLAB</title><link rel="stylesheet" href="/jarvis/app.css?v=30"><script defer src="/jarvis/app.js?v=30"></script></head>
+<body>
+<header><a href="/">← AuroraLAB</a><span id="identity"></span></header>
+<main>
+  <section class="hero"><p class="eyebrow">SEU ASSISTENTE PESSOAL</p><h1>Jarvis</h1><p>Converse, organize e consulte seus aplicativos.</p><small id="model">Conectando ao AuroraLAB…</small></section>
+  <p id="status" role="status" aria-live="polite"></p>
+  <section class="panel"><h2>Conversa</h2><div id="messages" aria-live="polite"></div>
+    <form id="chat"><label for="message">O que vamos fazer?</label><textarea id="message" maxlength="3000" rows="3" placeholder="Resuma meus últimos cinco treinos." required></textarea>
+    <label><input id="allow-web" type="checkbox"> Permitir pesquisa pública neste pedido (os termos saem do servidor)</label>
+    <div class="actions"><button id="send" type="submit">Enviar</button><button id="record" class="secondary" type="button">🎙 Gravar voz</button><button id="speak" class="secondary" type="button" disabled>Ouvir resposta</button></div>
+    <small>A gravação preenche o texto para você revisar antes de enviar. Limite de 90 segundos.</small></form><audio id="player" controls hidden></audio>
+  </section>
+  <section class="panel"><h2>Atalhos</h2><div class="actions"><button type="button" data-prompt="Resuma meus últimos cinco treinos, com tempo e calorias quando disponíveis.">Meus treinos</button><button type="button" data-prompt="Mostre minhas contas e categorias financeiras.">Finanças</button><button type="button" data-prompt="Busque minhas receitas e sugira um cardápio simples.">Receitas</button><button type="button" data-prompt="Qual é o estado atual da minha impressão 3D?">Impressão 3D</button></div></section>
+  <section class="panel"><h2>Aguardando sua confirmação</h2><p>Revise os dados antes de executar. As propostas expiram em 15 minutos.</p><div id="proposals"></div></section>
+  <div class="columns"><section class="panel"><h2>Notas e relatórios</h2><form id="note-form"><label for="note">Nova nota</label><textarea id="note" maxlength="4000" rows="3" required></textarea><button type="submit">Preparar nota</button></form><div id="notes"></div></section>
+  <section class="panel"><h2>Lembretes</h2><p>Entrega na caixa do Jarvis. Esta versão não envia notificações com o navegador fechado.</p><form id="reminder-form"><label for="reminder">Lembrar de</label><input id="reminder" maxlength="1000" required><label for="due">Data e hora neste aparelho</label><input id="due" type="datetime-local" required><button type="submit">Preparar lembrete</button></form><div id="reminders"></div></section></div>
+  <footer>OpenJarvis + Ollama · IA local · Whisper e Piper<br>Consultas na internet enviam os termos da pesquisa ao serviço de busca.</footer>
+</main>
+<dialog id="confirm"><form method="dialog"><h2>Executar esta ação?</h2><pre id="confirm-details"></pre><div class="actions"><button value="cancel" class="secondary">Cancelar</button><button value="confirm">Confirmar</button></div></form></dialog>
+</body></html>

@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 30.0.0 — Jarvis com IA e voz locais
+
+Módulo opcional em doze containers, com motor original OpenJarvis/Ollama, Whisper, Piper, histórico/notas por usuário, relatórios Markdown, lembretes na caixa e conectores por domínio. Login central, CSRF, grants, confirmações atômicas e prévias legíveis. Pesquisa pública por opção explícita; sem API de IA paga. Backup/restore inclui Jarvis e preparação do SQLite Manyfold após reinício. [Descrição e validação](RELEASE-30.md).
+
 ## 29.0.0 — cadastro concluído e chave entregue
 
 O formulário passa a respeitar a restrição administrativa do Cockpit antes de enviar o cadastro, evitando que a seleção de todos os aplicativos cancele a operação. Erros e progresso aparecem junto ao botão; envio duplicado bloqueado e requisições com prazo limitado. Cadastro, chave de 151 caracteres, login com a chave e exclusão conferidos no navegador com a API e SQLite reais em ambiente descartável. [Detalhes](RELEASE-29.md).

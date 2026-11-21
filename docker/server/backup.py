@@ -17,6 +17,14 @@ def status(value):
     temp.write_text(json.dumps(value)); temp.chmod(0o644); temp.replace(path)
 
 def backup():
+    # A read-only WAL database may need its shared-memory files initialized by
+    # the writer after reboot. Wake the native app; never ignore an active WAL.
+    if os.environ.get('MANYFOLD_BACKUP_WARMUP')=='1':
+        import urllib.request
+        cfg=json.loads(pathlib.Path('/source/secrets/sso/apps.json').read_text())['manyfold']
+        identity=next(iter(cfg['identities']))
+        req=urllib.request.Request('http://manyfold:3214/models',headers={'X-Aurora-Identity':identity,'X-Aurora-Proxy-Secret':cfg['secret'],'Accept':'application/vnd.manyfold.v0+json'})
+        with urllib.request.urlopen(req,timeout=30) as response: response.read(1)
     stamp=dt.datetime.now(dt.timezone.utc)
     name='auroralab-data-'+stamp.strftime('%Y%m%d-%H%M%S')+'.tar.gz'
     target=pathlib.Path('/backups')/name
@@ -45,6 +53,7 @@ def backup():
         if (pathlib.Path('/source')/history).exists(): required.add(history)
         for app in ('manyfold','mealie','actual','auth'):
             if (pathlib.Path('/source')/app).exists() and not any(db.startswith(app+'/') for db in databases): raise RuntimeError('Banco de aplicativo adicional ausente')
+        if pathlib.Path('/source/config/compose.jarvis.yaml').exists(): required.add('jarvis-app/jarvis.sqlite3')
         if not required.issubset(databases): raise RuntimeError('Banco esperado ausente')
         partial=target.with_suffix(target.suffix+'.partial')
         with tarfile.open(partial,'w:gz') as archive:
@@ -68,7 +77,7 @@ def backup():
         partial.replace(target)
         digest=hashlib.file_digest(target.open('rb'),'sha256').hexdigest()
         target.with_suffix(target.suffix+'.sha256').write_text(digest+'  '+name+'\n')
-        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, HomeBoard, Home Assistant, openGym, Garmin, Manyfold, Mealie, Actual Budget, autenticacao central e codigo/configuracoes; copia local no mesmo SSD'})
+        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, HomeBoard, Home Assistant, openGym, Garmin, Manyfold, Mealie, Actual Budget, autenticacao central, Jarvis quando ativo e codigo/configuracoes; copia local no mesmo SSD'})
     print('Backup verificado:',name,flush=True)
     # A restore failure has its own status: do not overwrite a valid backup result.
     try: result=check_archive(target,digest)
