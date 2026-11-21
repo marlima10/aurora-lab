@@ -13,7 +13,7 @@ const root=require('node:path').resolve(__dirname,'../static')+'/';
   switch(new URL(url,w.location).pathname){
    case '/auth/session':status=signed?200:401;value={email:'aurora@server.local',admin:true,csrf:'fixture',grants:{}};break;
    case '/auth/users':status=failUsers?503:200;value=failUsers?{error:'fixture unavailable'}:{users:[...records.values()]};break;
-   case '/auth/apps':value={adminOnly:['cockpit'],apps:Object.fromEntries(['manyfold','mealie','actual','opengym','octoprint','homeassistant','homeboard','cockpit'].map(app=>[app,[{identity:'fixture-identity',label:'Fixture'}]]))};break;
+   case '/auth/apps':value={adminOnly:['cockpit'],apps:Object.fromEntries(['manyfold','mealie','actual','opengym','octoprint','cockpit'].map(app=>[app,[{identity:'fixture-identity',label:'Fixture'}]]))};break;
    case '/auth/issue':lastGrants=data.grants;if(failIssue||(data.email!=='aurora@server.local'&&data.grants?.cockpit)){status=403;value={error:'fixture registration rejected'};break;}calls++;records.set(data.email,{email:data.email,enabled:true});value={key:String.fromCharCode(65+calls).repeat(151)};break;
    case '/auth/delete':records.delete(data.email);break;
    case '/auth/logout':signed=false;break;
@@ -38,7 +38,7 @@ const root=require('node:path').resolve(__dirname,'../static')+'/';
  form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
  assert.ok(doc.querySelector('#confirm-dialog').open);assert.equal(calls,0);
  doc.querySelector('#confirm-yes').click();await tick();
- assert.ok(doc.querySelector('#generated').open);assert.equal(doc.querySelector('#new-key').value.length,151);assert.equal(doc.activeElement.id,'new-key');assert.equal(lastGrants.cockpit,undefined);assert.equal(Object.keys(lastGrants).length,7);
+ assert.ok(doc.querySelector('#generated').open);assert.equal(doc.querySelector('#new-key').value.length,151);assert.equal(doc.activeElement.id,'new-key');assert.equal(lastGrants.cockpit,undefined);assert.equal(Object.keys(lastGrants).length,5);
  doc.querySelector('#clear-key').click();assert.equal(doc.querySelector('#new-key').value,'');
  const button=text=>[...doc.querySelectorAll('#users button')].find(b=>b.textContent===text);
  button('Ver chave gerada').click();await tick();assert.ok(doc.querySelector('#generated').open);assert.equal(doc.querySelector('#new-key').value.length,151);doc.querySelector('#clear-key').click();

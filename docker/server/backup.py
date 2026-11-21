@@ -77,7 +77,7 @@ def backup():
         partial.replace(target)
         digest=hashlib.file_digest(target.open('rb'),'sha256').hexdigest()
         target.with_suffix(target.suffix+'.sha256').write_text(digest+'  '+name+'\n')
-        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, HomeBoard, Home Assistant, openGym, Garmin, Manyfold, Mealie, Actual Budget, autenticacao central, Jarvis quando ativo e codigo/configuracoes; copia local no mesmo SSD'})
+        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, openGym, Garmin, Manyfold, Mealie, Actual Budget, autenticacao central, Jarvis quando ativo e codigo/configuracoes; copia local no mesmo SSD'})
     print('Backup verificado:',name,flush=True)
     # A restore failure has its own status: do not overwrite a valid backup result.
     try: result=check_archive(target,digest)

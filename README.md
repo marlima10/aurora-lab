@@ -1,4 +1,4 @@
-# AuroraLAB 30.0.0
+# AuroraLAB 31.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -28,7 +28,7 @@ A release 30 acrescenta conversa por texto e voz, notas, relatórios, lembretes 
 | --- | --- | --- |
 | Portátil | `compose.yaml` | Nginx, interface e API Fitness PHP/SQLite; sem os serviços do servidor |
 | Servidor Linux | `compose.server.yaml` | Portal, Fitness, OctoPrint, Samba, monitoramento e backup; Tailscale e proxy Cockpit dependem de preparação |
-| Módulos adicionais | Arquivos `compose.*.yaml` | Home Assistant, openGym/Garmin, energia e dispositivo da impressora |
+| Módulos adicionais | Arquivos `compose.*.yaml` | openGym/Garmin, Jarvis, energia e dispositivo da impressora |
 
 Os dois ambientes usam a porta 8088. Escolha um por instalação. O servidor completo usa recursos do Linux amd64 e scripts destinados ao Debian; o portátil pode rodar no Docker Desktop com contêineres Linux.
 
@@ -57,9 +57,9 @@ Novidades desta versão: [release 29](docs/RELEASE-29.md); a migração e o novo
 - OctoPrint para impressora 3D, catálogo de plugins fixados e câmera USB opcional.
 - Métricas do host, rede, armazenamento e status de backup.
 - Samba autenticado para arquivos de impressão.
-- HomeBoard em Docker com acesso HTTPS privado; CasaOS removido do ambiente atual.
+- Home Assistant, HomeBoard e CasaOS removidos da instalação atual.
 - Cockpit com sessão local Debian pelo gateway SSO privado, preservando sudo/polkit e SSH somente por chave.
-- Home Assistant Container e openGym em serviços separados.
+- openGym e seus conectores em serviços separados.
 - Garmin → openGym com prévia, seleção, consulta automática dos cinco últimos treinos e resumo no Início.
 - Metas semanais por perfil, alertas no portal e teste isolado de restauração após o backup diário.
 - Histórico diário de CPU/bateria por até 90 dias e resumo mensal de energia.
@@ -111,7 +111,7 @@ Alterações no backend exigem rebuild. Antes de atualizar serviços com dados, 
 
 Na LAN, use o IP local do servidor e a porta correspondente. IPs `100.x` e domínios privados Tailscale exigem o cliente conectado à tailnet e permissão para o serviço. A publicação de HTTPS privado via Serve é uma configuração separada.
 
-Portal e Fitness não têm login; CasaOS, Cockpit, Home Assistant e openGym possuem autenticação própria. Não publique o portal/Fitness na internet sem definir controle de acesso. Veja [rede, portas e Tailscale](docs/REDE-E-TAILSCALE.md).
+Na instalação atual, portal e aplicativos usam o login central do AuroraLAB e HTTPS privado. As configurações portáteis sem autenticação não devem ser expostas na internet. Veja [rede, portas e Tailscale](docs/REDE-E-TAILSCALE.md).
 
 ## Documentação
 
@@ -125,7 +125,6 @@ Portal e Fitness não têm login; CasaOS, Cockpit, Home Assistant e openGym poss
 | [Solução de problemas](docs/SOLUCAO-DE-PROBLEMAS.md) | Erros de Git, Docker, preparação e acesso |
 | [CasaOS](docs/CASAOS.md) | Instalação nova, diagnóstico e atalhos |
 | [Cockpit](docs/COCKPIT.md) | Preparação do backend Debian e proxy HTTPS |
-| [Home Assistant](docs/HOMEASSISTANT.md) | Configuração, acesso e recuperação |
 | [openGym](docs/OPENGYM.md) | Passkeys, preparação, HTTPS e dados |
 | [Garmin](docs/GARMIN.md) | Instalação, importação e limites |
 | [OctoPrint/Python](docs/UPGRADE-PYTHON-OCTOPRINT.md) | Build, plugins e retorno de imagem |
@@ -133,5 +132,3 @@ Portal e Fitness não têm login; CasaOS, Cockpit, Home Assistant e openGym poss
 | [Histórico](docs/CHANGELOG.md) | Alterações por versão |
 
 Padrões: [desenvolvimento](skills/aurora-development/SKILL.md) e [visual](skills/aurora-visual/SKILL.md). As skills ficam versionadas no projeto; não pressupõem instalação global.
-
-Painel HomeBoard, preservacao dos aplicativos e politica da tampa: [guia HomeBoard](docs/HOMEBOARD.md).

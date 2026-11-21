@@ -37,7 +37,6 @@ known={
     'octoprint':('OctoPrint',portal+':5000/','octoprint'),
     'samba':('Samba - arquivos',portainer,'samba'),
     'php':('PHP AuroraLAB',portainer,'php'),
-    'homeassistant':('Home Assistant Aurora',portal+':8123/','homeassistant'),
     'opengym-web':('openGym',portal+'/opengym','opengym'),
     'opengym-garmin':('Garmin - importar treinos',portal+'/garmin','opengym'),
     'opengym-api':('openGym - API',portainer,'api'),

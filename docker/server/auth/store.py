@@ -9,7 +9,7 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 
-APPS = ('portal', 'manyfold', 'mealie', 'actual', 'opengym', 'octoprint', 'homeassistant', 'homeboard', 'cockpit')
+APPS = ('portal', 'manyfold', 'mealie', 'actual', 'opengym', 'octoprint', 'cockpit')
 ADMIN_EMAIL = 'aurora@server.local'
 SESSION_SECONDS = 12 * 3600
 
@@ -62,6 +62,10 @@ class Store:
                 if 'deleted' not in columns:
                     db.execute('ALTER TABLE users ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0')
                 db.execute('INSERT INTO schema_migrations VALUES(1,?)', (int(self.clock()),))
+            # Remove retired applications without rotating keys or changing other grants.
+            if not db.execute('SELECT 1 FROM schema_migrations WHERE version=2').fetchone():
+                db.execute("DELETE FROM grants WHERE app IN ('homeassistant','homeboard')")
+                db.execute('INSERT INTO schema_migrations VALUES(2,?)', (int(self.clock()),))
         self.path.chmod(0o600)
 
     @contextmanager
