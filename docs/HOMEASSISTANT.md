@@ -1,3 +1,5 @@
+> Histórico: aplicativo removido na release 31.0.0. Este guia não representa a instalação atual.
+
 # Home Assistant Container
 
 `compose.homeassistant.yaml` fixa Home Assistant Container **2026.10.2** por digest. Essa modalidade não inclui Supervisor nem loja de complementos; outros serviços são contêineres independentes.

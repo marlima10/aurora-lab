@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 from store import Store, AccessError, SESSION_SECONDS
 
 COOKIE = '__Host-aurora_session'
-APP_PORTS = {'manyfold':3214,'mealie':9925,'actual':5006,'opengym':8081,'octoprint':5000,'homeassistant':8123,'homeboard':8090,'cockpit':9090}
+APP_PORTS = {'manyfold':3214,'mealie':9925,'actual':5006,'opengym':8081,'octoprint':5000,'cockpit':9090}
 
 
 class BoundedHTTPServer(ThreadingHTTPServer):
@@ -137,12 +137,7 @@ def handler(store, origin, assets=None, apps_config=None):
                         identity = session['grants'][app]
                         if not config.get('ready') or identity not in config.get('identities', {}):
                             return self.send(503, {'error': 'Integração SSO ainda não validada para esta identidade.'})
-                        if app == 'homeassistant':
-                            extra['X-Aurora-HA-IP'] = config['identities'][identity]
-                            if len(config.get('secret', '')) < 32:
-                                return self.send(503, {'error': 'Configure o adaptador Home Assistant.'})
-                            extra['X-Aurora-App-Secret'] = config['secret']
-                        elif app == 'cockpit':
+                        if app == 'cockpit':
                             if not session['admin'] or identity != config.get('local_user'):
                                 return self.send(403, {'error': 'Administração não autorizada.'})
                         else:

@@ -38,10 +38,10 @@ def prepare(root, mapping_file):
     origin = 'https://' + parsed.hostname
     native = mapping['apps']
     if set(native) != set(APPS) - {'portal'}:
-        raise ValueError('Forneça o inventário explícito dos oito aplicativos.')
+        raise ValueError('Forneça o inventário explícito dos aplicativos ativos.')
     grants = mapping['admin_grants']
     if set(grants) != set(native):
-        raise ValueError('Confirme as oito identidades internas para o administrador inicial.')
+        raise ValueError('Confirme as identidades internas para o administrador inicial.')
     for app, identity in grants.items():
         if identity not in native[app]['identities']:
             raise ValueError('Identidade administrativa ausente do inventário: ' + app)
@@ -115,7 +115,7 @@ def prepare(root, mapping_file):
     write_private(private / 'cockpit/cockpit.conf', config)
     for path in (Path(__file__).parent / 'host').iterdir():
         write_private(private / 'host' / path.name, path.read_text().replace('@LOCAL_USER@', local))
-    return {'prepared': True, 'native_identities_mapped': 8, 'admin_email': ADMIN_EMAIL, 'key_file': str(key_path),
+    return {'prepared': True, 'native_identities_mapped': len(native), 'admin_email': ADMIN_EMAIL, 'key_file': str(key_path),
             'apps_validated': sorted(app for app in native if result[app]['ready']), 'production_configuration_changed': False,
             'notice': 'Não ativa SSO; valide adaptadores e siga o plano de migração/retorno.'}
 

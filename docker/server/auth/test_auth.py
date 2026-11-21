@@ -293,5 +293,28 @@ class BurstAuthenticationTests(unittest.TestCase):
             server.shutdown();server.server_close();thread.join()
 
 
+class RetiredApplicationsTests(unittest.TestCase):
+    def test_migration_retires_only_removed_grants_and_preserves_login(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as folder:
+            store = Store(Path(folder)/'auth.sqlite3')
+            key = store.initialize()
+            token, _ = store.authenticate(ADMIN_EMAIL, key, 'fixture')
+            with store.db() as db:
+                db.execute('DELETE FROM schema_migrations WHERE version=2')
+                for app in ('homeassistant','homeboard','opengym'):
+                    db.execute('INSERT INTO grants VALUES(?,?,?)',(ADMIN_EMAIL,app,'fixture'))
+                before = [tuple(row) for row in db.execute('SELECT * FROM users')]
+            restored = Store(store.path)
+            with restored.db() as db:
+                self.assertEqual(before,[tuple(row) for row in db.execute('SELECT * FROM users')])
+            grants = restored.session(token)['grants']
+            self.assertNotIn('homeassistant',grants)
+            self.assertNotIn('homeboard',grants)
+            self.assertEqual(grants['opengym'],'fixture')
+            self.assertEqual(restored.authenticate(ADMIN_EMAIL,key,'fixture')[0] is not None,True)
+
+
 if __name__ == '__main__':
     unittest.main()

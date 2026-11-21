@@ -54,7 +54,7 @@ services:
     user: '65534:65534'
     read_only: true
     tmpfs: [/tmp]
-    environment: {SERVER_IP: '${SERVER_IP:-192.168.0.71}', TZ: America/Sao_Paulo, OPENGYM_ORIGIN: '${OPENGYM_ORIGIN:-}', HOMEBOARD_ORIGIN: '${HOMEBOARD_ORIGIN:-}'}
+    environment: {SERVER_IP: '${SERVER_IP:-192.168.0.71}', TZ: America/Sao_Paulo, OPENGYM_ORIGIN: '${OPENGYM_ORIGIN:-}'}
     volumes:
       - ./docker/server/monitor.py:/app/monitor.py:ro
       - ./docker/server/alerts.py:/app/alerts.py:ro
@@ -75,13 +75,8 @@ services:
       - ./data/garmin:/source/garmin:ro
       - ./data/opengym:/source/opengym:ro
       - ./compose.opengym.yaml:/source/config/compose.opengym.yaml:ro
-      - ./data/homeassistant:/source/homeassistant
-      - ./compose.homeassistant.yaml:/source/config/compose.homeassistant.yaml:ro
       - /etc/cockpit:/source/cockpit-config:ro
       - /etc/systemd/system/cockpit.socket.d:/source/cockpit-socket:ro
-      - ./data/homeboard:/source/homeboard
-      - ./data/homeboard-photos:/source/homeboard-photos:ro
-      - ./compose.homeboard.yaml:/source/config/compose.homeboard.yaml:ro
       - /etc/systemd/logind.conf.d:/source/logind-config:ro
       - /home/rafael/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml:/source/xfce-power.xml:ro
       - ./data/fitness:/source/fitness

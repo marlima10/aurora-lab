@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='aurora-real-auth-fixture-') as director
     assets=data/'static';shutil.copytree(ROOT/'static',assets)
     page=assets/'index.html'
     page.write_text(page.read_text(encoding='utf-8').replace('<header>','<header><b>TESTE · DADOS FICTÍCIOS</b>'),encoding='utf-8')
-    identities={'manyfold':'person@example.invalid','mealie':'person@example.invalid','actual':'fixture-instance','opengym':'fixture-profile','octoprint':'fixture-operator','homeassistant':'f'*32,'homeboard':'viewer','cockpit':'fixture-system'}
+    identities={'manyfold':'person@example.invalid','mealie':'person@example.invalid','actual':'fixture-instance','opengym':'fixture-profile','octoprint':'fixture-operator','cockpit':'fixture-system'}
     registry={name:{'identities':{identity:identity},'labels':{identity:'Perfil fictício'}} for name,identity in identities.items()}
     Base=handler(store,TLS_ORIGIN,assets=assets,apps_config=registry)
     class LocalTLSAdapter(Base):

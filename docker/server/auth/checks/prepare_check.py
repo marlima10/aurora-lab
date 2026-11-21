@@ -20,8 +20,8 @@ class PreparationTests(unittest.TestCase):
         (self.root/'docker/server').mkdir(parents=True)
         (self.root/'docker/server/nginx.conf').write_text('server {\nlocation / { proxy_pass http://monitor; }\n}\n')
         identities = {'manyfold':'user@example.test','mealie':'user@example.test','actual':'shared',
-                      'opengym':'existing','octoprint':'fixture','homeassistant':'1'*32,'homeboard':'editor','cockpit':'fixture'}
-        self.inventory = {'apps':{a:{'identities':{i:'198.18.0.10' if a=='homeassistant' else i}} for a,i in identities.items()},
+                      'opengym':'existing','octoprint':'fixture','cockpit':'fixture'}
+        self.inventory = {'apps':{a:{'identities':{i:i}} for a,i in identities.items()},
                           'admin_grants':identities}
         self.mapping = self.root/'mapping.json'
         self.mapping.write_text(json.dumps(self.inventory))

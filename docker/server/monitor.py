@@ -71,7 +71,7 @@ def collect():
     available = mem.get('MemAvailable', mem.get('MemFree', 0))
     swap_total = mem.get('SwapTotal', 0)
     swap_used = swap_total-mem.get('SwapFree', 0)
-    services = {name: online(host, port) for name,host,port in [('octoprint','127.0.0.1',5000),('webcam','127.0.0.1',8080),('nginx','127.0.0.1',80),('samba','127.0.0.1',445),('cockpit','127.0.0.1',9090),('homeboard','127.0.0.1',8090),('homeassistant','127.0.0.1',8123),('opengym','127.0.0.1',8081)]}
+    services = {name: online(host, port) for name,host,port in [('octoprint','127.0.0.1',5000),('webcam','127.0.0.1',8080),('nginx','127.0.0.1',80),('samba','127.0.0.1',445),('cockpit','127.0.0.1',9090),('opengym','127.0.0.1',8081)]}
     data = dict(generated=now, hostname='AuroraServer', local_ip=os.environ.get('SERVER_IP','192.168.0.71'), tailscale_ip='Offline', uptime=f'{int(float(text(PROC/"uptime","0").split()[0])//3600)} h', os='Debian GNU/Linux 13 / containers', kernel=text(PROC/'sys/kernel/osrelease'), arch='x86_64', cpu_model=next((r.split(':',1)[1].strip() for r in text(PROC/'cpuinfo').splitlines() if r.startswith('model name')), 'Intel'), cores=os.cpu_count(), cpu=usage, memory=round(100*(total_mem-available)/total_mem), memory_total=total_mem//1024, memory_used=(total_mem-available)//1024, swap=round(100*swap_used/swap_total) if swap_total else 0, swap_total=swap_total//1024, swap_used=swap_used//1024, disk=round(100*disk.used/disk.total), disk_total=f'{disk.total/2**30:.1f} GiB', disk_used=f'{disk.used/2**30:.1f} GiB', disk_free=f'{disk.free/2**30:.1f} GiB', temperature=temp, load=text(PROC/'loadavg').split()[0], thresholds={'temperature':{'warn':75,'crit':85},'disk':{'warn':80,'crit':90}}, **services)
     for name,port in [('manyfold',3214),('mealie',9925),('actual',5006)]:
         if os.environ.get(name.upper()+'_ENABLED')=='1': data[name]=online('127.0.0.1',port)
@@ -166,10 +166,8 @@ SERVICE_ROUTES = {
     '/actual': ('OPENGYM_ORIGIN',8081,5006,'/'),
     '/opengym': ('OPENGYM_ORIGIN', 8081, 8081, ''),
     '/garmin': ('OPENGYM_ORIGIN', 8081, 8081, '/garmin/'),
-    '/homeboard': ('HOMEBOARD_ORIGIN', 8090, 8090, ''),
     '/octoprint': ('OPENGYM_ORIGIN', 8081, 5000, '/'),
     '/cockpit': ('OPENGYM_ORIGIN', 8081, 9090, '/'),
-    '/homeassistant': ('OPENGYM_ORIGIN', 8081, 8123, '/'),
 }
 
 def service_redirect_url(path):

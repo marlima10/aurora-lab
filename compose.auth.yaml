@@ -3,7 +3,7 @@
 services:
   auth:
     build: ./docker/server/auth
-    image: auroralab-auth:29.0.0
+    image: auroralab-auth:31.0.0
     environment:
       AUTH_ORIGIN: https://${AURORA_PRIVATE_HOST:?configure private HTTPS host}
       AUTH_APP_CONFIG: /run/secrets/sso-apps.json
@@ -38,8 +38,6 @@ services:
       - '127.0.0.1:5006:5006'
       - '127.0.0.1:8081:8081'
       - '127.0.0.1:5000:5000'
-      - '127.0.0.1:8123:8123'
-      - '127.0.0.1:8090:8090'
       - '127.0.0.1:9090:9090'
     extra_hosts: ['host.docker.internal:host-gateway']
     volumes:
@@ -51,25 +49,6 @@ services:
     read_only: true
     tmpfs: ['/tmp:size=32m', '/var/cache/nginx:size=32m', '/run:size=1m']
     mem_limit: 128m
-    pids_limit: 64
-    restart: unless-stopped
-    logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
-  ha-sso:
-    build:
-      context: ./docker/server/auth
-      dockerfile: Dockerfile.homeassistant
-    image: auroralab-homeassistant-sso:25.0.0
-    environment: {HA_NATIVE_UPSTREAM: 'http://172.31.248.1:18123'}
-    env_file: ./secrets/sso/homeassistant.env
-    networks:
-      auth:
-      ha-sso: {ipv4_address: 172.31.248.2}
-    user: '65534:65534'
-    read_only: true
-    tmpfs: ['/tmp:size=16m,mode=1777']
-    cap_drop: [ALL]
-    security_opt: [no-new-privileges:true]
-    mem_limit: 192m
     pids_limit: 64
     restart: unless-stopped
     logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
@@ -126,14 +105,6 @@ services:
     env_file: ./secrets/sso/octoprint.env
     volumes:
       - ./docker/server/auth/adapters/octoprint_aurora.py:/octoprint/octoprint/plugins/aurora_identity.py:ro
-  homeboard:
-    ports: !reset []
-    build:
-      context: ./docker/server/auth
-      dockerfile: Dockerfile.homeboard
-    image: auroralab-homeboard-sso:25.0.0
-    env_file: ./secrets/sso/homeboard.env
-    environment: {AURORA_SSO_ENABLED: '1'}
   cockpit:
     ports: !reset []
     profiles: [legacy-cockpit]
@@ -145,7 +116,3 @@ services:
       - ./compose.auth.yaml:/source/config/compose.auth.yaml:ro
 networks:
   auth: {internal: true}
-  ha-sso:
-    internal: true
-    ipam:
-      config: [{subnet: 172.31.248.0/29}]

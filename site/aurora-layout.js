@@ -21,8 +21,6 @@
     ['history', '◴', 'Histórico', '/history.html'],
     ['backup', '☁', 'Backup', '/#backup-card'],
     ['diagnostics', '✥', 'Diagnóstico', '/diagnostics.html'],
-    ['homeboard', '◆', 'HomeBoard', '/homeboard'],
-    ['homeassistant', '⌂', 'Home Assistant', '/homeassistant'],
     ['opengym', '💪', 'openGym', '/opengym'],
     ['manyfold', '🧊', 'Manyfold', '/manyfold'],
     ['mealie', '🍽️', 'Mealie', '/mealie'],

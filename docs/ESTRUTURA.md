@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 30.0.0
+# Estrutura e arquitetura — AuroraLAB 31.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -30,7 +30,6 @@ aurora-lab/
 ├── skills/                    # Padrões reutilizáveis
 ├── compose.yaml               # Portátil: web e php
 ├── compose.server.yaml        # Servidor Linux: projeto auroralab
-├── compose.homeassistant.yaml
 ├── compose.opengym.yaml       # API/web openGym e importador Garmin
 ├── compose.power.yaml
 ├── compose.printer.yaml
@@ -83,7 +82,6 @@ O backend fica na imagem, fora da raiz pública Nginx. Rebuild é necessário pa
 | tailscale | Daemon em rede host; pode conflitar com a instalação Debian |
 | cockpit | Nginx HTTPS 9090 para backend Cockpit/PAM nativo 9091 |
 | CasaOS | Serviços systemd no Debian, não um serviço Compose Aurora |
-| homeassistant | Container com rede host e configuração própria |
 | opengym-api/web | Rede Docker dedicada, API interna e web loopback 8081 |
 | opengym-garmin | Serviço Python sem porta extra no host, integrado pelo proxy web |
 | power | Telemetria/controles locais, mounts específicos de CPU/brilho |
@@ -92,7 +90,7 @@ Os preparadores openGym/Cockpit ainda consultam o nome fixo do contêiner VPN. O
 
 ## Persistência e backup
 
-Os estados ficam separados em `data/fitness`, `octoprint`, `prints`, `samba`, `monitor`, `power`, `homeassistant`, `opengym`, `garmin` e `tailscale`. CasaOS e Cockpit também têm configuração nativa em `/etc` e `/var/lib`. `.env`, `secrets`, `backups` e `deploy-state` não entram no Git.
+Os estados ficam separados em `data/fitness`, `octoprint`, `prints`, `samba`, `monitor`, `power`, `opengym`, `garmin` e `tailscale`. CasaOS e Cockpit também têm configuração nativa em `/etc` e `/var/lib`. `.env`, `secrets`, `backups` e `deploy-state` não entram no Git.
 
 O backup monta explicitamente suas origens no Compose, incluindo `docs/`. Usa snapshots dos SQLite reconhecidos e valida JSON openGym individualmente. Não há transação global entre todos os aplicativos. Ele exige o banco Fitness e valida o histórico PrintHistory quando presente. Estado VPN do host, deploy-state e aplicativos CasaOS novos não são incluídos automaticamente. Restauração e cópia externa: [ATUALIZACAO.md](ATUALIZACAO.md).
 
@@ -102,17 +100,16 @@ Testes PHP: `docker compose run --rm --no-deps --entrypoint php php tests/run.ph
 
 Os testes sintéticos não substituem login real, restore real ou impressão física. Verifique Compose com config --quiet e use fixtures temporárias; não teste gravando dados pessoais.
 
-Padrões: [desenvolvimento](../skills/aurora-development/SKILL.md) e [visual](../skills/aurora-visual/SKILL.md). Procedimentos operacionais: [servidor](AURORASERVER.md), [rede](REDE-E-TAILSCALE.md), [CasaOS](CASAOS.md), [Cockpit](COCKPIT.md), [Home Assistant](HOMEASSISTANT.md), [openGym](OPENGYM.md), [Garmin](GARMIN.md) e [OctoPrint](UPGRADE-PYTHON-OCTOPRINT.md).
+Padrões: [desenvolvimento](../skills/aurora-development/SKILL.md) e [visual](../skills/aurora-visual/SKILL.md). Procedimentos operacionais: [servidor](AURORASERVER.md), [rede](REDE-E-TAILSCALE.md), [CasaOS](CASAOS.md), [Cockpit](COCKPIT.md), [openGym](OPENGYM.md), [Garmin](GARMIN.md) e [OctoPrint](UPGRADE-PYTHON-OCTOPRINT.md).
 
 
-## HomeBoard e retirada do CasaOS (v15)
+## Aplicativos retirados
 
-`compose.homeboard.yaml` acrescenta HomeBoard na rede Docker com porta local 8090. `docker/server/homeboard/prepare.py` confere a fonte upstream fixada e constroi a imagem sem versionar o arquivo de terceiros. Portal/monitor possuem atalho e status HomeBoard. Dados em `data/homeboard/` e `data/homeboard-photos/`, incluidos no backup; logind e a configuracao XFCE tambem sao copiados. CasaOS foi retirado do escopo atual; seus scripts anteriores ficam como historico/retorno. Administracao de containers permanece no Portainer e do host no Cockpit. Consulte [HOMEBOARD.md](HOMEBOARD.md).
-
+Home Assistant e HomeBoard foram removidos na versão 31. Os guias antigos registram somente o histórico. Portainer e Cockpit permanecem disponíveis.
 
 ## Atalhos HTTPS e câmera USB (16.0.0)
 
-`openPort` encaminha 5000, 9090 e 8123 para `/octoprint`, `/cockpit` e `/homeassistant`. O Nginx do servidor repassa ao monitor, que usa o hostname HTTPS privado de `OPENGYM_ORIGIN` e a porta própria de cada serviço. Isso funciona mesmo com o portal aberto por HTTP/IP e evita certificados incompatíveis com o IP Tailscale. Os serviços precisam estar publicados no Tailscale Serve; o portátil não oferece esses módulos. Origem ausente/inválida retorna 503, sem redirecionar para HTTP. `/homeboard` usa `HOMEBOARD_ORIGIN`; `/garmin` e `/opengym` mantêm seus destinos. Testes isolados: `python3 -m unittest discover -s docker/server -p test_service_links.py` em Linux, sem acesso aos bancos.
+`openPort` encaminha 5000 e 9090 para `/octoprint` e `/cockpit`. O Nginx do servidor repassa ao monitor, que usa o hostname HTTPS privado de `OPENGYM_ORIGIN` e a porta própria de cada serviço. Isso funciona mesmo com o portal aberto por HTTP/IP e evita certificados incompatíveis com o IP Tailscale. Os serviços precisam estar publicados no Tailscale Serve; o portátil não oferece esses módulos. Origem ausente/inválida retorna 503, sem redirecionar para HTTP. `/garmin` e `/opengym` mantêm seus destinos. Testes isolados: `python3 -m unittest discover -s docker/server -p test_service_links.py` em Linux, sem acesso aos bancos.
 
 A câmera fica no perfil Compose `camera`: configure `CAMERA_DEVICE` com `/dev/v4l/by-id/<camera-externa>-video-index0` e acrescente `camera` a `COMPOSE_PROFILES` no `.env`, preservando os demais perfis. Inicie apenas `docker compose up -d --build camera`. Nunca selecione automaticamente a câmera integrada. O container recebe somente esse dispositivo como `/dev/video0`; `/camera-stream` transmite pelo proxy da mesma origem do portal, sem cache offline. Confirme a captura em `http://127.0.0.1:8080/snapshot` no servidor e o estado `webcam` no monitor. Após desconectar/reconectar USB, pode ser necessário recriar somente `camera` com `docker compose up -d --no-deps --force-recreate camera`. Sem o dispositivo, mantenha esse perfil desativado. Acesso direto à porta 8080 é HTTP; prefira o stream do portal pelo Tailscale.
 
@@ -200,3 +197,7 @@ Na 29, `/auth/apps` informa `adminOnly`, mantendo o contrato `apps` existente. O
 ## Jarvis local (30.0.0)
 
 O overlay opcional compose.jarvis.yaml separa interface, coordenador, motor OpenJarvis/Ollama, transcrição Whisper, síntese Piper, worker e conectores por domínio. O gateway central protege /jarvis/; o API verifica sessão/CSRF e grants antes de cada ferramenta. Notas/histórico são separados por e-mail. Gravações exigem propostas com confirmação atômica; consultas de aplicativos usam identidades nativas existentes. Não há API de IA paga ou fallback para nuvem. Ver [JARVIS.md](JARVIS.md) para preparação, dados, testes e limitações.
+
+## Remoção de aplicativos — 31.0.0
+
+Home Assistant e HomeBoard foram retirados dos overlays, autenticação central, navegação, monitoramento e escopo de novos backups. Adaptadores e preparadores exclusivos foram removidos. Migration 2 do autenticador remove apenas os grants desses aplicativos; usuários, chaves e demais permissões são preservados. Documentos antigos e releases anteriores registram a arquitetura histórica e não devem ser usados para reinstalá-los.

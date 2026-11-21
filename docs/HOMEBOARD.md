@@ -1,3 +1,5 @@
+> Histórico: aplicativo removido na release 31.0.0. Este guia não representa a instalação atual.
+
 # HomeBoard no AuroraServer
 
 O HomeBoard e um painel familiar independente (calendarios, fotos, tarefas e telas). Nao gerencia o Docker. Portainer e Cockpit continuam disponiveis para administracao; o portal AuroraLAB permanece na porta 80.
