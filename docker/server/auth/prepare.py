@@ -79,6 +79,9 @@ def prepare(root, mapping_file):
             config['ready'] = bool(prior.get('ready'))
         result[app] = config
     result['_power_secret'] = (root / 'secrets/power-admin.key').read_text().strip()
+    for key in ('_javis_proxy_secret', '_javis_connector_secret'):
+        if key in existing:
+            result[key] = existing[key]
     write_private(config_path, json.dumps(result, indent=2), uid=65534)
     write_private(private / 'gateway.conf', render(origin))
     # Native monitor requests carry a separate private secret; a direct LAN request cannot bypass SSO.

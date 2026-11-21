@@ -62,6 +62,7 @@
       <button type="button" class="quick q7" onclick="location.href='/manyfold'"><span>🧊</span><div><b>Manyfold</b><small>Biblioteca de modelos 3D</small></div><i>→</i></button>
       <button type="button" class="quick q5" onclick="location.href='/mealie'"><span>🍽️</span><div><b>Mealie</b><small>Receitas e planejamento de refeições</small></div><i>→</i></button>
       <button type="button" class="quick q6" onclick="location.href='/actual'"><span>💰</span><div><b>Actual Budget</b><small>Organização financeira pessoal</small></div><i>→</i></button>
+      <button type="button" id="javis-shortcut" class="quick q7" hidden onclick="location.href='/javis'"><span aria-hidden="true">✦</span><div><b>Javis OS</b><small>Notas e conexão com Claude Desktop</small></div><i>→</i></button>
       <button type="button" id="user-management-shortcut" class="quick q7" hidden onclick="location.href='/auth/admin'"><span aria-hidden="true">👥</span><div><b>Gestão de usuários</b><small>Cadastros, permissões e chaves</small></div><i>→</i></button>
     </section>
 
@@ -260,7 +261,7 @@
 <script src="/pwa.js?v=20261007-1" defer></script>
 <script src="/aurora.js?v=20261121-v31"></script>
 <script>
-document.addEventListener('aurora:session', event => { const shortcut = document.getElementById('user-management-shortcut'); if(shortcut) shortcut.hidden = !event.detail?.admin; });
+document.addEventListener('aurora:session', event => { for(const id of ['user-management-shortcut','javis-shortcut']) { const shortcut = document.getElementById(id); if(shortcut) shortcut.hidden = !event.detail?.admin; } });
 let rotation=Number(localStorage.getItem('auroraCameraRotation')||180), H=[], NH=[];
 const val=(v,f='--')=>(v===undefined||v===null||v==='')?f:v;
 function fmtTime(s){s=Number(s);if(!isFinite(s)||s<=0)return '--';s=Math.round(s);let h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return (h?h+'h ':'')+String(m).padStart(2,'0')+'min '+String(ss).padStart(2,'0')+'s'}
@@ -309,7 +310,7 @@ function updateBackupHealth(){let el=document.getElementById('backupHealth');fet
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork();if(!cam.naturalWidth)connectCamera()}});
 update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
 </script>
-<script src="/aurora-layout.js?v=20261121-v31" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+<script src="/aurora-layout.js?v=20261121-v34" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
   <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
   <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
   <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>

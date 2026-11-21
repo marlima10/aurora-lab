@@ -1,4 +1,4 @@
-# AuroraLAB 33.0.0
+# AuroraLAB 34.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -129,3 +129,7 @@ Na instalação atual, portal e aplicativos usam o login central do AuroraLAB e 
 | [Histórico](docs/CHANGELOG.md) | Alterações por versão |
 
 Padrões: [desenvolvimento](skills/aurora-development/SKILL.md) e [visual](skills/aurora-visual/SKILL.md). As skills ficam versionadas no projeto; não pressupõem instalação global.
+
+## Javis OS opcional (34.0.0)
+
+Seis containers separados integram o hub MCP original do Javis ao Claude Desktop gratuito, com consultas aos aplicativos e notas próprias. Não usa API paga nem ativa o chat interno. Consulte [JAVIS.md](docs/JAVIS.md) para arquitetura, permissões, ativação, backup e limitações.

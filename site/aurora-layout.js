@@ -101,6 +101,7 @@
     moreButton.classList.toggle('active', moreIsCurrent);
     if (moreIsCurrent) moreButton.setAttribute('aria-current', 'page'); else moreButton.removeAttribute('aria-current');
     rest.forEach(item => { const anchor = makeAnchor(item, true); if (item.id === active) { anchor.classList.add('active'); anchor.setAttribute('aria-current', 'page'); } moreLinks.append(anchor); });
+    if (accountSession?.admin) moreLinks.append(makeAnchor({id:'javis',icon:'✦',label:'Javis OS',href:'/javis'},true));
     if (accountSession) moreLinks.append(makeAnchor({ id:'account', icon:'♙', label:accountSession.admin?'Usuários e chaves':'Minha conta', href:'/auth/' }, true));
     document.querySelectorAll('.aurora-theme-choice').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.theme === (document.documentElement.dataset.auroraTheme || 'aurora'))));
   }

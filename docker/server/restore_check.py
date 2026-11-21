@@ -63,6 +63,10 @@ def check_archive(source, expected_sha256, probe=None):
                                 if handle.read(16)==b'SQLite format 3\x00': db_count+=1
                     if db_count==0: raise ValueError('Banco adicional ausente na restauracao')
                     apps[app]={'sqlite_verified':db_count}
+            if (root/'config/compose.javis.yaml').exists():
+                for item in ('javis-app/state/settings.json','javis-app/state/mcp_servers.json','javis-brains/auroralab/README.md'):
+                    if not (root/item).is_file(): raise ValueError('Estado Javis ausente na restauracao')
+                apps['javis']={'state_verified':True,'notes_verified':True}
             probe_result=probe(root) if probe else None
         return {'time':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'ok','archive':source.name,'sha256':digest,'files_verified':count,'bytes_restored':total,'sqlite_verified':databases,'json_verified':jsons,'opengym_json_verified':profiles,'isolated':True,'production_modified':False,'apps_verified':apps,'application_probe':probe_result,'scope':'Restauracao descartavel dos arquivos, SQLite e JSON; nao testa hardware, VPN ou todos os servicos.'}
 

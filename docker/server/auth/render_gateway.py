@@ -11,6 +11,7 @@ ROUTES = {
     'actual': (5006, 'http://actual:5006'),
     'opengym': (8081, 'http://opengym-web:80'),
     'octoprint': (5000, 'http://octoprint:80'),
+    'javis': (7777, 'http://javis:7777'),
     'cockpit': (9090, 'http://unix:/run/auroralab-cockpit/sso.sock:'),
 }
 
@@ -42,9 +43,12 @@ limit_req_zone $aurora_login_key zone=aurora_login:1m rate=10r/m;
     # LAN HTTP exposes only a redirect. Tailscale HTTPS uses the private 18080 listener.
     text += f'server {{ listen 8088; server_name _; return 308 {origin}$request_uri; }}\n'
     for app, (port, upstream) in ROUTES.items():
+        verify_app = 'portal' if app == 'javis' else app
+        javis_required = '1' if app == 'javis' else '0'
         extra = ''
         if app == 'portal':
             extra = '''location = /auth/check { return 404; }
+    location = /auth/internal/javis { return 404; }
     location ^~ /auth/ {
         auth_request off;
         limit_req zone=aurora_login burst=10 nodelay;
@@ -84,7 +88,8 @@ limit_req_zone $aurora_login_key zone=aurora_login:1m rate=10r/m;
         proxy_pass_request_body off;
         proxy_set_header Content-Length "";
         proxy_set_header Cookie $http_cookie;
-        proxy_set_header X-Aurora-App {app};
+        proxy_set_header X-Aurora-App {verify_app};
+        proxy_set_header X-Aurora-Require-Javis {javis_required};
         proxy_set_header X-Aurora-Require-Admin $required_admin;
         proxy_set_header X-Aurora-Require-Power $required_power;
         proxy_set_header X-Aurora-Method $original_method;
@@ -92,8 +97,8 @@ limit_req_zone $aurora_login_key zone=aurora_login:1m rate=10r/m;
     }}
     {extra}location / {{
         set $original_method $request_method;
-        set $required_admin $aurora_admin_operation;
-        set $required_power $aurora_power_operation;
+        set $required_admin {'1' if app == 'javis' else '$aurora_admin_operation'};
+        set $required_power {'0' if app == 'javis' else '$aurora_power_operation'};
         auth_request /_aurora_verify;
         auth_request_set $sso_identity $upstream_http_x_aurora_identity;
         auth_request_set $sso_secret $upstream_http_x_aurora_app_secret;

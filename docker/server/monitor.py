@@ -161,6 +161,7 @@ def loop():
 
 # The configured VPN name keeps certificates valid even when the portal is opened by IP.
 SERVICE_ROUTES = {
+    '/javis': ('OPENGYM_ORIGIN',8081,7777,'/'),
     '/manyfold': ('OPENGYM_ORIGIN',8081,3214,'/'),
     '/mealie': ('OPENGYM_ORIGIN',8081,9925,'/'),
     '/actual': ('OPENGYM_ORIGIN',8081,5006,'/'),

@@ -9,7 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from store import Store, AccessError, SESSION_SECONDS
+from store import Store, AccessError, SESSION_SECONDS, ADMIN_EMAIL
 
 COOKIE = '__Host-aurora_session'
 APP_PORTS = {'manyfold':3214,'mealie':9925,'actual':5006,'opengym':8081,'octoprint':5000,'cockpit':9090}
@@ -94,6 +94,18 @@ def handler(store, origin, assets=None, apps_config=None):
         def do_GET(self):
             path = urlsplit(self.path).path
             try:
+                if path == '/auth/internal/javis':
+                    secret = apps_config.get('_javis_connector_secret', '')
+                    if len(secret) < 32 or not secrets.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + secret):
+                        return self.send(403, {'error': 'Acesso interno não autorizado.'})
+                    with store.db() as db:
+                        owner = db.execute('SELECT enabled,deleted FROM users WHERE email=?', (ADMIN_EMAIL,)).fetchone()
+                        if not owner or not owner['enabled'] or owner['deleted']:
+                            return self.send(403, {'error': 'Proprietário desativado.'})
+                        grants = dict(db.execute('SELECT app,identity FROM grants WHERE email=?', (ADMIN_EMAIL,)))
+                    if 'portal' not in grants:
+                        return self.send(403, {'error': 'Portal não autorizado.'})
+                    return self.send(200, {'owner': ADMIN_EMAIL, 'grants': grants})
                 if path == '/health':
                     return self.send(200, {'status': 'ok'})
                 if path in ('/auth/', '/auth/admin'):
@@ -117,11 +129,19 @@ def handler(store, origin, assets=None, apps_config=None):
                     if app not in session['grants']:
                         return self.send(403, {'error': 'Aplicativo não autorizado.'})
                     method = self.headers.get('X-Aurora-Method', 'GET')
-                    expected_origin = origin if app == 'portal' else f'https://{parsed.hostname}:{APP_PORTS[app]}'
+                    javis = self.headers.get('X-Aurora-Require-Javis') == '1'
+                    if javis and (app != 'portal' or not session['admin']):
+                        return self.send(403, {'error': 'Javis OS é reservado ao administrador.'})
+                    expected_origin = f'https://{parsed.hostname}:7777' if javis else origin if app == 'portal' else f'https://{parsed.hostname}:{APP_PORTS[app]}'
                     supplied_origin = self.headers.get('X-Aurora-Original-Origin')
                     if (supplied_origin and supplied_origin != expected_origin) or (method not in ('GET', 'HEAD', 'OPTIONS') and supplied_origin != expected_origin):
                         return self.send(403, {'error': 'Origem da operação não autorizada.'})
                     extra = {}
+                    if javis:
+                        key = apps_config.get('_javis_proxy_secret', '')
+                        if len(key) < 32 or '\r' in key or '\n' in key:
+                            return self.send(503, {'error': 'Integração Javis não configurada.'})
+                        extra['X-Aurora-App-Secret'] = key
                     if self.headers.get('X-Aurora-Require-Admin') == '1':
                         if not session['admin']:
                             return self.send(403, {'error': 'Operação reservada ao administrador.'})

@@ -1,0 +1,18 @@
+import vm from 'node:vm';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const calls=[];
+const sdk={init:async()=>{},shutdown:async()=>calls.push('shutdown'),getBudgets:async()=>[{id:'fixture',groupId:'fixture',state:'remote'}],downloadBudget:async()=>{},sync:async()=>{},getAccounts:async()=>[{id:'open',name:'Fixture'},{id:'closed',name:'Closed',closed:true}],getCategories:async()=>[],getTransactions:async(id)=>id==='open'?[{amount:10000},{amount:-2500},{amount:-300,transfer_id:'ignored'},{amount:-200,is_parent:true},{amount:-100}]:[{amount:-400}]};
+const context=vm.createContext({process:{env:{AURORA_FINANCE_FIXTURE:'1'}},console:{},Buffer,AbortSignal,fetch:async()=>({ok:true,json:async()=>({data:{token:'synthetic'}})})});
+const modules={'@actual-app/api':sdk,'node:http':{default:{}},'node:fs':{default:{mkdirSync(){}}},'node:crypto':{default:{createHash:()=>({update:()=>({digest:()=> 'fixture'})})}}};
+const mod=new vm.SourceTextModule(fs.readFileSync(new URL('./finance.mjs',import.meta.url),'utf8'),{context});
+await mod.link(async name=>{const values=modules[name];assert(values);let m=new vm.SyntheticModule(Object.keys(values),function(){for(const [k,v]of Object.entries(values))this.setExport(k,v)},{context});return m;});
+await mod.evaluate();
+const config={ready:true,identities:{fixture:'native'}};
+const run=(tool,args={},identity='fixture')=>mod.namespace.query(config,{tool,args,identity});
+let summary=await run('aurora_finance_summary',{start:'2026-01-01',end:'2026-01-31'});
+assert.equal(summary.incomeCents,10000);assert.equal(summary.expenseCents,3000);assert.equal(summary.periodBalanceCents,7000);assert.equal(summary.count,4);
+let accounts=await run('aurora_finance_accounts');assert.equal(accounts.accounts.length,1);
+for(const [tool,args,identity]of [['importTransactions',{},'fixture'],['aurora_finance_accounts',{},'stranger'],['aurora_finance_summary',{start:'2026-02-30',end:'2026-03-01'},'fixture'],['aurora_finance_summary',{start:'2026-02-01',end:'2026-01-01'},'fixture'],['aurora_finance_summary',{url:'http://invalid'},'fixture']])await assert.rejects(run(tool,args,identity));
+assert(calls.length>=4);
+console.log('7 verificações financeiras sintéticas passaram: centavos, transferências, contas encerradas, identidade, datas e bloqueio de escrita.');
