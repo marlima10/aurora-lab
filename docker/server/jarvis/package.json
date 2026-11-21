@@ -1,9 +1,0 @@
-{
-  "name": "auroralab-jarvis-finance",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "@actual-app/api": "26.10.0"
-  }
-}

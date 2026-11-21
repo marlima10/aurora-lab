@@ -44,23 +44,7 @@ limit_req_zone $aurora_login_key zone=aurora_login:1m rate=10r/m;
     for app, (port, upstream) in ROUTES.items():
         extra = ''
         if app == 'portal':
-            extra = '''location = /jarvis { return 308 /jarvis/; }
-    location ^~ /jarvis/ {
-        set $original_method $request_method;
-        set $required_admin 0;
-        set $required_power 0;
-        auth_request /_aurora_verify;
-        set $jarvis_service http://jarvis-web:8080;
-        proxy_pass $jarvis_service$request_uri;
-        proxy_set_header Host $http_host;
-        proxy_set_header Cookie $http_cookie;
-        proxy_set_header Origin $http_origin;
-        proxy_set_header X-Aurora-CSRF $http_x_aurora_csrf;
-        proxy_set_header Authorization "";
-        proxy_read_timeout 180s;
-        add_header Cache-Control "no-store" always;
-    }
-    location = /auth/check { return 404; }
+            extra = '''location = /auth/check { return 404; }
     location ^~ /auth/ {
         auth_request off;
         limit_req zone=aurora_login burst=10 nodelay;

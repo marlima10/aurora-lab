@@ -1,4 +1,4 @@
-# AuroraLAB 32.0.0
+# AuroraLAB 33.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -18,9 +18,6 @@ A release 28 coloca a lista de usuários no topo para o administrador, com conta
 
 A release 29 corrige o cadastro quando eram selecionados aplicativos administrativos, informa erros junto ao formulário e valida cadastro/chave/login/exclusão em ensaio completo com API real e dados descartáveis. [Detalhes](docs/RELEASE-29.md).
 
-## Jarvis com IA local
-
-A release 30 acrescenta conversa por texto e voz, notas, relatórios, lembretes na caixa Jarvis e conectores para treinos, finanças, alimentação e impressão 3D. OpenJarvis/Ollama, Whisper, Piper e ferramentas rodam separados em Docker, com login central, permissões e confirmações antes de gravar. Sem API de IA paga. Pesquisa pública é opcional; lembretes não são push no celular. [Operação](docs/JARVIS.md) · [Release 30 e validação](docs/RELEASE-30.md).
 
 ## Escolha o ambiente
 
@@ -28,7 +25,7 @@ A release 30 acrescenta conversa por texto e voz, notas, relatórios, lembretes 
 | --- | --- | --- |
 | Portátil | `compose.yaml` | Nginx, interface e API Fitness PHP/SQLite; sem os serviços do servidor |
 | Servidor Linux | `compose.server.yaml` | Portal, Fitness, OctoPrint, Samba, monitoramento e backup; Tailscale e proxy Cockpit dependem de preparação |
-| Módulos adicionais | Arquivos `compose.*.yaml` | openGym/Garmin, Jarvis, energia e dispositivo da impressora |
+| Módulos adicionais | Arquivos `compose.*.yaml` | openGym/Garmin, energia e dispositivo da impressora |
 
 Os dois ambientes usam a porta 8088. Escolha um por instalação. O servidor completo usa recursos do Linux amd64 e scripts destinados ao Debian; o portátil pode rodar no Docker Desktop com contêineres Linux.
 

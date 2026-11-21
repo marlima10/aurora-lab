@@ -111,6 +111,8 @@ services:
   camera:
     ports: !override ['127.0.0.1:8080:8080']
   backup:
+    networks: [default, manyfold]
+    environment: {MANYFOLD_BACKUP_WARMUP: '1'}
     volumes:
       - ./data/auth:/source/auth:ro
       - ./compose.auth.yaml:/source/config/compose.auth.yaml:ro

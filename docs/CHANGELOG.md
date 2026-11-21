@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 33.0.0 — 2026-11-21
+
+Retirado o módulo de assistente local: containers, modelos, voz, conectores, dados, segredos, redes, fontes e atalho. Backup e restauração voltam ao escopo dos aplicativos mantidos.
+
 ## 32.0.0 — 2026-11-21
 
 Concluída a limpeza visual da retirada de Home Assistant/HomeBoard da versão 31: removidos dois atalhos legados openPort(8123) e renovado o cache do portal. Nenhum serviço ou dado adicional alterado.
@@ -8,9 +12,6 @@ Concluída a limpeza visual da retirada de Home Assistant/HomeBoard da versão 3
 
 Remoção completa de Home Assistant e HomeBoard da instalação ativa, com dados, imagens, containers e integrações exclusivos. Atualizados Compose, login único, atalhos, monitoramento, cache PWA e backups futuros; históricos compartilhados preservados.
 
-## 30.0.0 — Jarvis com IA e voz locais
-
-Módulo opcional em doze containers, com motor original OpenJarvis/Ollama, Whisper, Piper, histórico/notas por usuário, relatórios Markdown, lembretes na caixa e conectores por domínio. Login central, CSRF, grants, confirmações atômicas e prévias legíveis. Pesquisa pública por opção explícita; sem API de IA paga. Backup/restore inclui Jarvis e preparação do SQLite Manyfold após reinício. [Descrição e validação](RELEASE-30.md).
 
 ## 29.0.0 — cadastro concluído e chave entregue
 
