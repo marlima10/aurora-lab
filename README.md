@@ -1,4 +1,4 @@
-# AuroraLAB 29.0.0
+# AuroraLAB 30.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -17,6 +17,10 @@ A release 27 mostra a chave recém-gerada em uma janela com cópia e permite ren
 A release 28 coloca a lista de usuários no topo para o administrador, com contador, atualização e diagnóstico de carregamento. O cadastro fica separado em uma seção expansível. [Detalhes](docs/RELEASE-28.md).
 
 A release 29 corrige o cadastro quando eram selecionados aplicativos administrativos, informa erros junto ao formulário e valida cadastro/chave/login/exclusão em ensaio completo com API real e dados descartáveis. [Detalhes](docs/RELEASE-29.md).
+
+## Jarvis com IA local
+
+A release 30 acrescenta conversa por texto e voz, notas, relatórios, lembretes na caixa Jarvis e conectores para treinos, finanças, alimentação e impressão 3D. OpenJarvis/Ollama, Whisper, Piper e ferramentas rodam separados em Docker, com login central, permissões e confirmações antes de gravar. Sem API de IA paga. Pesquisa pública é opcional; lembretes não são push no celular. [Operação](docs/JARVIS.md) · [Release 30 e validação](docs/RELEASE-30.md).
 
 ## Escolha o ambiente
 
