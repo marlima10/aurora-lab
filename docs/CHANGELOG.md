@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 32.0.0 — 2026-11-21
+
+Concluída a limpeza visual da retirada de Home Assistant/HomeBoard da versão 31: removidos dois atalhos legados openPort(8123) e renovado o cache do portal. Nenhum serviço ou dado adicional alterado.
+
 ## 31.0.0 — 2026-11-21
 
 Remoção completa de Home Assistant e HomeBoard da instalação ativa, com dados, imagens, containers e integrações exclusivos. Atualizados Compose, login único, atalhos, monitoramento, cache PWA e backups futuros; históricos compartilhados preservados.
