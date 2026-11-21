@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 32.0.0
+# Estrutura e arquitetura — AuroraLAB 33.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -194,9 +194,6 @@ Na 29, `/auth/apps` informa `adminOnly`, mantendo o contrato `apps` existente. O
 `#issue-status` mostra confirmação, progresso e erros junto ao cadastro. O botão fica bloqueado desde a confirmação para evitar envios duplicados e cada requisição tem prazo de 20 s, com orientação para conferir a lista antes de repetir uma operação sem resposta. `checks/ui_fixture.py` executa o handler HTTP e Store/SQLite reais com identidades fictícias em diretório temporário, exclusivamente em 127.0.0.1:8489; seu adaptador modela a terminação TLS/cookie para esse HTTP local. Não encaminha chamadas a produção, não aceita escolher endereço público ou banco e não altera o protocolo seguro em produção.
 
 
-## Jarvis local (30.0.0)
-
-O overlay opcional compose.jarvis.yaml separa interface, coordenador, motor OpenJarvis/Ollama, transcrição Whisper, síntese Piper, worker e conectores por domínio. O gateway central protege /jarvis/; o API verifica sessão/CSRF e grants antes de cada ferramenta. Notas/histórico são separados por e-mail. Gravações exigem propostas com confirmação atômica; consultas de aplicativos usam identidades nativas existentes. Não há API de IA paga ou fallback para nuvem. Ver [JARVIS.md](JARVIS.md) para preparação, dados, testes e limitações.
 
 ## Remoção de aplicativos — 31.0.0
 

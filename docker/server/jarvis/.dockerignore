@@ -1,6 +1,0 @@
-__pycache__/
-*.pyc
-tests/
-data/
-secrets/
-*.sqlite3

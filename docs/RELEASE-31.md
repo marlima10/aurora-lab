@@ -1,6 +1,6 @@
 # AuroraLAB 31.0.0 — retirada de Home Assistant e HomeBoard
 
-Home Assistant e HomeBoard foram desinstalados da instalação AuroraServer por solicitação do proprietário. O portal mantém Jarvis, openGym/Garmin, Actual Budget, Mealie, Manyfold, OctoPrint, Cockpit, Portainer e infraestrutura.
+Home Assistant e HomeBoard foram desinstalados da instalação AuroraServer por solicitação do proprietário. O portal mantém openGym/Garmin, Actual Budget, Mealie, Manyfold, OctoPrint, Cockpit, Portainer e infraestrutura.
 
 ## Remoção realizada
 
@@ -15,7 +15,7 @@ Home Assistant e HomeBoard foram desinstalados da instalação AuroraServer por 
 
 Removidos atalhos, menus, linhas de status, nomes no painel de usuários, monitoramento e alertas. Endereços antigos retornam indisponibilidade definitiva (HTTP 410), sem redirecionar para um serviço inexistente. Cache PWA atualizado com URLs coerentes; endereços retirados não recebem fallback offline do portal.
 
-Migration 2 do autenticador elimina somente os grants Home Assistant/HomeBoard. Usuários, hashes de chave, sessões e permissões dos aplicativos restantes continuam no esquema atual. Preparação de novas instalações usa o inventário dos seis aplicativos nativos restantes. Imagem do autenticador atualizada para 31.0.0; imagens Jarvis permanecem 30.0.0.
+Migration 2 do autenticador elimina somente os grants Home Assistant/HomeBoard. Usuários, hashes de chave, sessões e permissões dos aplicativos restantes continuam no esquema atual. Preparação de novas instalações usa o inventário dos seis aplicativos nativos restantes. Imagem do autenticador atualizada para 31.0.0.
 
 ## Backups e histórico
 
