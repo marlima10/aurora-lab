@@ -316,5 +316,31 @@ class RetiredApplicationsTests(unittest.TestCase):
             self.assertEqual(restored.authenticate(ADMIN_EMAIL,key,'fixture')[0] is not None,True)
 
 
+class JavisIntegrationTests(Fixture, unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.secret='fixture_javis_private_key_000000000000000000'
+        self.http=BoundedHTTPServer(('127.0.0.1',0),handler(self.store,'https://portal.example.test',apps_config={'_javis_proxy_secret':self.secret,'_javis_connector_secret':self.secret}))
+        self.thread=threading.Thread(target=self.http.serve_forever,daemon=True);self.thread.start()
+
+    def tearDown(self):
+        self.http.shutdown();self.http.server_close();self.thread.join();super().tearDown()
+
+    def request(self,path,headers):
+        conn=http.client.HTTPConnection(*self.http.server_address,timeout=5);conn.request('GET',path,headers=headers);r=conn.getresponse();value=(r.status,dict(r.getheaders()),json.loads(r.read()));conn.close();return value
+
+    def test_javis_origin_and_admin_session_are_required(self):
+        token,_=self.login();headers={'Cookie':COOKIE+'='+token,'X-Aurora-App':'portal','X-Aurora-Require-Javis':'1','X-Aurora-Method':'GET','X-Aurora-Original-Origin':'https://portal.example.test:7777'}
+        status,h,_=self.request('/auth/check',headers);self.assertEqual(status,200);self.assertEqual(h['X-Aurora-App-Secret'],self.secret)
+        self.assertEqual(self.request('/auth/check',dict(headers,**{'X-Aurora-Original-Origin':'https://attacker.invalid'}))[0],403)
+        key=self.store.issue(ADMIN_EMAIL,'person@example.invalid',{});person,_=self.store.authenticate('person@example.invalid',key,'fixture');self.assertEqual(self.request('/auth/check',dict(headers,Cookie=COOKIE+'='+person))[0],403)
+
+    def test_connector_grants_need_private_key_and_follow_revocation(self):
+        self.assertEqual(self.request('/auth/internal/javis',{})[0],403)
+        status,_,value=self.request('/auth/internal/javis',{'Authorization':'Bearer '+self.secret});self.assertEqual(status,200);self.assertIn('portal',value['grants']);self.assertNotIn('key_hash',json.dumps(value))
+        self.store.issue(ADMIN_EMAIL,ADMIN_EMAIL,{'mealie':'fixture'});self.assertEqual(self.request('/auth/internal/javis',{'Authorization':'Bearer '+self.secret})[2]['grants']['mealie'],'fixture')
+        self.store.issue(ADMIN_EMAIL,ADMIN_EMAIL,{});self.assertNotIn('mealie',self.request('/auth/internal/javis',{'Authorization':'Bearer '+self.secret})[2]['grants'])
+
+
 if __name__ == '__main__':
     unittest.main()

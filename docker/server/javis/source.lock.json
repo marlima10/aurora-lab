@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/blogminhquy/javis-os",
+  "commit": "38cc59499c7bb18b50324b1789a32a3a53a1a7dd",
+  "version": "0.623.0",
+  "image": "ghcr.io/blogminhquy/javis-os@sha256:844de16180d2295ceccdee610715378f0a01bc29199482b0170f7559f88b4341",
+  "verifiedFiles": {
+    "server/main.py": "87a61819ffad9ee9b7692755725820a2a93223a31d5c05f41959c9daed3117d9",
+    "server/config.py": "494ce8753371fa5024f3df2c84c35e2812a0ea4058cb12834933aa675b9ae2ce",
+    "server/mcp_hub.py": "0ede62702330bd5448af4785b0037cfcd5728adbdcf5d9cc498326005fd562ea",
+    "server/mcp_store.py": "068a7570f3dec52fdd568b3623c169cb487ffb8bc0873e3754968135b5769878",
+    "server/web_security.py": "f1ff4efa531dd13da0d2f76ed8f7ca82970af2f05835aaca62dc86af1671c5f9",
+    "dashboard/index.html": "6d08fda039a1270a76c9da3083222d29ba0a938499c9b0dd365a18ee625d74af"
+  }
+}

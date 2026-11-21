@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 34.0.0 — 2026-11-21
+
+Javis OS original 0.623.0 fixado por digest, com seis containers, SSO administrativo, ponte MCP privada ao Claude Desktop gratuito, sete consultas aos aplicativos e notas próprias. Sem API paga, chat interno, shell ou escrita nos aplicativos. Atalho administrativo, backup e guia operacional. [Detalhes](JAVIS.md).
+
 ## 33.0.0 — 2026-11-21
 
 Retirado o módulo de assistente local: containers, modelos, voz, conectores, dados, segredos, redes, fontes e atalho. Backup e restauração voltam ao escopo dos aplicativos mantidos.

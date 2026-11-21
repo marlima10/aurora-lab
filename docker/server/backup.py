@@ -43,7 +43,7 @@ def backup():
             dst=sqlite3.connect(str(dest)); src.backup(dst)
             if dst.execute('pragma integrity_check').fetchall()!=[('ok',)]: raise RuntimeError('Banco invalido')
             src.close(); dst.close(); databases.append(str(relative))
-        for source in pathlib.Path('/source/opengym').rglob('*.json'):
+        for source in [*pathlib.Path('/source/opengym').rglob('*.json'), *pathlib.Path('/source/javis-app/state').rglob('*.json')]:
             if not source.is_file() or source.is_symlink(): continue
             value=source.read_bytes();json.loads(value)
             relative=source.relative_to('/source');dest=stage/relative
@@ -76,7 +76,7 @@ def backup():
         partial.replace(target)
         digest=hashlib.file_digest(target.open('rb'),'sha256').hexdigest()
         target.with_suffix(target.suffix+'.sha256').write_text(digest+'  '+name+'\n')
-        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, openGym, Garmin, Manyfold, Mealie, Actual Budget, autenticacao central e codigo/configuracoes; copia local no mesmo SSD'})
+        status({'time':stamp.isoformat(),'status':'ok','verified':True,'file':name,'sha256':digest,'scope':'Fitness, OctoPrint, Prints, Samba, Tailscale, openGym, Garmin, Manyfold, Mealie, Actual Budget, autenticacao central, Javis OS/notas e codigo/configuracoes; copia local no mesmo SSD'})
     print('Backup verificado:',name,flush=True)
     # A restore failure has its own status: do not overwrite a valid backup result.
     try: result=check_archive(target,digest)

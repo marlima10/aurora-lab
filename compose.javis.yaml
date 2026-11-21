@@ -1,0 +1,98 @@
+# Optional Javis OS + read-only AuroraLAB data tools. Insert before compose.auth.yaml.
+x-javis-reader: &reader
+  image: auroralab-javis-reader:34.0.0
+  build: {context: ./docker/server/javis}
+  user: '65534:65534'
+  read_only: true
+  tmpfs: ['/tmp:size=32m,mode=1777']
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  mem_limit: 128m
+  cpus: 0.5
+  pids_limit: 48
+  restart: unless-stopped
+  logging: {driver: json-file, options: {max-size: 3m, max-file: '2'}}
+  healthcheck:
+    test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=3)"]
+    interval: 30s
+    timeout: 5s
+    retries: 3
+services:
+  javis:
+    build: {context: ./docker/server/javis, dockerfile: Dockerfile.javis}
+    image: auroralab-javis-os:34.0.0
+    user: '10001:10001'
+    env_file: ./secrets/javis/admin.env
+    environment:
+      PYTHONPATH: /app/server
+      TZ: America/Sao_Paulo
+      JAVIS_REQUIRE_LOGIN: '1'
+      JAVIS_AUTO_INSTALL_CLIS: '0'
+      JAVIS_AUTO_BACKGROUND_PAUSED: '1'
+      JAVIS_AUTO_LEARNING_PAUSED: '1'
+      JAVIS_CLAUDE_AUTO_UPDATE: '0'
+      JAVIS_CODEX_SANDBOX: auto
+    volumes:
+      - ./data/javis/app:/data
+      - ./data/javis/brains:/brains
+      - ./data/javis/claude-auth:/home/javis/.claude
+      - ./data/javis/codex-auth:/home/javis/.codex
+      - ./secrets/javis/proxy.json:/run/secrets/aurora.json:ro
+      - ./secrets/javis/bootstrap.json:/run/secrets/mcp-bootstrap.json:ro
+    networks: [javis]
+    read_only: true
+    tmpfs: ['/tmp:size=128m,mode=1777', '/home/javis:size=64m,uid=10001,gid=10001,mode=700']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 1536m
+    cpus: 1.5
+    pids_limit: 256
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
+  javis-mcp:
+    <<: *reader
+    command: [python, mcp_service.py]
+    volumes: ['./secrets/javis/mcp.json:/run/secrets/config.json:ro']
+    networks: [javis, auth]
+    mem_limit: 192m
+  javis-fitness:
+    <<: *reader
+    command: [python, connector.py]
+    environment: {CONNECTOR_ROLE: fitness}
+    volumes: ['./secrets/javis/fitness.json:/run/secrets/config.json:ro']
+    networks: [javis, opengym]
+  javis-food:
+    <<: *reader
+    command: [python, connector.py]
+    environment: {CONNECTOR_ROLE: food}
+    volumes: ['./secrets/javis/food.json:/run/secrets/config.json:ro']
+    networks: [javis, mealie]
+  javis-print:
+    <<: *reader
+    command: [python, connector.py]
+    environment: {CONNECTOR_ROLE: print}
+    volumes: ['./secrets/javis/print.json:/run/secrets/config.json:ro']
+    networks: [javis, default, manyfold]
+  javis-finance:
+    <<: *reader
+    image: auroralab-javis-finance:34.0.0
+    build: {context: ./docker/server/javis, dockerfile: Dockerfile.finance}
+    command: [node, finance.mjs]
+    volumes: ['./secrets/javis/finance.json:/run/secrets/config.json:ro', './data/javis/finance-cache:/data']
+    networks: [javis, actual]
+    mem_limit: 512m
+    pids_limit: 96
+    healthcheck: {test: [CMD, node, -e, "fetch('http://127.0.0.1:8000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"], interval: 30s, timeout: 5s, retries: 3}
+  auth-gateway:
+    networks: [auth, default, manyfold, mealie, actual, opengym, javis]
+  backup:
+    volumes:
+      # SQLite mode=ro still needs writable shared-memory files for WAL initialization.
+      # Only the trusted backup process gets this mount; source databases open in read-only mode.
+      - ./data/javis/app:/source/javis-app
+      - ./data/javis/brains:/source/javis-brains:ro
+      - ./data/javis/claude-auth:/source/javis-claude-auth:ro
+      - ./data/javis/codex-auth:/source/javis-codex-auth:ro
+      - ./compose.javis.yaml:/source/config/compose.javis.yaml:ro
+networks:
+  javis: {internal: true}
