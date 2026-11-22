@@ -29,6 +29,8 @@ O MMM-Remote-Control foi consultado, mas não instalado: os blocos visuais do Au
 
 Testes de persistência/reabertura do SQLite, preservação de lembretes pessoais, rejeição de campos desconhecidos e valores inválidos, impossibilidade de ocultar tudo, ordem única/completa e padrões independentes. Testes HTTP exercitam bloqueio de usuários comuns mesmo com cabeçalhos forjados, origem exata e CSRF administrativo. Teste do módulo verifica ordem, ocultação, aplicação numérica e preservação das permissões de atalhos. Conferência visual em notebook/celular e salvamento, recarga, efeito na tela e restauração de padrões usam dados descartáveis.
 
-No Linux passaram 12 testes do painel e 30 de autenticação. O teste de rajada de 64 conexões falhou por timeout na execução Windows e passou no Linux de destino; o relatório não considera o teste Windows aprovado. Verificações de PWA, monitor e sintaxe JS também foram executadas. Corrigida a codificação de mensagens de erro do conector do painel.
+No Linux passaram 12 testes do painel e 31 de autenticação. O teste de rajada de 64 conexões falhou por timeout na execução Windows e passou no Linux de destino; o relatório não considera o teste Windows aprovado. Verificações de PWA, monitor e sintaxe JS também foram executadas. Corrigida a codificação de mensagens de erro do conector do painel.
 
 Aplicar somente `magicmirror`, `mirror-api` e `auth` após o backup. Nenhuma preparação de novas credenciais é necessária. Preserve `.env`, segredos e dados. O cache da PWA avança para 43; o relatório privado registra a tag aplicada, saúde, autorização, backup/restauração e cópia externa. Reverter código/imagens não deve apagar o novo registro de aparência.
+
+A revisão também restringe o corpo da consulta de clima às coordenadas lat/lon. Campos extras não podem substituir identidade, proprietário, operação ou sinal administrativo da sessão; um teste específico cobre essa tentativa.
