@@ -4,6 +4,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
 from pathlib import Path, PurePosixPath
 import shutil
 import sqlite3
@@ -12,11 +13,25 @@ import tempfile
 
 MAX_BYTES = 20 * 2**30
 
+def check_json(data, path):
+    try:
+        json.loads(data)
+        return False
+    except json.JSONDecodeError:
+        # Claude writes JSONL under .json names. This exception never applies to app/config JSON.
+        if (path.parts[:2] != ('javis-claude-auth', 'telemetry')
+                or not re.fullmatch(r'1p_failed_events\.[0-9a-f-]+\.[0-9a-f-]+\.json', path.name)):
+            raise
+        lines = [line for line in data.splitlines() if line.strip()]
+        if not lines or any(not isinstance(json.loads(line), dict) for line in lines):
+            raise ValueError('Telemetria JSONL invalida')
+        return True
+
 def check_archive(source, expected_sha256, probe=None):
     source=Path(source)
     with source.open('rb') as handle: digest=hashlib.file_digest(handle,'sha256').hexdigest()
     if digest != expected_sha256: raise ValueError('SHA-256 divergente')
-    count=databases=jsons=profiles=total=0
+    count=databases=jsons=jsonlines=profiles=total=0
     # Private temporary data is removed even on a failed validation/probe.
     with tempfile.TemporaryDirectory(prefix='aurora-restore-') as directory:
         root=Path(directory);root.chmod(0o700)
@@ -49,7 +64,7 @@ def check_archive(source, expected_sha256, probe=None):
                         if db.execute('pragma integrity_check').fetchall()!=[('ok',)]: raise ValueError('SQLite restaurado invalido')
                     databases+=1
                 if dest.suffix=='.json':
-                    json.loads(dest.read_bytes());jsons+=1
+                    jsonlines+=int(check_json(dest.read_bytes(),normalized));jsons+=1
                     if normalized.parts[0]=='opengym': profiles+=1
             if not (root/'fitness/fitness.sqlite3').is_file() or databases < 1 or profiles < 1: raise ValueError('Dados essenciais ausentes no backup')
             apps = {}
@@ -68,7 +83,7 @@ def check_archive(source, expected_sha256, probe=None):
                     if not (root/item).is_file(): raise ValueError('Estado Javis ausente na restauracao')
                 apps['javis']={'state_verified':True,'notes_verified':True}
             probe_result=probe(root) if probe else None
-        return {'time':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'ok','archive':source.name,'sha256':digest,'files_verified':count,'bytes_restored':total,'sqlite_verified':databases,'json_verified':jsons,'opengym_json_verified':profiles,'isolated':True,'production_modified':False,'apps_verified':apps,'application_probe':probe_result,'scope':'Restauracao descartavel dos arquivos, SQLite e JSON; nao testa hardware, VPN ou todos os servicos.'}
+        return {'time':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'ok','archive':source.name,'sha256':digest,'files_verified':count,'bytes_restored':total,'sqlite_verified':databases,'json_verified':jsons,'jsonl_verified':jsonlines,'opengym_json_verified':profiles,'isolated':True,'production_modified':False,'apps_verified':apps,'application_probe':probe_result,'scope':'Restauracao descartavel dos arquivos, SQLite e JSON; nao testa hardware, VPN ou todos os servicos.'}
 
 def save_report(path, report):
     path=Path(path);tmp=path.with_suffix('.tmp');tmp.write_text(json.dumps(report,ensure_ascii=False),encoding='utf-8');tmp.chmod(0o644);tmp.replace(path)

@@ -58,4 +58,21 @@ class OperationsTests(unittest.TestCase):
             for m,value in rows:t.addfile(m,io.BytesIO(value))
         h=hashlib.sha256(p.read_bytes()).hexdigest();self.assertRaises(ValueError,check_archive,p,h)
 
+    def jsonl_archive(self, name, value):
+        p,_=self.archive()
+        with tarfile.open(p,'r:gz') as t:rows=[(m,t.extractfile(m).read()) for m in t if m.isfile()]
+        with tarfile.open(p,'w:gz') as t:
+            for m,data in rows:t.addfile(m,io.BytesIO(data))
+            m=tarfile.TarInfo(name);m.size=len(value);t.addfile(m,io.BytesIO(value))
+        return p,hashlib.sha256(p.read_bytes()).hexdigest()
+    def test_restore_validates_native_claude_jsonl_without_skipping_lines(self):
+        name='javis-claude-auth/telemetry/1p_failed_events.abc-123.def-456.json'
+        p,h=self.jsonl_archive(name,b'{"event":"fixture-one"}\n{"event":"fixture-two"}\n')
+        result=check_archive(p,h);self.assertEqual(result['jsonl_verified'],1);self.assertEqual(result['sqlite_verified'],1)
+        for data in (b'{"event":"ok"}\ninvalid',b'{}\n42',b''):
+            p,h=self.jsonl_archive(name,data);self.assertRaises(ValueError,check_archive,p,h)
+    def test_restore_still_rejects_jsonl_in_config_or_unknown_log_paths(self):
+        for name in ('javis-app/state/settings.json','opengym/data/other.json','javis-claude-auth/telemetry/unknown.json'):
+            p,h=self.jsonl_archive(name,b'{"event":1}\n{"event":2}\n');self.assertRaises(json.JSONDecodeError,check_archive,p,h)
+
 if __name__=='__main__':unittest.main()
