@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 37.0.0 — 2026-11-21
+
+Reúne o português e a voz da 36 com a restauração de telemetria JSONL nativa, sem flexibilizar o JSON de configurações. A atualização do servidor usa esta versão. Veja [RELEASE-37.md](RELEASE-37.md).
+
 ## 36.0.0 — 2026-11-21
 
 Javis em português brasileiro: dicionário nativo, reconhecimento e ditado pt-BR, vozes Francisca/Antônio, correção da troca indevida para vietnamita e saída restrita para o TTS gratuito. Veja [RELEASE-36.md](RELEASE-36.md).
