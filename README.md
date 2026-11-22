@@ -1,12 +1,12 @@
-# AuroraLAB 44.0.0
+# AuroraLAB 45.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
 Este README acompanha a versão registrada em [`VERSION`](VERSION). Os guias operacionais ficam em [`docs/`](docs/); os padrões de trabalho, em [`skills/`](skills/).
 
-## Avaliação isolada do Workout Cool
+## Avaliação isolada do wger
 
-A release 44 adiciona um projeto Docker separado para avaliar o Workout Cool com uma cópia privada do openGym/Garmin. O aplicativo atual permanece ativo. Consulte [o guia do teste](docs/WORKOUTCOOL-TESTE.md) e [a revisão da release](docs/RELEASE-44.md).
+A release 45 substitui o teste do Workout Cool pelo **wger 2.7 oficial**, em quatro serviços Docker independentes. A cópia privada do openGym/Garmin inclui histórico de treinos, rotinas e peso corporal; o aplicativo atual permanece ativo. [Guia do teste](docs/WGER-TESTE.md) · [Revisão da release](docs/RELEASE-45.md).
 
 ## Login único e gestão de usuários
 
