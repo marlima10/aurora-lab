@@ -11,13 +11,14 @@
     { id: 'ice', name: 'Gelo', colors: ['#eaf2f7', '#087eaa', '#4266ca'] }
   ];
   const coreItems = [
-    ['dashboard', '⌂', 'Dashboard', '/'],
-    ['system', '⚙', 'Sistema', '/#system-card'],
+    ['dashboard', '⌂', 'Início', '/'],
+    ['monitor', '⚙', 'Monitor de processos', '/monitor-processos.html'],
+    ['system', '⚙', 'Sistema', '/monitor-processos.html#system-card'],
     ['network', '⌁', 'Rede', '/network.html'],
-    ['services', '✣', 'Serviços', '/#services-card'],
-    ['storage', '▤', 'Armazenamento', '/#storage-card'],
+    ['services', '✣', 'Serviços', '/monitor-processos.html#services-card'],
+    ['storage', '▤', 'Armazenamento', '/monitor-processos.html#storage-card'],
     ['history', '◴', 'Histórico', '/history.html'],
-    ['backup', '☁', 'Backup', '/#backup-card'],
+    ['backup', '☁', 'Backup', '/monitor-processos.html#backup-card'],
     ['diagnostics', '✥', 'Diagnóstico', '/diagnostics.html'],
     ['opengym', '💪', 'openGym', '/opengym'],
     ['manyfold', '🧊', 'Manyfold', '/manyfold'],
@@ -37,6 +38,7 @@
     if (path.endsWith('/fitness-exercicios.html')) return 'exercises';
     if (path.endsWith('/fitness-planos.html')) return 'plans';
     if (path.endsWith('/fitness.html')) return 'fitness';
+    if (path.endsWith('/monitor-processos.html')) return 'monitor';
     if (path.endsWith('/network.html')) return 'network';
     if (path.endsWith('/history.html')) return 'history';
     if (path.endsWith('/diagnostics.html')) return 'diagnostics';

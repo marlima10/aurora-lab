@@ -1,0 +1,48 @@
+# Official MagicMirror server-only + private data connector. No public ports.
+services:
+  magicmirror:
+    build: {context: ./docker/server/mirror}
+    image: auroralab-magicmirror:40.0.0
+    user: '1000:1000'
+    read_only: true
+    tmpfs: ['/tmp:size=32m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [default]
+    mem_limit: 384m
+    cpus: 0.75
+    pids_limit: 96
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:8080/').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 3m, max-file: '2'}}
+  mirror-api:
+    build: {context: ./docker/server/mirror, dockerfile: Dockerfile.api}
+    image: auroralab-mirror-api:40.0.0
+    user: '65534:65534'
+    volumes: ['./data/mirror:/data', './secrets/mirror.json:/run/secrets/mirror.json:ro']
+    networks: [auth, opengym, mirror-outbound]
+    read_only: true
+    tmpfs: ['/tmp:size=16m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 48
+    environment: {TZ: America/Sao_Paulo}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 3m, max-file: '2'}}
+  backup:
+    volumes:
+      - ./data/mirror:/source/mirror:ro
+      - ./compose.mirror.yaml:/source/config/compose.mirror.yaml:ro
+networks:
+  mirror-outbound: {}

@@ -11,7 +11,7 @@
 <link rel="icon" href="/favicon.svg">
 <link rel="stylesheet" href="/aurora.css?v=20261007-2">
 <link rel="stylesheet" href="/portal-health.css?v=20261007-1">
-<title>Aurora Lab · Dashboard</title>
+<title>Aurora Lab · Monitor de processos</title>
 <link rel="stylesheet" href="/aurora-layout.css?v=20261024-v25">
 <link rel="stylesheet" href="/power.css?v=20261024-v24">
 </head>
@@ -20,7 +20,7 @@
   <aside class="sidebar">
     <div class="logo"><span class="logo-mark">✦</span><div><strong>AURORA LAB</strong><small>Print Server & Home Lab</small></div></div>
     <nav class="side-nav">
-      <a class="active" href="/">⌂ <span>Dashboard</span></a>
+      <a class="active" href="/">⌂ <span>Monitor de processos</span></a>
 
 
       <a href="#system-card">⚙ <span>Sistema</span></a>
@@ -52,7 +52,9 @@
 
     <div id="banner" class="banner">⚠ Dados indisponíveis ou desatualizados.</div>
 
+    <h1 class="panel-title">Monitor de processos</h1>
     <section class="quick-grid">
+      <button id="installApp" type="button" class="quick q3">⬇ Instalar app no celular ou tablet</button>
       <button class="quick q3" onclick="openPort(9090)"><span>🛠️</span><div><b>Cockpit</b><small>:9090 · Administração</small></div><i>→</i></button>
       <button class="quick q4" onclick="openSamba()"><span>📁</span><div><b>Samba</b><small id="sambaPath">Arquivos compartilhados</small></div><i>→</i></button>
       <button type="button" class="quick q7" onclick="location.href='/opengym'"><span>💪</span><div><b>openGym</b><small>Treinos com acesso seguro</small></div><i>→</i></button>
@@ -215,7 +217,7 @@
 </div>
 
 <script src="/mobile-nav.js?v=20261007-1" defer></script>
-<script src="/pwa.js?v=20261007-1" defer></script>
+<script src="/pwa.js?v=20261122-v40" defer></script>
 <script src="/aurora.js?v=20261121-v39"></script>
 <script>
 document.addEventListener('aurora:session', event => { for(const id of ['user-management-shortcut','javis-shortcut']) { const shortcut = document.getElementById(id); if(shortcut) shortcut.hidden = !event.detail?.admin; } });
@@ -256,7 +258,7 @@ function updateBackupHealth(){let el=document.getElementById('backupHealth');fet
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork()}});
 update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
 </script>
-<script src="/aurora-layout.js?v=20261121-v39" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+<script src="/aurora-layout.js?v=20261122-v40" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
   <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
   <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
   <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>

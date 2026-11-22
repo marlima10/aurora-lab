@@ -21,7 +21,7 @@ class PreparationTests(unittest.TestCase):
             self.assertEqual(before,{p.name:p.read_bytes() for p in (root/'secrets/javis').iterdir()})
             mcp=json.loads(before['mcp.json']);boot=json.loads(before['bootstrap.json'])
             self.assertEqual(set(boot),{'token'});self.assertEqual(boot['token'],mcp['token'])
-            self.assertEqual(len(set(mcp['connectors'].values())),4)
+            self.assertEqual(len(set(mcp['connectors'].values())),5)
             for role in ('fitness','food','finance'):
                 config=json.loads(before[role+'.json']);self.assertNotIn('connectors',config);self.assertEqual(config['token'],mcp['connectors'][role])
 

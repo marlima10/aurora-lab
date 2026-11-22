@@ -1,5 +1,5 @@
 (()=>{
-  if('serviceWorker' in navigator&&window.isSecureContext)window.addEventListener('load',()=>navigator.serviceWorker.register('/service-worker.js').catch(error=>console.error('PWA:',error)));
+  if('serviceWorker' in navigator&&window.isSecureContext){const register=()=>navigator.serviceWorker.register('/service-worker.js').catch(error=>console.error('PWA:',error));if(document.readyState==='complete')register();else window.addEventListener('load',register,{once:true});}
   const button=document.getElementById('installApp');
   if(!button)return;
   if(window.matchMedia('(display-mode: standalone)').matches)button.textContent='✓ App instalado';

@@ -1,4 +1,4 @@
-# AuroraLAB 39.0.0
+# AuroraLAB 40.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -128,6 +128,10 @@ Na instalação atual, portal e aplicativos usam o login central do AuroraLAB e 
 
 Padrões: [desenvolvimento](skills/aurora-development/SKILL.md) e [visual](skills/aurora-visual/SKILL.md). As skills ficam versionadas no projeto; não pressupõem instalação global.
 
-## Javis OS com Gemini (39.0.0)
+## Javis OS com Gemini (40.0.0)
 
 Conversa no próprio Javis do AuroraServer, com Gemini API, login único, sete consultas aos aplicativos e túnel TLS limitado ao Google. Navegador/celular com Tailscale; sem dependência do Claude Desktop ou PC particular. Consulte [JAVIS.md](docs/JAVIS.md) para configuração privada, arquitetura, escopo de ferramentas, dados enviados e limitações do Free Tier.
+
+## Página inicial MagicMirror (40.0.0)
+
+Nova tela pessoal com relógio, clima pela localização do aparelho, calendário, lembretes, treinos e notícias. O dashboard anterior passa a **[Monitor de processos](site/monitor-processos.html)**. Javis ganha pesquisa de notícias e leitura de páginas públicas em container separado. [Detalhes, limites e implantação da release 40](docs/RELEASE-40.md).
