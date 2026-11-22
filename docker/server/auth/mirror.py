@@ -5,7 +5,7 @@ import urllib.error
 
 def query(session,cfg,action,value=None):
     if 'portal' not in session['grants']:raise ValueError('Portal não autorizado.')
-    payload={'owner':session['email'],'identity':session['grants'].get('opengym'),'action':action}
+    payload={'owner':session['email'],'identity':session['grants'].get('opengym'),'action':action,'admin':session.get('admin') is True}
     if action=='weather':payload.update(value or {})
     elif value is not None:payload['value']=value
     key=cfg.get('_mirror_secret','')

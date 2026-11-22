@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 42.0.0
+# Estrutura e arquitetura — AuroraLAB 43.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -215,3 +215,7 @@ O conector Javis `web_reader.py` atende duas ferramentas de leitura pública, em
 Na release 41 o HTML declara base `/mirror/`, o manifest inicia nesse caminho e o service worker não intercepta a raiz nem o index, preservando redirecionamentos de navegação.
 
 Na release 42, Monitor de processos não tem grade de atalhos de aplicativos; mantém os indicadores e o botão compacto de instalação do app.
+
+## Configuração visual do MagicMirror (43.0.0)
+
+`docker/server/auth/static/mirror-config.*` contém a página administrativa, servida em `/auth/mirror/configurar`. GET/POST `/auth/mirror/settings` passam pela sessão administrativa e pelo conector interno. `docker/server/mirror/settings.py` define o esquema limitado e os padrões; a tabela `display_settings` compartilha o banco mirror.sqlite3, incluído no backup. O módulo MMM-Aurora aplica preferências retornadas com seu estado, preservando grants dos aplicativos. O MMM-Remote-Control não é dependência desta implementação.
