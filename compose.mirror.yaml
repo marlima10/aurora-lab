@@ -2,7 +2,7 @@
 services:
   magicmirror:
     build: {context: ./docker/server/mirror}
-    image: auroralab-magicmirror:40.0.0
+    image: auroralab-magicmirror:41.0.0
     user: '1000:1000'
     read_only: true
     tmpfs: ['/tmp:size=32m,mode=1777']

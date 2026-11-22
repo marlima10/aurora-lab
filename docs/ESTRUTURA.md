@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 40.0.0
+# Estrutura e arquitetura — AuroraLAB 41.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -211,3 +211,5 @@ Os dois serviços, seus builds, dispositivos, portas, atalhos, painéis, coleta 
 `docker/server/mirror/` contém a imagem oficial server-only, o módulo visual MMM-Aurora e o conector privado de dados. `compose.mirror.yaml` declara MagicMirror e mirror-api sem portas públicas, rede de saída separada e persistência em `data/mirror`. A fachada autenticada fica em `docker/server/auth/mirror.py`; toda identidade vem da sessão central. O novo proxy `/mirror/` é descrito na [release 40](RELEASE-40.md). O painel anterior está em `site/monitor-processos.html`; o index estático mantém o modo portátil.
 
 O conector Javis `web_reader.py` atende duas ferramentas de leitura pública, em `javis-web`. A rede do motor Gemini continua restrita às duas origens existentes; pesquisas e leitura externa passam pelo conector sem segredos de aplicativos.
+
+Na release 41 o HTML declara base `/mirror/`, o manifest inicia nesse caminho e o service worker não intercepta a raiz nem o index, preservando redirecionamentos de navegação.

@@ -3,7 +3,7 @@
   "name": "Aurora Lab",
   "short_name": "Aurora Lab",
   "description": "AuroraLAB: painel pessoal, aplicativos e monitor de processos",
-  "start_url": "/",
+  "start_url": "/mirror/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
