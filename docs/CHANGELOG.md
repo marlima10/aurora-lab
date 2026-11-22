@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 38.0.0 — 2026-11-21
+
+Perfil de voz Antônio, ritmo inicial 0,90× e tom ligeiramente mais grave. Migração única preserva ajustes posteriores. Veja [RELEASE-38.md](RELEASE-38.md).
+
 ## 37.0.0 — 2026-11-21
 
 Reúne o português e a voz da 36 com a restauração de telemetria JSONL nativa, sem flexibilizar o JSON de configurações. A atualização do servidor usa esta versão. Veja [RELEASE-37.md](RELEASE-37.md).

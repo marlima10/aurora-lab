@@ -66,3 +66,7 @@ O Edge TTS gratuito é o mecanismo já incluído pelo Javis. A frase que será l
 O build verifica os arquivos upstream e aplica correções guardadas em `localize_assets.py`: idioma do reconhecimento/ditado, opções brasileiras e fallback de voz. `locale_runtime.py` impede que o parâmetro upstream `en=0` converta português em vietnamita, e conecta o TTS ao túnel sem abrir internet geral ao container. O dicionário preserva as chaves e placeholders da versão fixada. Não use o seletor de atualização automática do upstream para contornar esses controles.
 
 Para retorno à release 35, preserve primeiro o estado atual, aplique a imagem/código oficiais anteriores e restaure as preferências de idioma/voz a partir da cópia privada anterior à migração, sem sobrescrever chaves ou outros dados atuais. Limpe somente a preferência de idioma AuroraLAB do navegador se necessário; não apague o armazenamento inteiro, que contém histórico e preferências.
+
+## Perfil de voz masculino (38.0.0)
+
+Antônio é o padrão brasileiro, com ritmo inicial de 0,90× aplicado uma vez por navegador e tom de -4 Hz no Edge TTS. O seletor e o controle nativos continuam válidos após a migração. O tom se aplica somente ao nome exato pt-BR-AntonioNeural e preserva parâmetros explícitos; outras vozes permanecem sem esse ajuste. O fallback do navegador depende das vozes disponíveis no aparelho e pode soar diferente do Edge TTS.
