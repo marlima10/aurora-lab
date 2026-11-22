@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 41.0.0
+# Estrutura e arquitetura — AuroraLAB 42.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -213,3 +213,5 @@ Os dois serviços, seus builds, dispositivos, portas, atalhos, painéis, coleta 
 O conector Javis `web_reader.py` atende duas ferramentas de leitura pública, em `javis-web`. A rede do motor Gemini continua restrita às duas origens existentes; pesquisas e leitura externa passam pelo conector sem segredos de aplicativos.
 
 Na release 41 o HTML declara base `/mirror/`, o manifest inicia nesse caminho e o service worker não intercepta a raiz nem o index, preservando redirecionamentos de navegação.
+
+Na release 42, Monitor de processos não tem grade de atalhos de aplicativos; mantém os indicadores e o botão compacto de instalação do app.
