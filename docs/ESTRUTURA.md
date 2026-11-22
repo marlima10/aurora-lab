@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 34.0.0
+# Estrutura e arquitetura — AuroraLAB 35.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -199,6 +199,6 @@ Na 29, `/auth/apps` informa `adminOnly`, mantendo o contrato `apps` existente. O
 
 Home Assistant e HomeBoard foram retirados dos overlays, autenticação central, navegação, monitoramento e escopo de novos backups. Adaptadores e preparadores exclusivos foram removidos. Migration 2 do autenticador remove apenas os grants desses aplicativos; usuários, chaves e demais permissões são preservados. Documentos antigos e releases anteriores registram a arquitetura histórica e não devem ser usados para reinstalá-los.
 
-## Javis OS opcional (34.0.0)
+## Javis OS com Gemini (35.0.0)
 
-Seis containers separados integram o hub MCP original do Javis ao Claude Desktop gratuito, com consultas aos aplicativos e notas próprias. Não usa API paga nem ativa o chat interno. Consulte [JAVIS.md](JAVIS.md) para arquitetura, permissões, ativação, backup e limitações.
+Conversa no próprio Javis do AuroraServer, com Gemini API, login único, sete consultas aos aplicativos e túnel TLS limitado ao Google. Navegador/celular com Tailscale; sem dependência do Claude Desktop ou PC particular. Consulte [JAVIS.md](JAVIS.md) para configuração privada, arquitetura, escopo de ferramentas, dados enviados e limitações do Free Tier.

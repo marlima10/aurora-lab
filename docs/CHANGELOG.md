@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 35.0.0 — 2026-11-21
+
+Migração do Javis para Gemini API no AuroraServer. Chat e grafo autenticados, entrada privada de chave, cofre nativo, seleção de modelo pelo catálogo real e túnel TLS restrito à API Google. Conectores preservados, ferramentas limitadas às consultas autorizadas e leitura das notas. Retirada da dependência do Claude Desktop. [Guia](JAVIS.md).
+
 ## 34.0.0 — 2026-11-21
 
 Javis OS original 0.623.0 fixado por digest, com seis containers, SSO administrativo, ponte MCP privada ao Claude Desktop gratuito, sete consultas aos aplicativos e notas próprias. Sem API paga, chat interno, shell ou escrita nos aplicativos. Atalho administrativo, backup e guia operacional. [Detalhes](JAVIS.md).

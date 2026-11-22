@@ -1,75 +1,56 @@
-# Javis OS no AuroraLAB — 34.0.0
+# Javis OS com Gemini no AuroraServer — 35.0.0
 
-## Execução com Claude gratuito
-
-Esta instalação usa o Javis OS original 0.623.0, commit `38cc59499c7bb18b50324b1789a32a3a53a1a7dd`. A imagem oficial amd64 está fixada por digest em `docker/server/javis/source.lock.json`; seis arquivos críticos são conferidos durante o build. A interface e o hub são do projeto original. O overlay AuroraLAB adiciona SSO, isolamento, conectores e a ponte privada para o Claude Desktop.
-
-O Claude gratuito não oferece a autenticação Claude Code/API exigida pelo chat interno do Javis. Nesta modalidade, a conversa acontece no **Claude Desktop do Windows**, usando o MCP local do aplicativo, sujeito aos limites gratuitos da Anthropic. Nenhuma API paga ou modelo local é configurado. O chat interno e terminais WebSocket estão desativados. O Javis web organiza as próprias notas e conexões; sua interface nativa oferece inglês e vietnamita e recebeu uma orientação em português.
+O Javis OS original 0.623.0 conversa com a Gemini API diretamente a partir do AuroraServer. O navegador, inclusive no celular com Tailscale, é apenas o cliente. Claude Desktop, Codex no PC e ponte SSH do Windows não são necessários para esta modalidade. O modelo Gemini é executado na nuvem do Google; interface, memória, notas e conectores ficam no servidor.
 
 ```mermaid
 flowchart LR
-  U[Rafael no Claude Desktop gratuito] --> S[SSH privado pelo Tailscale]
-  S --> J[Javis OS: hub MCP original]
-  J --> N[Notas e relatórios próprios]
-  J --> M[Conector MCP AuroraLAB]
-  M --> A[Permissões atuais do login único]
-  M --> F[Conector treinos]
-  M --> B[Conector financeiro]
-  M --> R[Conector alimentação]
-  M --> P[Conector impressão 3D]
-  F --> G[openGym / dados Garmin importados]
-  B --> AB[Actual Budget]
-  R --> ME[Mealie]
-  P --> MM[Manyfold / OctoPrint]
+ B[Navegador / celular] --> S[Login único AuroraLAB]
+ S --> J[Javis OS no AuroraServer]
+ J --> E[Túnel TLS restrito]
+ E --> G[Gemini API do Google]
+ J --> H[MCP Hub original]
+ H --> C[Conectores separados]
+ C --> A[openGym / Garmin, Actual, Mealie, Manyfold, OctoPrint]
+ H --> N[Leitura das notas AuroraLAB]
 ```
 
-Os resultados consultados e autorizados no Claude Desktop são enviados à Anthropic para gerar a resposta. Os bancos inteiros não são montados no Javis. Senhas dos aplicativos ficam somente nos respectivos conectores e nunca são devolvidas ao modelo. O Claude não fica executando no servidor nem gera relatórios sozinho com o computador desligado. Esta ponte não habilita a conversa no navegador ou iPhone: o MCP local depende do Claude Desktop e do Tailscale no Windows. Não há Funnel nem endpoint MCP público.
+## Serviços
 
-## Containers e permissões
+O overlay opcional `compose.javis.yaml` mantém `javis`, `javis-mcp`, `javis-fitness`, `javis-finance`, `javis-food` e `javis-print` e acrescenta `javis-ai-egress`. Javis e o túnel usam imagens 35.0.0; os conectores sem mudanças continuam na imagem 34.0.0. A versão upstream e o digest oficial continuam fixados em `source.lock.json`, com seis arquivos críticos conferidos antes de aplicar o adaptador AuroraLAB.
 
-| Serviço | Responsabilidade | Acesso |
-| --- | --- | --- |
-| javis | Interface e MCP Hub originais | Rede interna, próprios dados/notas, sem Docker socket |
-| javis-mcp | Catálogo e despacho de ferramentas | Identidades e permissões vigentes na autenticação central |
-| javis-fitness | Resumo de treinos | openGym, somente consulta |
-| javis-food | Receitas e listas | Mealie, somente consulta |
-| javis-print | Biblioteca e estado da impressão | Manyfold e OctoPrint, somente consulta |
-| javis-finance | Contas e totais do período | SDK oficial Actual, cache próprio e consulta |
+O Javis permanece na rede Docker interna. Somente o túnel participa também de uma rede com saída e aceita exclusivamente `CONNECT generativelanguage.googleapis.com:443`. Não termina TLS, não recebe a chave em texto aberto e não registra tráfego, cabeçalhos ou corpo. Outros destinos são recusados. `NO_PROXY` preserva o acesso ao conector MCP interno. Sem Docker socket, host networking ou nova porta pública.
 
-Contêineres sem privilégios, limites de memória/processos, código em leitura e segredos separados. O Javis tem apenas rede interna, sem saída para provedores de IA. Os conectores precisam alcançar as redes dos aplicativos correspondentes; sua implementação só expõe operações fixas. Não há ferramentas para shell, navegação arbitrária, iniciar impressão ou gravar transações/receitas/treinos.
+`HTTPS_PROXY`/`HTTP_PROXY` apontam para esse túnel. A consulta de modelos foi adaptada para enviar a chave por `x-goog-api-key`, evitando credencial na URL ou em mensagens de erro. O motor de conversa, streaming e ciclo de ferramentas continuam sendo os nativos do Javis.
 
-O painel Javis exige o administrador protegido `aurora@server.local` e a permissão portal. Não há segundo login: o adaptador cria uma sessão nativa no backend após validar o segredo do gateway. Cookies enviados pelo navegador não escolhem o perfil. O endpoint interno de permissões não fica disponível no portal público. Revogações dos aplicativos são consultadas novamente a cada listagem/chamada das ferramentas AuroraLAB.
+## Configuração da chave
 
-## Ferramentas disponíveis
+1. Com Tailscale, entre no AuroraLAB como administrador protegido.
+2. Abra `https://SEU-HOST-PRIVADO:7777/aurora-ai/setup`.
+3. Cole a chave da Gemini API e escolha **Salvar chave e conferir conexão**. Não envie chaves pelo chat, GitHub ou URL.
+4. A chave é guardada pelo cofre nativo do Javis, criptografada no volume de estado, e retirada do campo do navegador após o envio. Não é salva em localStorage. Somente o catálogo de modelos é consultado nessa etapa.
+5. Selecione um modelo realmente disponível para o projeto em **Modelos do Javis**. A implantação validada usa `gemini-3.5-flash-lite`, com suporte a Free Tier conforme a tabela do Google na data da migração. Não reutilize modelos antigos apenas porque aparecem no fallback do upstream.
+6. Abra `https://SEU-HOST-PRIVADO:7777/#p=chat`, recarregue a página e envie a mensagem.
 
-- `aurora_fitness_summary`: período de até 366 dias, últimos treinos com duração/calorias quando presentes; não inventa medições ausentes.
-- `aurora_finance_accounts`: contas abertas e categorias do orçamento selecionado.
-- `aurora_finance_summary`: receitas/despesas/saldo do período em centavos, sem transferências, incluindo histórico de contas encerradas.
-- `aurora_recipes` e `aurora_shopping_lists`: consultas ao Mealie.
-- `aurora_print_status` e `aurora_model_library`: estado da impressão e biblioteca Manyfold.
-- Ferramentas nativas de leitura/pesquisa/listagem das notas do próprio Javis.
-- `javis_write_file`: somente nova nota `.md` em `notes/` ou `reports/`, até 20 mil caracteres, sem sobrescrever arquivo existente. O Claude recebe instrução para confirmar o conteúdo antes de salvar. A gravação de notas não altera os aplicativos nativos.
+Uma chave salva não é prova de autenticação válida. A confirmação exige catálogo retornado pelo Google com `live: true` e resposta real do motor. Chave inválida resulta em HTTP 400. Ausência de quota pode produzir HTTP 429; nenhum upgrade de faturamento é feito pela instalação. Cadastro de chave, seleção de modelo e projeto Free Tier são verificações diferentes. Disponibilidade e limites do Google podem mudar.
 
-Os nomes Aurora são publicados pelo hub com o prefixo `auroralab__`. A ponte impõe uma lista exata de ferramentas em todas as chamadas, não apenas na apresentação ao modelo. Bloqueia caminhos absolutos, ocultos, escapes do diretório e sobrescrita. Um bloqueio coordena gravações entre pontes; edições manuais no painel continuam sendo operações do administrador.
+Não habilite faturamento por consequência de um erro de quota. Primeiro confira o projeto, elegibilidade, modelo e limites no Google AI Studio. O software não muda o plano do projeto e não promete custo zero caso o proprietário configure uma chave de projeto pago posteriormente. Sugestões automáticas de próximo prompt e tarefas autônomas devem permanecer desativadas para evitar chamadas que o usuário não solicitou.
 
-## Ativação em outra instalação
+## Dados e ferramentas
 
-1. Prepare e valide o login único e os mapeamentos nativos já existentes. Faça backup e restauração isolada antes da mudança.
-2. Inclua `compose.javis.yaml` antes de `compose.auth.yaml` em `COMPOSE_FILE`. O overlay é opcional. Execute como root `python3 docker/server/javis/prepare.py --root /srv/auroralab`. Isso preserva os segredos já criados e prepara arquivos privados, não grava dados nos aplicativos.
-3. Valide `docker compose config --quiet`; construa os seis serviços e a imagem auth 34.0.0. Execute `docker compose up -d --no-deps javis javis-mcp javis-fitness javis-food javis-print javis-finance`.
-4. Execute `docker compose exec -T javis python /opt/aurora/bootstrap.py`. O bootstrap registra o conector nativo AuroraLAB com permissão `readonly` e cria o diretório de notas.
-5. Reprepare/renderize o gateway com o host privado correto e recrie auth/gateway. Publique somente a porta local 7777 por Tailscale Serve HTTPS. Valide o administrador, o bloqueio sem sessão e os aplicativos anteriores.
-6. Crie uma chave SSH exclusiva para o MCP. No `authorized_keys`, limite-a com `restrict,command="/usr/local/sbin/aurora-javis-mcp"`. O comando fixo executa somente `docker exec -i --user 10001:10001 auroralab-javis-1 python /opt/aurora/stdio_bridge.py`. Não permita terminal, forwarding ou comandos escolhidos pelo cliente. A chave privada fica exclusivamente no Windows.
-7. No arquivo real `claude_desktop_config.json` do Claude Desktop, preserve as outras entradas e acrescente `mcpServers.AuroraLAB` com o Python local executando `docker/server/javis/desktop_bridge.py`, seguido pelo executável OpenSSH e os argumentos de chave, host conhecido e servidor. A ponte usa UTF-8 e abre uma conexão restrita por chamada ao hub stateless; assim, uma reinicialização do Javis não deixa uma sessão MCP permanentemente presa. Não coloque senhas ou tokens dos aplicativos no arquivo do cliente. Reinicie o Desktop e valide a conexão. O caminho de configuração depende da versão/empacotamento do Claude.
+Sete consultas AuroraLAB: resumo de treinos openGym/Garmin, contas/categorias e totais do Actual, receitas e listas Mealie, estado OctoPrint e biblioteca Manyfold. As identidades e permissões atuais continuam sendo verificadas pelo autenticador a cada listagem/chamada.
 
-Com mais de um orçamento remoto no Actual, configure explicitamente a seleção em `secrets/javis/finance.json`, campo `budgets` por identidade. Orçamentos criptografados precisam de `encryptionPasswords` nesse mesmo arquivo privado. Não exponha esses campos no portal ou Git. Se não há orçamento, o conector informa indisponibilidade; não cria um orçamento automaticamente.
+O adaptador limita tanto a descoberta quanto o inventário e o despacho às sete ferramentas e três ferramentas nativas de leitura/pesquisa/listagem do vault `/brains/auroralab`. Usa o identificador nativo `fn`, preservando o prefixo `auroralab__`. Pedidos de escopo mais estreito são respeitados; plugins, diretórios de trabalho externos, staging e ferramentas de shell/escrita não ampliam esse conjunto. Conversa e grafo usam WebSocket autenticado; terminal e voz ao vivo ficam desativados nesta implantação.
 
-## Testes e backup
+O acesso aos dados dos aplicativos foi solicitado pelo proprietário. A IA consulta os aplicativos; gravações de lançamentos financeiros, alterações de receitas/treinos, exclusões e comandos de impressão não fazem parte desse catálogo. O administrador continua usando as interfaces dos aplicativos para essas ações. Não confunda acesso a todos os módulos conectados com autorização irrestrita de shell ou controle do Debian.
 
-Use apenas fixtures para testes de escrita e revogação. Os testes do módulo ficam em `docker/server/javis/tests/`; o ensaio financeiro em `test_finance.mjs` usa `node --experimental-vm-modules`. A suíte de autenticação cobre origem, administrador e permissões internas. Não execute testes sobre bancos pessoais.
+Os dados incluídos nas consultas e mensagens são enviados ao Google. No Free Tier, o Google informa uso de entradas/saídas para melhorar produtos e orienta não enviar dados pessoais, confidenciais ou sensíveis. Consulte os termos antes de decidir quais fontes disponibilizar. As credenciais dos aplicativos permanecem nos conectores; não são retornadas ao modelo. A chave Google fica fora do Git e de diagnósticos públicos.
 
-O overlay amplia o backup com estado Javis, notas, diretórios de autenticação próprios e sua configuração. O cache temporário do SDK Actual fica fora. O volume de estado do Javis é gravável apenas para o serviço de backup confiável inicializar os arquivos auxiliares de memória compartilhada do SQLite/WAL; o código abre os bancos de origem com `mode=ro`, gera snapshots e não ignora WAL ativo. As notas e os demais novos volumes são montados em leitura no backup. JSON do estado é validado, SQLite usa snapshots e o verificador de restauração exige settings, conexões e README do vault quando o overlay aparece no arquivo. Segredos são privados e exigem a mesma proteção dos backups anteriores; a chave SSH privada do Windows não vai ao servidor.
+## Backup e retorno
 
-Para retornar, retire a publicação HTTPS 7777 e a chave restrita do MCP, restaure a configuração anterior do gateway/seleção Compose e pare somente os seis novos serviços. Não execute `down -v` nem apague dados para atualizar. Preserve as notas antes de remover o módulo.
+Estado e chave criptografada já pertencem ao backup privado do Javis; a chave de criptografia deve ser preservada junto desse estado. Configuração do túnel fica no Compose/código público, sem segredo próprio. O cache financeiro continua fora do backup. O serviço confiável de backup mantém a autorização específica de escrita no estado Javis para inicialização dos auxiliares SQLite/WAL; bancos de origem são abertos em leitura e arquivados por snapshots.
 
-Fontes: [Javis OS](https://github.com/blogminhquy/javis-os), [MCP local no Claude Desktop](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop), [conectores remotos e diferença de rede](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+Antes da migração, faça backup com restauração isolada e preserve as configurações. Para retornar, restaure código/imagem/configuração anteriores do Javis, pare somente `javis-ai-egress` e retire o proxy do ambiente. Não execute `down -v` nem apague os dados dos aplicativos. A retirada da conexão antiga do Claude Desktop e da sua chave SSH restrita deve ser registrada separadamente; não desinstale o aplicativo pessoal Claude nem altere os outros conectores do usuário.
+
+Os testes do módulo cobrem SSO, preservação de segredos, limites de consultas, filtro de ferramentas, namespace nativo e destino TLS. Use fixtures para testes de escrita e nunca bancos pessoais. As validações de implantação devem registrar apenas nomes de ferramentas, status, hashes e contagens, sem chaves ou conteúdo pessoal.
+
+Fontes: [Javis OS](https://github.com/blogminhquy/javis-os), [chaves Gemini](https://ai.google.dev/gemini-api/docs/api-key), [preços e modelos](https://ai.google.dev/gemini-api/docs/pricing), [termos e tratamento de dados](https://ai.google.dev/gemini-api/terms). O modo anterior por Claude Desktop está documentado historicamente na [release 34](RELEASE-34.md).
