@@ -23,3 +23,4 @@
 +
 +Testes de autenticação/migração, preparação, monitor/links, proteção HTTP, catálogo Javis, higienização de backups mistos/aninhados, SQLite e renderização sintética do dashboard. Resultados efetivamente executados, inventário final, quantidades higienizadas e restauração/cópia externa são registrados no relatório privado da implantação.
 +
+Validação concluída antes da publicação: 39 testes operacionais/preparação, 25 de autenticação e 28 do Javis aprovados; teste adicional da higienização do estado VPN e seis testes específicos de arquivos mistos aprovados. Dashboard renderizado com dados simulados após a remoção dos elementos. A higienização histórica e o inventário final são conferidos separadamente na implantação.

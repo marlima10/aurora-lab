@@ -1,6 +1,6 @@
 # Histórico de versões
 
-## 39.0.0 — 2026-11-21
+## 39.0.0 — 2026-11-22
 
 Removidos OctoPrint, câmera e suas integrações; higienização dos backups históricos autorizada pelo proprietário. Manyfold e demais aplicativos preservados. Veja [RELEASE-39.md](RELEASE-39.md).
 
