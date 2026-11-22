@@ -1,4 +1,4 @@
-const CACHE_NAME='aurora-shell-20261121-v34';
+const CACHE_NAME='aurora-shell-20261121-v35';
 const APP_SHELL=['/operations.js?v=20261024-v23','/aurora.js?v=20261121-v31','/power.css?v=20261024-v24','/power.js?v=20261024-v24','/aurora-layout.css?v=20261024-v25','/aurora-layout.js?v=20261121-v34','/','/aurora.css?v=20261007-2','/portal-health.css?v=20261007-1','/fitness.css?v=20261013-fitness-upgrades-1','/fitness.js?v=20261121-v31','/fitness-guided.js?v=20261024-v24','/fitness-planos.css?v=20261007-3','/fitness-planos.js?v=20261024-v24','/fitness-exercicios.css?v=20261007-2','/fitness-exercicios.js?v=20261024-v24','/fitness-plan-card.js?v=20261024-v24','/mobile-nav.js?v=20261007-1','/pwa.js?v=20261007-1','/manifest.json','/icons/app-192.png','/icons/app-512.png'];
 async function installShell(){
   let urls=APP_SHELL;

@@ -20,10 +20,14 @@ x-javis-reader: &reader
 services:
   javis:
     build: {context: ./docker/server/javis, dockerfile: Dockerfile.javis}
-    image: auroralab-javis-os:34.0.0
+    image: auroralab-javis-os:35.0.0
     user: '10001:10001'
     env_file: ./secrets/javis/admin.env
     environment:
+      JAVIS_AI_PROVIDER: gemini
+      HTTPS_PROXY: http://javis-ai-egress:3128
+      HTTP_PROXY: http://javis-ai-egress:3128
+      NO_PROXY: localhost,127.0.0.1,::1,javis-mcp,auth
       PYTHONPATH: /app/server
       TZ: America/Sao_Paulo
       JAVIS_REQUIRE_LOGIN: '1'
@@ -49,6 +53,25 @@ services:
     pids_limit: 256
     restart: unless-stopped
     logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
+  javis-ai-egress:
+    image: auroralab-javis-egress:35.0.0
+    build: {context: ./docker/server/javis, dockerfile: Dockerfile.egress}
+    user: '65534:65534'
+    networks: [javis, javis-outbound]
+    read_only: true
+    tmpfs: ['/tmp:size=8m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 64m
+    cpus: 0.5
+    pids_limit: 32
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 2m, max-file: '2'}}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:3128/health',timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
   javis-mcp:
     <<: *reader
     command: [python, mcp_service.py]
@@ -96,3 +119,4 @@ services:
       - ./compose.javis.yaml:/source/config/compose.javis.yaml:ro
 networks:
   javis: {internal: true}
+  javis-outbound: {}

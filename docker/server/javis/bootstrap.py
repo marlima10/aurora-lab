@@ -11,6 +11,10 @@ cfg['setup_done'] = True
 cfg.setdefault('locale', {}).update(ui_lang='en', tz='America/Sao_Paulo', currency='BRL')
 cfg.setdefault('model', {})['claude_auto_update'] = False
 cfg.setdefault('backup', {})['enabled'] = False
+import os
+if os.getenv('JAVIS_AI_PROVIDER') == 'gemini':
+    cfg.setdefault('chat', {}).update(suggest_next=False, plan_tool=False)
+    cfg.setdefault('model', {}).setdefault('auxiliary', {})['auto'] = False
 config.write_settings(cfg)
 brain = Path('/brains/auroralab')
 for name in ('notes', 'reports'):

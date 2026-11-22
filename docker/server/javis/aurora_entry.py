@@ -1,9 +1,14 @@
 """Real native Javis session behind the central AuroraLAB administrator SSO."""
 import hmac
 import json
+import os
 from pathlib import Path
 import config
 import main
+
+if os.getenv('JAVIS_AI_PROVIDER') == 'gemini':
+    import gemini_runtime
+    gemini_runtime.install(main)
 
 SESSION = ''
 ASSETS = Path('/opt/aurora')
@@ -33,15 +38,21 @@ class AuroraSSO:
                 return await send({'type': 'websocket.close', 'code': 1008})
             return await reply(send, 403, {'error': 'Entre pelo login do AuroraLAB.'})
         if scope['type'] == 'http':
+            if path == '/aurora-ai/status':
+                settings = config.read_settings().get('model', {})
+                return await reply(send, 200, {'keyConfigured': bool(settings.get('gemini_api_key')), 'provider': (settings.get('main') or {}).get('provider', ''), 'model': (settings.get('main') or {}).get('model', '')})
+            if path == '/aurora-ai/setup':
+                return await reply(send, 200, (ASSETS/'gemini-setup.html').read_bytes(), 'text/html; charset=utf-8')
             if path in ('/aurora-mode.js', '/aurora-mode.css'):
                 mime = 'text/javascript' if path.endswith('.js') else 'text/css'
                 return await reply(send, 200, (ASSETS/path.lstrip('/')).read_bytes(), mime)
             if path.startswith('/auth/') and scope.get('method') not in ('GET', 'HEAD'):
                 return await reply(send, 403, {'error': 'O acesso é gerenciado pelo AuroraLAB.'})
-        if scope['type'] == 'websocket' and path.startswith('/ws'):
+        gemini_mode = os.getenv('JAVIS_AI_PROVIDER') == 'gemini'
+        if scope['type'] == 'websocket' and path.startswith('/ws') and (not gemini_mode or path not in ('/ws', '/ws/graph')):
             await receive()
             await send({'type': 'websocket.accept'})
-            await send({'type': 'websocket.send', 'text': json.dumps({'type': 'error', 'message': 'Converse no Claude Desktop. O plano gratuito não ativa o chat interno.', 'text': 'Use o Claude Desktop conectado ao AuroraLAB.'})})
+            await send({'type': 'websocket.send', 'text': json.dumps({'type': 'error', 'message': 'Este canal está desativado. Use a conversa Gemini do Javis.', 'text': 'Abra a conversa no Javis do AuroraServer.'})})
             return await send({'type': 'websocket.close', 'code': 1000})
         if not SESSION or not config.valid_session(SESSION):
             SESSION = config.new_session(ua='AuroraLAB SSO')
