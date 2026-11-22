@@ -1,4 +1,4 @@
-# AuroraLAB 38.0.0
+# AuroraLAB 39.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -24,7 +24,7 @@ A release 29 corrige o cadastro quando eram selecionados aplicativos administrat
 | Ambiente | Configuração | Conteúdo |
 | --- | --- | --- |
 | Portátil | `compose.yaml` | Nginx, interface e API Fitness PHP/SQLite; sem os serviços do servidor |
-| Servidor Linux | `compose.server.yaml` | Portal, Fitness, OctoPrint, Samba, monitoramento e backup; Tailscale e proxy Cockpit dependem de preparação |
+| Servidor Linux | `compose.server.yaml` | Portal, Fitness, Samba, monitoramento e backup; Tailscale e proxy Cockpit dependem de preparação |
 | Módulos adicionais | Arquivos `compose.*.yaml` | openGym/Garmin, energia e dispositivo da impressora |
 
 Os dois ambientes usam a porta 8088. Escolha um por instalação. O servidor completo usa recursos do Linux amd64 e scripts destinados ao Debian; o portátil pode rodar no Docker Desktop com contêineres Linux.
@@ -51,7 +51,6 @@ Novidades desta versão: [release 29](docs/RELEASE-29.md); a migração e o novo
 - Manyfold (modelos 3D), Mealie (receitas/refeições) e Actual Budget (finanças), em módulos Docker separados: [guia](docs/APPS.md).
 
 - Portal responsivo, temas, atalhos e cache PWA.
-- OctoPrint para impressora 3D, catálogo de plugins fixados e câmera USB opcional.
 - Métricas do host, rede, armazenamento e status de backup.
 - Samba autenticado para arquivos de impressão.
 - Home Assistant, HomeBoard e CasaOS removidos da instalação atual.
@@ -124,12 +123,11 @@ Na instalação atual, portal e aplicativos usam o login central do AuroraLAB e 
 | [Cockpit](docs/COCKPIT.md) | Preparação do backend Debian e proxy HTTPS |
 | [openGym](docs/OPENGYM.md) | Passkeys, preparação, HTTPS e dados |
 | [Garmin](docs/GARMIN.md) | Instalação, importação e limites |
-| [OctoPrint/Python](docs/UPGRADE-PYTHON-OCTOPRINT.md) | Build, plugins e retorno de imagem |
 | [Docker portátil](docs/LEIA-ME-DOCKER-PORTATIL.md) | Ambiente reduzido para outro computador |
 | [Histórico](docs/CHANGELOG.md) | Alterações por versão |
 
 Padrões: [desenvolvimento](skills/aurora-development/SKILL.md) e [visual](skills/aurora-visual/SKILL.md). As skills ficam versionadas no projeto; não pressupõem instalação global.
 
-## Javis OS com Gemini (38.0.0)
+## Javis OS com Gemini (39.0.0)
 
 Conversa no próprio Javis do AuroraServer, com Gemini API, login único, sete consultas aos aplicativos e túnel TLS limitado ao Google. Navegador/celular com Tailscale; sem dependência do Claude Desktop ou PC particular. Consulte [JAVIS.md](docs/JAVIS.md) para configuração privada, arquitetura, escopo de ferramentas, dados enviados e limitações do Free Tier.

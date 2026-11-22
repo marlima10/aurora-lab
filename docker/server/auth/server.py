@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 from store import Store, AccessError, SESSION_SECONDS, ADMIN_EMAIL
 
 COOKIE = '__Host-aurora_session'
-APP_PORTS = {'manyfold':3214,'mealie':9925,'actual':5006,'opengym':8081,'octoprint':5000,'cockpit':9090}
+APP_PORTS = {'manyfold':3214,'mealie':9925,'actual':5006,'opengym':8081,'cockpit':9090}
 
 
 class BoundedHTTPServer(ThreadingHTTPServer):

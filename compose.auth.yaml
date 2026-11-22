@@ -3,7 +3,7 @@
 services:
   auth:
     build: ./docker/server/auth
-    image: auroralab-auth:34.0.0
+    image: auroralab-auth:39.0.0
     environment:
       AUTH_ORIGIN: https://${AURORA_PRIVATE_HOST:?configure private HTTPS host}
       AUTH_APP_CONFIG: /run/secrets/sso-apps.json
@@ -37,7 +37,6 @@ services:
       - '127.0.0.1:9925:9925'
       - '127.0.0.1:5006:5006'
       - '127.0.0.1:8081:8081'
-      - '127.0.0.1:5000:5000'
       - '127.0.0.1:9090:9090'
       - '127.0.0.1:7777:7777'
     extra_hosts: ['host.docker.internal:host-gateway']
@@ -60,7 +59,6 @@ services:
   monitor:
     environment:
       AURORA_MONITOR_SECRET_FILE: /run/secrets/sso-monitor.key
-      OCTOPRINT_API_ORIGIN: http://127.0.0.1:15000
     volumes:
       - ./secrets/sso/monitor.key:/run/secrets/sso-monitor.key:ro
   manyfold:
@@ -101,16 +99,9 @@ services:
     environment: {AURORA_SSO_ENABLED: '1'}
   opengym-garmin:
     environment: {AURORA_SSO_ENABLED: '1'}
-  octoprint:
-    ports: !override ['127.0.0.1:15000:80']
-    env_file: ./secrets/sso/octoprint.env
-    volumes:
-      - ./docker/server/auth/adapters/octoprint_aurora.py:/octoprint/octoprint/plugins/aurora_identity.py:ro
   cockpit:
     ports: !reset []
     profiles: [legacy-cockpit]
-  camera:
-    ports: !override ['127.0.0.1:8080:8080']
   backup:
     networks: [default, manyfold]
     environment: {MANYFOLD_BACKUP_WARMUP: '1'}

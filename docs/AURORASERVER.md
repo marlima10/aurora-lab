@@ -6,7 +6,7 @@ Guia do ambiente completo da versão 14.0.0. Para apagar uma instalação anteri
 
 ## Requisitos e escolha de configuração
 
-- Linux amd64 (`uname -m` deve mostrar `x86_64`); os artefatos OctoPrint/CasaOS incluem componentes específicos dessa arquitetura.
+- Linux amd64 (`uname -m` deve mostrar `x86_64`); as imagens fixadas devem corresponder à arquitetura do servidor.
 - Docker Engine funcionando e plugin Compose: `sudo docker info` e `docker compose version`.
 - Git e Python 3. O alvo dos scripts de instalação é Debian; a instalação relatada no projeto usa Debian 13.
 - Internet para baixar imagens, pacotes e fontes; espaço em disco para imagens, dados e backups.
@@ -29,7 +29,7 @@ O clone usa a branch padrão do repositório. Para desenvolvimento, escolha sua 
 
 `prepare.sh` cria os diretórios base, copia `.env.example` apenas quando `.env` não existe e solicita a senha Samba sem eco. Ele preserva dados existentes e não redefine a senha de uma base Samba já inicializada. O usuário Samba continua sendo **rafael**, definido em `entrypoint.sh` e `smb.conf`; o texto do prompt ou o nome do usuário Linux não mudam essa conta.
 
-O preparador valida `.env`, `secrets/octoprint-api.key` e `secrets/samba-users.txt`. Quando um desses caminhos é um diretório vazio criado por um bind mount ausente, ele usa apenas rmdir e depois cria o arquivo correto. Se houver conteúdo, link simbólico, arquivo especial ou diretório ocupado, ele interrompe sem apagar esses dados e informa o caminho. Pare o serviço que monta o caminho antes de reparar e recrie-o depois para atualizar o tipo da montagem.
+O preparador valida `.env` e `secrets/samba-users.txt`. Quando um desses caminhos é um diretório vazio criado por um bind mount ausente, ele usa apenas rmdir e depois cria o arquivo correto. Se houver conteúdo, link simbólico, arquivo especial ou diretório ocupado, ele interrompe sem apagar esses dados e informa o caminho. Pare o serviço que monta o caminho antes de reparar e recrie-o depois para atualizar o tipo da montagem.
 
 Arquivo Samba vazio sem uma base passdb.tdb inicializada exige nova senha em terminal interativo; uma base existente não exige redefinição. Arquivos regulares de configuração, chave e senha existentes são preservados. Não use `touch` para contornar a necessidade da senha.
 
@@ -79,7 +79,7 @@ Depois de conferir `COMPOSE_FILE` no `.env`:
 
 ```sh
 sudo docker compose config --quiet
-sudo docker compose up -d --build php monitor web octoprint samba backup
+sudo docker compose up -d --build php monitor web samba backup
 sudo docker compose ps
 sudo docker compose logs --tail=100 php web
 curl -I --connect-timeout 5 http://127.0.0.1:8088/
@@ -87,7 +87,6 @@ curl -I --connect-timeout 5 http://127.0.0.1:8088/
 
 A lista explícita evita iniciar o proxy Cockpit antes de preparar os certificados e o backend Debian. Não execute um `up -d` geral enquanto houver serviços sem pré-requisitos preparados. A dependência `depends_on` do portal não garante que o monitor já tenha produzido sua primeira amostra.
 
-Abra o OctoPrint na porta 5000, conclua o assistente e crie seu usuário. Para o monitor ler a impressora, grave a chave de API em `secrets/octoprint-api.key` no próprio servidor; não a publique. O diretório `secrets/` permanece restrito, enquanto esse arquivo recebe leitura para o processo do monitor.
 
 ## 5. Preparar e iniciar o Cockpit
 
@@ -196,7 +195,6 @@ sudo sh docker/server/power/prepare.sh
 
 Só então acrescente `compose.power.yaml` à lista COMPOSE_FILE e execute `sudo docker compose up -d --build power`. Se o hardware não existe, omita esse overlay: instalar todos os serviços não cria sensores nem dispositivos USB.
 
-Para a impressora, acrescente `compose.printer.yaml` após configurar PRINTER_DEVICE. Para câmera, configure CAMERA_DEVICE e habilite o perfil `camera`. Não teste a instalação iniciando uma impressão sem supervisão.
 
 ## 11. Criar os atalhos CasaOS
 
@@ -236,7 +234,6 @@ Confirme cada login, leitura de dados, rede/VPN, proxy, backup verificado e cóp
 | --- | --- |
 | Portal Nginx | HTTP 80 e 8088, conforme BIND_IP |
 | PHP-FPM | 9000 interna à rede Docker; sem publicação no host |
-| OctoPrint | HTTP 5000 |
 | Samba | TCP 445, compartilhamento Prints, usuário rafael |
 | Monitor | HTTP 9101 na rede host; preferir o proxy do portal |
 | CasaOS | HTTP 81 no Debian, após instalação |
@@ -245,20 +242,15 @@ Confirme cada login, leitura de dados, rede/VPN, proxy, backup verificado e cóp
 | openGym | HTTP 8081 apenas em 127.0.0.1; HTTPS privado depende de Serve |
 | Garmin | Sem nova porta no host; `/garmin/` no openGym |
 | Energia | HTTP 9110 apenas em 127.0.0.1, encaminhado pelo monitor |
-| Câmera | HTTP 8080 quando o perfil estiver ativo |
 
 Veja [rede e firewall](REDE-E-TAILSCALE.md). HTTPS via Tailscale Serve e autenticação dos aplicativos são configurações distintas. As portas de administração não devem ser liberadas indiscriminadamente para a internet.
 
 ## USB e energia
 
-Identifique dispositivos por caminhos persistentes, como `/dev/serial/by-id/...` e `/dev/v4l/by-id/...`, e ajuste `.env`. Acrescente `compose.printer.yaml` à lista `COMPOSE_FILE` somente quando a impressora estiver pronta; ela será exposta ao OctoPrint como `/dev/ttyPrinter`.
 
 ```sh
-sudo docker compose up -d octoprint
-sudo docker compose --profile camera up -d --build camera
 ```
 
-A câmera é opcional; o caminho padrão é propositalmente inexistente. O portal usa `/camera-stream`; confirme a imagem e a conexão serial antes de iniciar uma impressão.
 
 Para energia, confira `/sys/class/backlight` e defina `BACKLIGHT_PATH` para um dispositivo existente. O overlay padrão supõe `intel_backlight`, que não existe em todo hardware.
 
@@ -270,7 +262,7 @@ Acrescente `compose.power.yaml` a `COMPOSE_FILE`, valide e inicie `sudo docker c
 
 ## Persistência e backup
 
-`data/fitness/`, `data/octoprint/`, `data/prints/`, `data/samba/`, `data/monitor/`, `data/power/`, `data/homeassistant/`, `data/opengym/` e `data/garmin/` guardam estados separados. `data/tailscale/` é a identidade do contêiner; não é o estado da VPN instalada no Debian.
+`data/fitness/`, `data/prints/`, `data/samba/`, `data/monitor/`, `data/power/`, `data/homeassistant/`, `data/opengym/` e `data/garmin/` guardam estados separados. `data/tailscale/` é a identidade do contêiner; não é o estado da VPN instalada no Debian.
 
 O backup automático roda ao iniciar e a cada 24 horas, inclui os volumes/configurações montados, snapshots SQLite e a pasta `docs/`. Não há criptografia, cópia externa nem retenção automática. O estado Tailscale do host, `deploy-state/` e dados de novos aplicativos CasaOS em `/DATA/AppData` não são cobertos automaticamente. Confira o escopo antes de depender da cópia. Procedimento de verificação e restauração: [ATUALIZACAO.md](ATUALIZACAO.md).
 
@@ -279,3 +271,5 @@ O portátil usa `data/fitness.sqlite3`. Para migrar esse banco ao servidor, faç
 ## Diagnóstico
 
 Consulte [SOLUCAO-DE-PROBLEMAS.md](SOLUCAO-DE-PROBLEMAS.md) para erros de socket Docker, contêiner reiniciando, arquivos ausentes, órfãos e falhas de acesso. Não use `--remove-orphans`, remoção de volumes ou reinstalação completa como tentativa genérica de reparo.
+
+Desde a 39.0.0, OctoPrint e câmera foram retirados; não configure seus dispositivos ou portas. Manyfold e Samba continuam responsáveis pela biblioteca e arquivos de modelos.

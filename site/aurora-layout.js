@@ -12,8 +12,6 @@
   ];
   const coreItems = [
     ['dashboard', '⌂', 'Dashboard', '/'],
-    ['printer', '▣', 'Impressora 3D', '/#printer-card'],
-    ['camera', '◉', 'Câmera', '/#camera-card'],
     ['system', '⚙', 'Sistema', '/#system-card'],
     ['network', '⌁', 'Rede', '/network.html'],
     ['services', '✣', 'Serviços', '/#services-card'],
@@ -42,8 +40,6 @@
     if (path.endsWith('/network.html')) return 'network';
     if (path.endsWith('/history.html')) return 'history';
     if (path.endsWith('/diagnostics.html')) return 'diagnostics';
-    if (location.hash.includes('printer')) return 'printer';
-    if (location.hash.includes('camera')) return 'camera';
     if (location.hash.includes('services')) return 'services';
     if (location.hash.includes('storage')) return 'storage';
     if (location.hash.includes('backup')) return 'backup';

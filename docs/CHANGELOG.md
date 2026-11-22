@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 39.0.0 — 2026-11-22
+
+Removidos OctoPrint, câmera e suas integrações; higienização dos backups históricos autorizada pelo proprietário. Manyfold e demais aplicativos preservados. Veja [RELEASE-39.md](RELEASE-39.md).
+
 ## 38.0.0 — 2026-11-21
 
 Perfil de voz Antônio, ritmo inicial 0,90× e tom ligeiramente mais grave. Migração única preserva ajustes posteriores. Veja [RELEASE-38.md](RELEASE-38.md).

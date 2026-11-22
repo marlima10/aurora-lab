@@ -10,7 +10,7 @@ flowchart LR
  E --> G[Gemini API do Google]
  J --> H[MCP Hub original]
  H --> C[Conectores separados]
- C --> A[openGym / Garmin, Actual, Mealie, Manyfold, OctoPrint]
+ C --> A[openGym / Garmin, Actual, Mealie, Manyfold]
  H --> N[Leitura das notas AuroraLAB]
 ```
 
@@ -37,7 +37,7 @@ Não habilite faturamento por consequência de um erro de quota. Primeiro confir
 
 ## Dados e ferramentas
 
-Sete consultas AuroraLAB: resumo de treinos openGym/Garmin, contas/categorias e totais do Actual, receitas e listas Mealie, estado OctoPrint e biblioteca Manyfold. As identidades e permissões atuais continuam sendo verificadas pelo autenticador a cada listagem/chamada.
+Seis consultas AuroraLAB: resumo de treinos openGym/Garmin, contas/categorias e totais do Actual, receitas e listas Mealie, biblioteca Manyfold. As identidades e permissões atuais continuam sendo verificadas pelo autenticador a cada listagem/chamada.
 
 O adaptador limita tanto a descoberta quanto o inventário e o despacho às sete ferramentas e três ferramentas nativas de leitura/pesquisa/listagem do vault `/brains/auroralab`. Usa o identificador nativo `fn`, preservando o prefixo `auroralab__`. Pedidos de escopo mais estreito são respeitados; plugins, diretórios de trabalho externos, staging e ferramentas de shell/escrita não ampliam esse conjunto. Conversa e grafo usam WebSocket autenticado; terminal e voz ao vivo ficam desativados nesta implantação.
 
@@ -70,3 +70,5 @@ Para retorno à release 35, preserve primeiro o estado atual, aplique a imagem/c
 ## Perfil de voz masculino (38.0.0)
 
 Antônio é o padrão brasileiro, com ritmo inicial de 0,90× aplicado uma vez por navegador e tom de -4 Hz no Edge TTS. O seletor e o controle nativos continuam válidos após a migração. O tom se aplica somente ao nome exato pt-BR-AntonioNeural e preserva parâmetros explícitos; outras vozes permanecem sem esse ajuste. O fallback do navegador depende das vozes disponíveis no aparelho e pode soar diferente do Edge TTS.
+
+Desde a 39.0.0 o OctoPrint e a câmera foram removidos. O catálogo não expõe consulta de estado da impressora; o conector print mantém somente a biblioteca Manyfold, sem credencial OctoPrint. A lista restrita do motor contém nove ferramentas (seis consultas dos aplicativos e três leituras de notas).

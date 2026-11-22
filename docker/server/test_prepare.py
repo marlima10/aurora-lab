@@ -69,7 +69,7 @@ class PrepareTests(unittest.TestCase):
 
     def test_empty_bind_directories_replaced_by_files(self):
         self.initialized_database()
-        paths = [self.root/'.env', self.secrets/'octoprint-api.key', self.secrets/'samba-users.txt']
+        paths = [self.root/'.env', self.secrets/'samba-users.txt']
         for path in paths:
             path.mkdir()
         result = self.run_prepare()
@@ -77,11 +77,10 @@ class PrepareTests(unittest.TestCase):
         self.assertTrue(all(path.is_file() for path in paths))
         self.assertEqual((self.root/'.env').read_text(), 'SERVER_IP=192.0.2.1\n')
         self.assertEqual(stat.S_IMODE(paths[0].stat().st_mode), 0o600)
-        self.assertEqual(stat.S_IMODE(paths[1].stat().st_mode), 0o644)
-        self.assertEqual(stat.S_IMODE(paths[2].stat().st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(paths[1].stat().st_mode), 0o600)
 
     def test_nonempty_directories_preserved(self):
-        for relative in ['.env', 'secrets/octoprint-api.key', 'secrets/samba-users.txt']:
+        for relative in ['.env', 'secrets/samba-users.txt']:
             with self.subTest(path=relative):
                 folder = self.root/relative
                 folder.mkdir()
@@ -97,7 +96,6 @@ class PrepareTests(unittest.TestCase):
 
     def test_existing_configuration_keys_and_password_preserved(self):
         values = {self.root/'.env': 'SERVER_IP=192.0.2.77\n',
-                  self.secrets/'octoprint-api.key': 'existing-api-key',
                   self.secrets/'samba-users.txt': 'existing-password\n'}
         for path, value in values.items():
             path.write_text(value)
@@ -142,7 +140,7 @@ class PrepareTests(unittest.TestCase):
         outside = self.root/'original.txt'
         outside.write_text('original')
         outside.chmod(0o640)
-        for relative in ['.env', 'secrets/octoprint-api.key', 'secrets/samba-users.txt']:
+        for relative in ['.env', 'secrets/samba-users.txt']:
             with self.subTest(path=relative):
                 link = self.root/relative
                 link.symlink_to(outside)

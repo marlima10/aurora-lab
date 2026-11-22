@@ -31,7 +31,7 @@ class ServiceLinksTests(unittest.TestCase):
         return result
 
     def test_redirects_from_ip_domain_and_lan(self):
-        destinations = {'/manyfold':':3214/','/mealie':':9925/','/actual':':5006/','/octoprint': ':5000/', '/cockpit': ':9090/', '/opengym': ':8081', '/garmin': ':8081/garmin/'}
+        destinations = {'/manyfold':':3214/','/mealie':':9925/','/actual':':5006/','/cockpit': ':9090/', '/opengym': ':8081', '/garmin': ':8081/garmin/'}
         for host in ('100.80.213.50', '192.168.0.25', 'example.tail123.ts.net', 'attacker.invalid'):
             for path, suffix in destinations.items():
                 with self.subTest(host=host, path=path):
@@ -48,7 +48,7 @@ class ServiceLinksTests(unittest.TestCase):
                 self.assertNotIn('Location', headers)
 
     def test_retired_app_routes_are_not_available(self):
-        for path in ('/homeboard','/homeassistant'):
+        for path in ('/homeboard','/homeassistant','/octoprint','/camera-stream'):
             self.assertEqual(self.request(path)[0], 404)
 
 

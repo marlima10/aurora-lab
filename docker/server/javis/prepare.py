@@ -40,7 +40,7 @@ def prepare(root):
                 if key in previous:
                     native[key] = previous[key]
         write(private/(role+'.json'), dict(native, token=tokens[role]))
-    write(private/'print.json', {'token': tokens['print'], 'apps': {app: apps[app] for app in ('manyfold', 'octoprint')}})
+    write(private/'print.json', {'token': tokens['print'], 'apps': {app: apps[app] for app in ('manyfold',)}})
     control = private/'admin.env'
     if not control.exists():
         write(control, 'JAVIS_ADMIN_USER='+OWNER+'\nJAVIS_ADMIN_PASSWORD='+secrets.token_urlsafe(64)+'\n', 10001)

@@ -9,7 +9,7 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 
-APPS = ('portal', 'manyfold', 'mealie', 'actual', 'opengym', 'octoprint', 'cockpit')
+APPS = ('portal', 'manyfold', 'mealie', 'actual', 'opengym', 'cockpit')
 ADMIN_EMAIL = 'aurora@server.local'
 SESSION_SECONDS = 12 * 3600
 
@@ -66,6 +66,9 @@ class Store:
             if not db.execute('SELECT 1 FROM schema_migrations WHERE version=2').fetchone():
                 db.execute("DELETE FROM grants WHERE app IN ('homeassistant','homeboard')")
                 db.execute('INSERT INTO schema_migrations VALUES(2,?)', (int(self.clock()),))
+            if not db.execute('SELECT 1 FROM schema_migrations WHERE version=3').fetchone():
+                db.execute("DELETE FROM grants WHERE app='octoprint'")
+                db.execute('INSERT INTO schema_migrations VALUES(3,?)', (int(self.clock()),))
         self.path.chmod(0o600)
 
     @contextmanager

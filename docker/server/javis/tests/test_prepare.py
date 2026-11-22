@@ -14,7 +14,7 @@ class PreparationTests(unittest.TestCase):
     def test_private_configuration_is_idempotent_and_separated(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(prepare.os,'chown'), contextlib.redirect_stdout(io.StringIO()):
             root=Path(directory);(root/'secrets/sso').mkdir(parents=True)
-            (root/'secrets/sso/apps.json').write_text(json.dumps({k:{'ready':True,'secret':k+'-synthetic','identities':{'fixture':'native'}} for k in ('opengym','actual','mealie','manyfold','octoprint')}))
+            (root/'secrets/sso/apps.json').write_text(json.dumps({k:{'ready':True,'secret':k+'-synthetic','identities':{'fixture':'native'}} for k in ('opengym','actual','mealie','manyfold')}))
             prepare.prepare(root)
             before={p.name:p.read_bytes() for p in (root/'secrets/javis').iterdir()}
             prepare.prepare(root)

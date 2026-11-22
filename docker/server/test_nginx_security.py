@@ -44,8 +44,8 @@ class NginxSecurityHeadersTest(unittest.TestCase):
             self.assertIn('error_page 429 @aurora_rate_limited;', body)
         self.assertIn('location @aurora_rate_limited', CONF)
 
-    def test_camera_stream_not_cached(self):
-        self.assertIn('Cache-Control "no-store"', dict(location_blocks(CONF))['= /camera-stream'])
+    def test_camera_stream_is_not_configured(self):
+        self.assertNotIn('= /camera-stream', dict(location_blocks(CONF)))
 
     def test_compose_mounts_snippet(self):
         compose = (ROOT / 'compose.server.yaml').read_text(encoding='utf-8')

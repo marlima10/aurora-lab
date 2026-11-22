@@ -15,7 +15,6 @@ TOOLS = {
     'aurora_finance_summary': ('actual', 'finance', 'Consulta receitas e despesas em centavos no período. Transferências não contam como gastos.', schema({'start': DATE, 'end': DATE}, ['start', 'end'])),
     'aurora_recipes': ('mealie', 'food', 'Busca receitas cadastradas no Mealie.', schema({'query': QUERY})),
     'aurora_shopping_lists': ('mealie', 'food', 'Lista as listas de compras do Mealie.', schema()),
-    'aurora_print_status': ('octoprint', 'print', 'Consulta estado e progresso da impressora. Não envia comandos de impressão.', schema()),
     'aurora_model_library': ('manyfold', 'print', 'Busca modelos da biblioteca Manyfold.', schema({'query': QUERY})),
 }
 

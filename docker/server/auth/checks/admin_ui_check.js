@@ -13,7 +13,7 @@ const root=require('node:path').resolve(__dirname,'../static')+'/';
   switch(new URL(url,w.location).pathname){
    case '/auth/session':status=signed?200:401;value={email:'aurora@server.local',admin:true,csrf:'fixture',grants:{}};break;
    case '/auth/users':status=failUsers?503:200;value=failUsers?{error:'fixture unavailable'}:{users:[...records.values()]};break;
-   case '/auth/apps':value={adminOnly:['cockpit'],apps:Object.fromEntries(['manyfold','mealie','actual','opengym','octoprint','cockpit'].map(app=>[app,[{identity:'fixture-identity',label:'Fixture'}]]))};break;
+   case '/auth/apps':value={adminOnly:['cockpit'],apps:Object.fromEntries(['manyfold','mealie','actual','opengym','cockpit'].map(app=>[app,[{identity:'fixture-identity',label:'Fixture'}]]))};break;
    case '/auth/issue':lastGrants=data.grants;if(failIssue||(data.email!=='aurora@server.local'&&data.grants?.cockpit)){status=403;value={error:'fixture registration rejected'};break;}calls++;records.set(data.email,{email:data.email,enabled:true});value={key:String.fromCharCode(65+calls).repeat(151)};break;
    case '/auth/delete':records.delete(data.email);break;
    case '/auth/logout':signed=false;break;
