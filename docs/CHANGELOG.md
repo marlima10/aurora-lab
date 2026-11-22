@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 46.0.0 — 2026-11-22
+
+Avaliação wger encerrada: instalação, dados, backups próprios e rota de teste removidos. OpenGym/Garmin preservados como aplicativo atual. [Detalhes](RELEASE-46.md).
+
 ## 45.0.0 — 2026-11-22
 
 Workout Cool retirado e substituído por wger 2.7 em avaliação isolada, com login AuroraLAB, cópia privada do openGym/Garmin, peso corporal nativo e backup PostgreSQL restaurado. [Detalhes](RELEASE-45.md).
