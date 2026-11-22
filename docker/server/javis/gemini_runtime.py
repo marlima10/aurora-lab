@@ -5,7 +5,7 @@ import fnmatch
 VAULT='/brains/auroralab'
 READ_TOOLS=('auroralab__aurora_fitness_summary','auroralab__aurora_finance_accounts',
  'auroralab__aurora_finance_summary','auroralab__aurora_recipes','auroralab__aurora_shopping_lists',
- 'auroralab__aurora_print_status','auroralab__aurora_model_library',
+ 'auroralab__aurora_model_library',
  'javis_read_file','javis_list_dir','javis_search_files')
 
 def scoped(signature,args,kwargs):

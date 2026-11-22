@@ -71,14 +71,13 @@ def collect():
     available = mem.get('MemAvailable', mem.get('MemFree', 0))
     swap_total = mem.get('SwapTotal', 0)
     swap_used = swap_total-mem.get('SwapFree', 0)
-    services = {name: online(host, port) for name,host,port in [('octoprint','127.0.0.1',5000),('webcam','127.0.0.1',8080),('nginx','127.0.0.1',80),('samba','127.0.0.1',445),('cockpit','127.0.0.1',9090),('opengym','127.0.0.1',8081)]}
+    services = {name: online(host, port) for name,host,port in [('nginx','127.0.0.1',80),('samba','127.0.0.1',445),('cockpit','127.0.0.1',9090),('opengym','127.0.0.1',8081)]}
     data = dict(generated=now, hostname='AuroraServer', local_ip=os.environ.get('SERVER_IP','192.168.0.71'), tailscale_ip='Offline', uptime=f'{int(float(text(PROC/"uptime","0").split()[0])//3600)} h', os='Debian GNU/Linux 13 / containers', kernel=text(PROC/'sys/kernel/osrelease'), arch='x86_64', cpu_model=next((r.split(':',1)[1].strip() for r in text(PROC/'cpuinfo').splitlines() if r.startswith('model name')), 'Intel'), cores=os.cpu_count(), cpu=usage, memory=round(100*(total_mem-available)/total_mem), memory_total=total_mem//1024, memory_used=(total_mem-available)//1024, swap=round(100*swap_used/swap_total) if swap_total else 0, swap_total=swap_total//1024, swap_used=swap_used//1024, disk=round(100*disk.used/disk.total), disk_total=f'{disk.total/2**30:.1f} GiB', disk_used=f'{disk.used/2**30:.1f} GiB', disk_free=f'{disk.free/2**30:.1f} GiB', temperature=temp, load=text(PROC/'loadavg').split()[0], thresholds={'temperature':{'warn':75,'crit':85},'disk':{'warn':80,'crit':90}}, **services)
     for name,port in [('manyfold',3214),('mealie',9925),('actual',5006)]:
         if os.environ.get(name.upper()+'_ENABLED')=='1': data[name]=online('127.0.0.1',port)
     data['opengym_url'] = os.environ.get('OPENGYM_ORIGIN','')
     data['tailscale'] = 'offline'
-    data['printer'] = {'connected':False,'state':'Sem impressora conectada','usb':'offline','port':'','baudrate':0,'firmware':'--','tool':{'actual':0,'target':0},'bed':{'actual':0,'target':0},'job':{'file':'Nenhuma impressão','progress':0,'print_time':0,'print_time_left':0}}
-    for key in ('octoprint_size','prints','uploads','timelapse','octo_logs','system_logs','apt_cache'):
+    for key in ('prints','system_logs','apt_cache'):
         data[key] = 'Não medido'
     try:
         with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:
@@ -86,19 +85,6 @@ def collect():
             data['tailscale_ip']=socket.inet_ntoa(addr[20:24])
             data['tailscale']='online'
     except OSError: pass
-    key=text('/run/secrets/octoprint-api.key')
-    if key:
-        def octo(endpoint):
-            request=Request(os.environ.get('OCTOPRINT_API_ORIGIN','http://127.0.0.1:5000').rstrip('/')+'/api/'+endpoint,headers={'X-Api-Key':key})
-            with urlopen(request,timeout=1) as response: return json.load(response)
-        try:
-            p=octo('printer'); job=octo('job'); connection=octo('connection')
-            current=connection.get('current',{})
-            data['printer'].update(connected=True,state=p.get('state',{}).get('text','Operational'),port=current.get('port',''),baudrate=current.get('baudrate',0),usb='online')
-            for name,source in [('tool','tool0'),('bed','bed')]:
-                data['printer'][name]=p.get('temperature',{}).get(source,{'actual':0,'target':0})
-            data['printer']['job']={'file':job.get('job',{}).get('file',{}).get('display') or 'Nenhuma impressão','progress':job.get('progress',{}).get('completion') or 0,'print_time':job.get('progress',{}).get('printTime') or 0,'print_time_left':job.get('progress',{}).get('printTimeLeft') or 0}
-        except Exception: pass
     return data
 
 def scan_network():
@@ -167,7 +153,6 @@ SERVICE_ROUTES = {
     '/actual': ('OPENGYM_ORIGIN',8081,5006,'/'),
     '/opengym': ('OPENGYM_ORIGIN', 8081, 8081, ''),
     '/garmin': ('OPENGYM_ORIGIN', 8081, 8081, '/garmin/'),
-    '/octoprint': ('OPENGYM_ORIGIN', 8081, 5000, '/'),
     '/cockpit': ('OPENGYM_ORIGIN', 8081, 9090, '/'),
 }
 
@@ -259,7 +244,7 @@ class Handler(BaseHTTPRequestHandler):
             elif name=='history.json': result=list(history)
             elif name=='network.json':
                 result=network_state.copy()
-            elif name=='diagnostics.json': result={'kernel':latest.get('kernel',''),'usb':'Dispositivos verificados na implantação.','serial':'Impressora USB ainda não conectada.','octoprint_logs':'Consultar docker compose logs octoprint no servidor.'}
+            elif name=='diagnostics.json': result={'kernel':latest.get('kernel',''),'usb':'Dispositivos verificados na implantação.','serial':'Integração de impressão removida.'}
             elif name=='fitness-backup.json':
                 try: result=json.loads(text('/backup-status/fitness-backup.json','{}'))
                 except ValueError: result={}

@@ -34,7 +34,6 @@ manifest_path=root/'deploy-state/casaos-shortcuts.json'
 previous=json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
 previous_names={row['container']:row['name'] for row in previous.get('shortcuts',[])}
 known={
-    'octoprint':('OctoPrint',portal+':5000/','octoprint'),
     'samba':('Samba - arquivos',portainer,'samba'),
     'php':('PHP AuroraLAB',portainer,'php'),
     'opengym-web':('openGym',portal+'/opengym','opengym'),

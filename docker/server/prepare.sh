@@ -26,11 +26,10 @@ prepare_file_path() {
 [ "$(id -u)" -eq 0 ] || fail 'Execute com sudo sh docker/server/prepare.sh'
 umask 077
 [ ! -L secrets ] || fail 'O diretorio secrets e um link simbolico; revise antes de preparar.'
-mkdir -p data/fitness data/octoprint data/prints data/samba data/monitor data/backup-status data/tailscale secrets backups
+mkdir -p data/fitness data/prints data/samba data/monitor data/backup-status data/tailscale secrets backups
 
 # Validar antes de alterar permissoes ou solicitar a senha.
 prepare_file_path .env
-prepare_file_path secrets/octoprint-api.key
 prepare_file_path secrets/samba-users.txt
 
 chmod 700 secrets backups data/tailscale
@@ -38,9 +37,6 @@ chmod 755 data/monitor data/backup-status
 chown 65534:65534 data/monitor
 [ -f .env ] || cp .env.example .env
 chmod 600 .env
-[ -f secrets/octoprint-api.key ] || touch secrets/octoprint-api.key
-# Monitor e executado como nobody; a pasta secrets permanece restrita no host.
-chmod 644 secrets/octoprint-api.key
 
 if [ ! -s secrets/samba-users.txt ] && [ ! -s data/samba/private/passdb.tdb ]; then
     [ -t 0 ] || fail 'Senha Samba ausente. Execute a preparacao em um terminal interativo; a senha nao sera exibida.'

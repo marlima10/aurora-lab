@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 38.0.0
+# Estrutura e arquitetura — AuroraLAB 39.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -76,9 +76,7 @@ O backend fica na imagem, fora da raiz pública Nginx. Rebuild é necessário pa
 | web | Conteúdo estático, API FastCGI e proxies/redirects do ambiente |
 | monitor | Python em rede host; /proc e /sys somente leitura, sem Docker socket |
 | backup | Python, snapshots SQLite, validação e arquivo com SHA-256 |
-| octoprint | Python 3.12, OctoPrint 1.11.8, s6-overlay e plugins fixados |
 | samba | Prints autenticado; conta rafael fixada nos arquivos atuais |
-| camera | Perfil opcional, uStreamer e dispositivo USB explícito |
 | tailscale | Daemon em rede host; pode conflitar com a instalação Debian |
 | cockpit | Nginx HTTPS 9090 para backend Cockpit/PAM nativo 9091 |
 | CasaOS | Serviços systemd no Debian, não um serviço Compose Aurora |
@@ -90,7 +88,7 @@ Os preparadores openGym/Cockpit ainda consultam o nome fixo do contêiner VPN. O
 
 ## Persistência e backup
 
-Os estados ficam separados em `data/fitness`, `octoprint`, `prints`, `samba`, `monitor`, `power`, `opengym`, `garmin` e `tailscale`. CasaOS e Cockpit também têm configuração nativa em `/etc` e `/var/lib`. `.env`, `secrets`, `backups` e `deploy-state` não entram no Git.
+Os estados ficam separados em `data/fitness`, `prints`, `samba`, `monitor`, `power`, `opengym`, `garmin` e `tailscale`. CasaOS e Cockpit também têm configuração nativa em `/etc` e `/var/lib`. `.env`, `secrets`, `backups` e `deploy-state` não entram no Git.
 
 O backup monta explicitamente suas origens no Compose, incluindo `docs/`. Usa snapshots dos SQLite reconhecidos e valida JSON openGym individualmente. Não há transação global entre todos os aplicativos. Ele exige o banco Fitness e valida o histórico PrintHistory quando presente. Estado VPN do host, deploy-state e aplicativos CasaOS novos não são incluídos automaticamente. Restauração e cópia externa: [ATUALIZACAO.md](ATUALIZACAO.md).
 
@@ -100,7 +98,7 @@ Testes PHP: `docker compose run --rm --no-deps --entrypoint php php tests/run.ph
 
 Os testes sintéticos não substituem login real, restore real ou impressão física. Verifique Compose com config --quiet e use fixtures temporárias; não teste gravando dados pessoais.
 
-Padrões: [desenvolvimento](../skills/aurora-development/SKILL.md) e [visual](../skills/aurora-visual/SKILL.md). Procedimentos operacionais: [servidor](AURORASERVER.md), [rede](REDE-E-TAILSCALE.md), [CasaOS](CASAOS.md), [Cockpit](COCKPIT.md), [openGym](OPENGYM.md), [Garmin](GARMIN.md) e [OctoPrint](UPGRADE-PYTHON-OCTOPRINT.md).
+Padrões: [desenvolvimento](../skills/aurora-development/SKILL.md) e [visual](../skills/aurora-visual/SKILL.md). Procedimentos operacionais: [servidor](AURORASERVER.md), [rede](REDE-E-TAILSCALE.md), [CasaOS](CASAOS.md), [Cockpit](COCKPIT.md), [openGym](OPENGYM.md), [Garmin](GARMIN.md).
 
 
 ## Aplicativos retirados
@@ -109,9 +107,8 @@ Home Assistant e HomeBoard foram removidos na versão 31. Os guias antigos regis
 
 ## Atalhos HTTPS e câmera USB (16.0.0)
 
-`openPort` encaminha 5000 e 9090 para `/octoprint` e `/cockpit`. O Nginx do servidor repassa ao monitor, que usa o hostname HTTPS privado de `OPENGYM_ORIGIN` e a porta própria de cada serviço. Isso funciona mesmo com o portal aberto por HTTP/IP e evita certificados incompatíveis com o IP Tailscale. Os serviços precisam estar publicados no Tailscale Serve; o portátil não oferece esses módulos. Origem ausente/inválida retorna 503, sem redirecionar para HTTP. `/garmin` e `/opengym` mantêm seus destinos. Testes isolados: `python3 -m unittest discover -s docker/server -p test_service_links.py` em Linux, sem acesso aos bancos.
+`openPort` encaminha 9090 para `/cockpit`. O Nginx do servidor repassa ao monitor, que usa o hostname HTTPS privado de `OPENGYM_ORIGIN` e a porta própria de cada serviço. Isso funciona mesmo com o portal aberto por HTTP/IP e evita certificados incompatíveis com o IP Tailscale. Os serviços precisam estar publicados no Tailscale Serve; o portátil não oferece esses módulos. Origem ausente/inválida retorna 503, sem redirecionar para HTTP. `/garmin` e `/opengym` mantêm seus destinos. Testes isolados: `python3 -m unittest discover -s docker/server -p test_service_links.py` em Linux, sem acesso aos bancos.
 
-A câmera fica no perfil Compose `camera`: configure `CAMERA_DEVICE` com `/dev/v4l/by-id/<camera-externa>-video-index0` e acrescente `camera` a `COMPOSE_PROFILES` no `.env`, preservando os demais perfis. Inicie apenas `docker compose up -d --build camera`. Nunca selecione automaticamente a câmera integrada. O container recebe somente esse dispositivo como `/dev/video0`; `/camera-stream` transmite pelo proxy da mesma origem do portal, sem cache offline. Confirme a captura em `http://127.0.0.1:8080/snapshot` no servidor e o estado `webcam` no monitor. Após desconectar/reconectar USB, pode ser necessário recriar somente `camera` com `docker compose up -d --no-deps --force-recreate camera`. Sem o dispositivo, mantenha esse perfil desativado. Acesso direto à porta 8080 é HTTP; prefira o stream do portal pelo Tailscale.
 
 
 ## Garmin Personal API
@@ -175,7 +172,7 @@ O modo anterior, sem o overlay SSO, conserva seus acessos. A rede/portas descrit
 
 O evento `aurora:session` do layout informa a sessão ao dashboard. `#user-management-shortcut` permanece oculto até a confirmação administrativa e abre `/auth/admin`; a autorização efetiva continua no backend. O cache PWA é específico da versão e não armazena redirects de autenticação; a instalação considera o papel do usuário para os arquivos Fitness legados.
 
-`ha_proxy.py` valida a identidade em um WebSocket separado e mantém a sequência de comandos nativa do navegador. Remove cabeçalhos de compressão do handshake encaminhado e trata respostas vazias de revogação e formulários multipart. `auth-gateway` monta tmpfs em `/run`, preservando o bind mount filho do socket Cockpit. O monitor aceita `OCTOPRINT_API_ORIGIN`, configurado somente para o loopback 15000 no overlay SSO; instalações anteriores mantêm o destino padrão.
+`ha_proxy.py` valida a identidade em um WebSocket separado e mantém a sequência de comandos nativa do navegador. Remove cabeçalhos de compressão do handshake encaminhado e trata respostas vazias de revogação e formulários multipart. `auth-gateway` monta tmpfs em `/run`, preservando o bind mount filho do socket Cockpit.
 
 As particularidades HTTP do HA 2026.10, diretório XDG do Cockpit e suspensão de dispositivos USB ausentes estão no [guia de migração](LOGIN-UNICO.md). O overlay continua opcional para outras instalações; não habilite o gateway sem validar todos os aplicativos.
 
@@ -199,8 +196,12 @@ Na 29, `/auth/apps` informa `adminOnly`, mantendo o contrato `apps` existente. O
 
 Home Assistant e HomeBoard foram retirados dos overlays, autenticação central, navegação, monitoramento e escopo de novos backups. Adaptadores e preparadores exclusivos foram removidos. Migration 2 do autenticador remove apenas os grants desses aplicativos; usuários, chaves e demais permissões são preservados. Documentos antigos e releases anteriores registram a arquitetura histórica e não devem ser usados para reinstalá-los.
 
-## Javis OS com Gemini (38.0.0)
+## Javis OS com Gemini (39.0.0)
 
 Conversa no próprio Javis do AuroraServer, com Gemini API, login único, sete consultas aos aplicativos e túnel TLS limitado ao Google. Navegador/celular com Tailscale; sem dependência do Claude Desktop ou PC particular. Consulte [JAVIS.md](JAVIS.md) para configuração privada, arquitetura, escopo de ferramentas, dados enviados e limitações do Free Tier.
 
-Desde a 38.0.0, o módulo Javis inclui tradução nativa brasileira, correções guardadas de reconhecimento/ditado e voz Edge TTS pelo destino TLS restrito. Dicionário e adaptações ficam em docker/server/javis; detalhes e limites em JAVIS.md.
+Desde a 39.0.0, o módulo Javis inclui tradução nativa brasileira, correções guardadas de reconhecimento/ditado e voz Edge TTS pelo destino TLS restrito. Dicionário e adaptações ficam em docker/server/javis; detalhes e limites em JAVIS.md.
+
+## Remoção de OctoPrint e câmera (39.0.0)
+
+Os dois serviços, seus builds, dispositivos, portas, atalhos, painéis, coleta e permissões foram retirados. O conector Javis mantém apenas a biblioteca Manyfold no papel print; o catálogo Gemini possui nove ferramentas autorizadas, incluindo leitura de notas. A migração 3 da autenticação remove somente os grants OctoPrint. Backups novos não incluem os aplicativos removidos; a higienização histórica autorizada utiliza sanitize_print_backups.py e registra novos hashes, preservando os demais membros. Não reescreve o histórico Git.

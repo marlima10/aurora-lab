@@ -10,7 +10,6 @@ ROUTES = {
     'mealie': (9925, 'http://mealie:9000'),
     'actual': (5006, 'http://actual:5006'),
     'opengym': (8081, 'http://opengym-web:80'),
-    'octoprint': (5000, 'http://octoprint:80'),
     'javis': (7777, 'http://javis:7777'),
     'cockpit': (9090, 'http://unix:/run/auroralab-cockpit/sso.sock:'),
 }

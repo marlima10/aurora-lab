@@ -24,20 +24,6 @@ services:
     volumes: ['./data/fitness:/var/lib/fitness']
     restart: unless-stopped
     logging: *logging
-  octoprint:
-    build: {context: ./docker/server/octoprint}
-    ports: ['${BIND_IP:-0.0.0.0}:5000:80']
-    environment: {TZ: America/Sao_Paulo, ENABLE_MJPG_STREAMER: 'false'}
-    volumes: ['./data/octoprint:/octoprint']
-    restart: unless-stopped
-    logging: *logging
-  camera:
-    profiles: [camera]
-    build: {context: ./docker/server/camera}
-    devices: ['${CAMERA_DEVICE:-/dev/auroralab-camera-usb}:/dev/video0']
-    ports: ['${BIND_IP:-0.0.0.0}:8080:8080']
-    restart: unless-stopped
-    logging: *logging
   samba:
     build: {context: ./docker/server/samba}
     ports: ['${BIND_IP:-0.0.0.0}:445:445']
@@ -58,7 +44,6 @@ services:
     volumes:
       - ./docker/server/monitor.py:/app/monitor.py:ro
       - ./docker/server/alerts.py:/app/alerts.py:ro
-      - ./secrets/octoprint-api.key:/run/secrets/octoprint-api.key:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - ./data/monitor:/state
@@ -80,7 +65,6 @@ services:
       - /etc/systemd/logind.conf.d:/source/logind-config:ro
       - /home/rafael/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml:/source/xfce-power.xml:ro
       - ./data/fitness:/source/fitness
-      - ./data/octoprint:/source/octoprint
       - ./data/prints:/source/prints:ro
       - ./data/samba:/source/samba:ro
       - ./data/tailscale:/source/tailscale:ro

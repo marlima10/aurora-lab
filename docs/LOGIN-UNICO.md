@@ -12,8 +12,8 @@ Somente `aurora@server.local` cadastra, gera/renova, copia no momento da geraç�
 
 1. Faça backup verificado, registre a configuração Compose/Tailscale e mantenha o SSH por chave funcionando. Não remova volumes nem substitua `.env`, `secrets/` ou `data/`.
 2. Requer Compose com suporte a `!reset`/`!override` (2.24.4 ou posterior), HTTPS privado existente, as contas nativas e a imagem HomeBoard fixada já construída.
-3. Crie como root um inventário privado fora do Git, com `apps` e `admin_grants`. O inventário contém os oito aplicativos: `manyfold`, `mealie`, `actual`, `opengym`, `octoprint`, `homeassistant`, `homeboard`, `cockpit`.
-4. Para cada aplicativo, `identities` é um objeto de identificadores existentes; `labels` contém nomes legíveis. Manyfold/Mealie usam e-mail existente; openGym e HA usam IDs internos; OctoPrint usa usuário existente; HomeBoard usa `viewer`/`editor`; Actual usa um identificador de acesso à instância compartilhada. Cockpit usa a conta Debian existente, sem mapear `root`.
+3. Crie como root um inventário privado fora do Git, com `apps` e `admin_grants`. O inventário contém os cinco aplicativos: `manyfold`, `mealie`, `actual`, `opengym`, `cockpit`.
+4. Para cada aplicativo, `identities` é um objeto de identificadores existentes; `labels` contém nomes legíveis. Manyfold/Mealie usam e-mail existente; openGym usa IDs internos; Actual usa um identificador de acesso à instância compartilhada. Cockpit usa a conta Debian existente, sem mapear `root`.
 5. Para HA, os valores de `identities` são aliases únicos do bloco `198.18.0.0/24`, por exemplo `198.18.0.10`; nos demais aplicativos os valores podem repetir o identificador. `admin_grants` escolhe uma identidade existente em cada aplicativo. Conferir essas escolhas significa autorizar acesso àqueles dados.
 
 Exemplo estrutural parcial (o inventário real deve incluir os oito aplicativos):
@@ -40,7 +40,7 @@ A senha atual do Actual deve corresponder à credencial privada usada na prepara
 
 ## Migração controlada
 
-Construa as imagens e valide o Compose com **todos os overlays já usados**, acrescentando `compose.auth.yaml` por último. Não substitua a seleção existente por um exemplo incompleto. Preserve o override do Tailscale. Confira os dispositivos USB antes de selecionar o overlay da impressora e o perfil da câmera: um caminho ausente impede a criação do contêiner. Se estiverem desconectados, registre a seleção anterior e suspenda somente a seleção do hardware até a reconexão; preserve dados e configurações. O Dockerfile do HomeBoard pressupõe a imagem local da revisão fixada; o preparador existente do HomeBoard deve construí-la antes, quando necessário.
+Construa as imagens e valide o Compose com **todos os overlays já usados**, acrescentando `compose.auth.yaml` por último. Não substitua a seleção existente por um exemplo incompleto. Preserve o override do Tailscale.
 
 Antes de ativar:
 
@@ -49,7 +49,6 @@ Antes de ativar:
 - Mealie: conferir usuário existente e acesso sem formulário de senha; cadastro automático deve continuar desativado.
 - Actual: testar cabeçalho nativo no orçamento de ensaio. A imagem adaptada 25 corrige a descoberta de `header` nas duas rotas de métodos da revisão 26.10.0, sem alterar o banco; a verificação de hash recusa fontes diferentes. Confira também no navegador que não aparece um segundo formulário. Autorizar o aplicativo concede acesso à instância compartilhada.
 - openGym/Garmin: confirmar o perfil e treinos existentes e uma chamada de sincronização sem criar perfil novo ou duplicar exercícios. Não teste importação escrevendo em banco pessoal sem backup.
-- OctoPrint: `trustRemoteUser: true`, `remoteUserHeader: X-Aurora-Identity`, `addRemoteUsers: false`, `trustRemoteGroups: false`; preserve API keys internas e permissões nativas. Testar leitura com a impressora desconectada da instância de ensaio; não enviar movimento, aquecimento ou impressão.
 - HomeBoard: testar `viewer` e `editor`, incluindo recusa de escrita para o primeiro.
 - Cockpit: preparar o grupo e diretório `/run/auroralab-cockpit`; instalar as unidades revisadas de `secrets/sso/host/` e a configuração de `secrets/sso/cockpit/`. A unidade usa a conta local existente e `PAMName=cockpit`, com socket Unix 0660 e diretório 0750. Copie `secrets/sso/cockpit/cockpit.conf` para `/etc/auroralab-cockpit-sso/cockpit/cockpit.conf`: o subdiretório `cockpit/` é necessário dentro de `XDG_CONFIG_DIRS`. Esse arquivo não contém senha e precisa ser legível pela conta local, mantendo propriedade root. Executar tmpfiles antes de iniciar o socket. Não publicar esse socket por TCP, não desabilitar PAM, não usar root ou NOPASSWD. O gateway usa o mesmo GID 64024. O tmpfs do Nginx deve ser montado em `/run`, pois `/var/run` é um link para esse diretório na imagem; montar no link oculta o socket privado filho. Após validar o novo acesso, desative o socket/proxy TCP legado para impedir um caminho alternativo.
 
@@ -90,13 +89,12 @@ Teste um navegador sem sessão, administrador e usuário comum; todos os oito ap
 
 No retorno, restaure a seleção Compose, portas nativas, configuração HA e destinos Serve registrados antes da migração. Desative apenas as novas unidades do socket SSO do Cockpit. Preserve o banco central e os segredos para investigar; nunca apague dados ou faça `down -v`. Os mecanismos nativos originais continuam disponíveis após restaurar a configuração anterior.
 
-As fontes oficiais de referência são [Actual](https://actualbudget.org/docs/advanced/http-header-auth/), [HA](https://www.home-assistant.io/docs/authentication/providers/), [Cockpit](https://cockpit-project.org/guide/latest/cockpit-ws.8.html) e [OctoPrint](https://docs.octoprint.org/en/main/configuration/config_yaml.html). Os adaptadores AuroraLAB são mantidos por este projeto e exigem nova revisão ao trocar as imagens fixadas.
+As fontes oficiais de referência são [Actual](https://actualbudget.org/docs/advanced/http-header-auth/), [HA](https://www.home-assistant.io/docs/authentication/providers/), [Cockpit](https://cockpit-project.org/guide/latest/cockpit-ws.8.html). Os adaptadores AuroraLAB são mantidos por este projeto e exigem nova revisão ao trocar as imagens fixadas.
 
 No modo SSO, as páginas, scripts e API do Fitness legado ficam reservados ao administrador, pois usam registros compartilhados. O contrato dos dados permanece preservado.
 
 ## Monitoramento e migração 25
 
-No modo SSO, o monitor consulta a API OctoPrint em `http://127.0.0.1:15000`, com a chave interna já existente. Esse destino não é publicado na LAN e evita que o monitor receba HTML do login na porta web protegida. O monitor na porta 9101 exige o segredo privado configurado; o portal o injeta somente no servidor.
 
 O cache PWA 25 verifica a sessão antes da instalação: usuários comuns não tentam guardar os arquivos Fitness reservados ao administrador. Redirecionamentos de login não são gravados como HTML ou JavaScript offline. `/auth/` continua fora do cache. A instalação portátil sem SSO continua compatível.
 
@@ -119,3 +117,5 @@ Cockpit é reservado ao administrador principal pela política existente. Para o
 Após confirmar, o formulário informa que está salvando e, no sucesso, abre a chave de 151 caracteres e atualiza a listagem. Se houver falha de permissão, sessão ou resposta, a mensagem aparece junto ao botão de cadastro. Uma espera acima de 20 segundos é interrompida com orientação para consultar a lista antes de repetir, pois o servidor pode ter concluído uma operação cuja resposta não chegou. Não há repetição automática nem armazenamento adicional de chaves.
 
 O ensaio completo pode ser executado com `python docker/server/auth/checks/ui_fixture.py`. Use somente o endereço local informado; o administrador fictício usa a letra F repetida 151 vezes. Não reutilize essa credencial fora do ensaio. O servidor de teste usa dados temporários, identidades fictícias e não se conecta ao AuroraServer.
+
+A migração 3 (39.0.0) elimina os grants do OctoPrint, preservando usuários, chaves, sessões e demais permissões. A configuração privada e o gateway deixam de oferecer o aplicativo.

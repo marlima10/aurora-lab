@@ -89,13 +89,13 @@ Mantenha a mesma seleção de arquivos Compose para não criar órfãos nem rein
 
 ## 6. Conferir e registrar
 
-Verifique status/logs, portal, redirects `/opengym` e `/garmin`, acesso HTTPS e autenticação de cada módulo. Confirme que os registros antigos permanecem acessíveis no armazenamento correto. Confira backup, OctoPrint/Samba, monitoramento e os dispositivos presentes. Atualize cache PWA quando arquivos públicos versionados mudarem.
+Verifique status/logs, portal, redirects `/opengym` e `/garmin`, acesso HTTPS e autenticação de cada módulo. Confirme que os registros antigos permanecem acessíveis no armazenamento correto. Confira backup, Samba, monitoramento e os dispositivos presentes. Atualize cache PWA quando arquivos públicos versionados mudarem.
 
 Registre data, commit anterior/novo, serviços/imagens, backup e cópia externa, testes executados, limitações e eventual retorno. Não registre como validado algo apenas descrito por uma implantação anterior.
 
 ## 7. Retorno e restauração
 
-Preserve código e imagens anteriores antes da atualização. Voltar a imagem não desfaz migrations nem gravações; avalie compatibilidade dos dados. O [guia OctoPrint](UPGRADE-PYTHON-OCTOPRINT.md) traz exemplo de imagem de retorno.
+Preserve código e imagens anteriores antes da atualização. Voltar a imagem não desfaz migrations nem gravações; avalie compatibilidade dos dados. Preserve a imagem e os arquivos anteriores de cada serviço afetado para retorno.
 
 Para restaurar, pare os escritores afetados, preserve o estado atual e extraia o backup para uma área temporária privada. Recoloque arquivos comuns e snapshots `sqlite-snapshots/` nos caminhos esperados por cada volume. Não sobreponha banco ativo nem misture WAL/SHM antigos com snapshots. Confira integridade, permissões e credenciais antes de reiniciar. Para openGym/Garmin, restaure de forma coerente perfil e registro de importações, preservando domínio e segredo de sessão.
 

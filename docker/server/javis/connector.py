@@ -29,7 +29,7 @@ def dispatch(method, path, headers, body):
     name, args, identity = body.get('tool'), body.get('args', {}), body.get('identity')
     validate(name, args)
     role = os.environ['CONNECTOR_ROLE']
-    app = cfg['apps']['manyfold' if name == 'aurora_model_library' else 'octoprint'] if role == 'print' else cfg
+    app = cfg['apps']['manyfold'] if role == 'print' else cfg
     if not app.get('ready') or not isinstance(identity, str) or identity not in app.get('identities', {}):
         raise Problem(403, 'Perfil não autorizado.')
     h = {'X-Aurora-Identity': identity, 'X-Aurora-Proxy-Secret': app['secret']}
@@ -44,9 +44,6 @@ def dispatch(method, path, headers, body):
         if name == 'aurora_shopping_lists':
             rows = request('http://mealie:9000/api/households/shopping/lists?perPage=20', headers=h).get('items', [])
             return {'source': 'Mealie', 'lists': [{k: row.get(k) for k in ('id', 'name')} for row in rows[:20]]}
-    if role == 'print' and name == 'aurora_print_status':
-        result = request('http://octoprint:80/api/job', headers=h)
-        return {'source': 'OctoPrint', 'state': result.get('state'), 'progress': result.get('progress'), 'job': result.get('job')}
     if role == 'print' and name == 'aurora_model_library':
         h['Accept'] = 'application/vnd.manyfold.v0+json'
         result = request('http://manyfold:3214/models?' + urllib.parse.urlencode({'q': args.get('query', '')}), headers=h)

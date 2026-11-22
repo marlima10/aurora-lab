@@ -342,5 +342,21 @@ class JavisIntegrationTests(Fixture, unittest.TestCase):
         self.store.issue(ADMIN_EMAIL,ADMIN_EMAIL,{});self.assertNotIn('mealie',self.request('/auth/internal/javis',{'Authorization':'Bearer '+self.secret})[2]['grants'])
 
 
+
+class RetiredPrintAppTests(unittest.TestCase):
+    def test_retirement_keeps_keys_and_unrelated_grants(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'auth.sqlite3';store=Store(path);key=store.initialize()
+            with store.db() as db:
+                before=db.execute('SELECT key_hash FROM users WHERE email=?',(ADMIN_EMAIL,)).fetchone()[0]
+                db.execute('INSERT INTO grants VALUES(?,?,?)',(ADMIN_EMAIL,'octoprint','retired-fixture'))
+                db.execute('INSERT INTO grants VALUES(?,?,?)',(ADMIN_EMAIL,'manyfold','kept-fixture'))
+                db.execute('DELETE FROM schema_migrations WHERE version=3')
+            reopened=Store(path)
+            with reopened.db() as db:
+                self.assertEqual(db.execute('SELECT key_hash FROM users WHERE email=?',(ADMIN_EMAIL,)).fetchone()[0],before)
+                self.assertEqual({row[0] for row in db.execute('SELECT app FROM grants WHERE email=?',(ADMIN_EMAIL,))},{'portal','manyfold'})
+            self.assertTrue(reopened.authenticate(ADMIN_EMAIL,key,'fixture-retirement'))
+
 if __name__ == '__main__':
     unittest.main()

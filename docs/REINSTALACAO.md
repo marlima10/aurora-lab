@@ -114,6 +114,6 @@ Os outros arquivos de programa/unidades oficiais podem permanecer desativados e 
 
 ## 6. Instalar novamente pelo roteiro
 
-Continue em [AURORASERVER.md](AURORASERVER.md), a partir da preparação do projeto existente. O novo `.env` começa sem overrides antigos. Escolha o Tailscale **no contêiner**, autorize-o e descubra seu domínio novo antes de preparar Cockpit/openGym. Crie contas novas no CasaOS, Home Assistant, OctoPrint e openGym. A conta Samba permanece rafael conforme a configuração atual, com a nova senha definida na preparação.
+Continue em [AURORASERVER.md](AURORASERVER.md), a partir da preparação do projeto existente. O novo `.env` começa sem overrides antigos. Escolha o Tailscale **no contêiner**, autorize-o e descubra seu domínio novo antes de preparar Cockpit/openGym. Prepare os perfis do openGym, Manyfold, Mealie, Actual Budget e da autenticação central. A conta Samba permanece rafael conforme a configuração atual, com a nova senha definida na preparação.
 
 O estado antigo apagado não será recuperado por Git, imagem Docker ou reinstalação do aplicativo. Não registre essa operação como atualização com preservação de dados.

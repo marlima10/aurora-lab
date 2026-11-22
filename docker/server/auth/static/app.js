@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const apps = { manyfold:'Manyfold', mealie:'Mealie', actual:'Actual Budget', opengym:'openGym', octoprint:'OctoPrint', cockpit:'Cockpit' };
+  const apps = { manyfold:'Manyfold', mealie:'Mealie', actual:'Actual Budget', opengym:'openGym', cockpit:'Cockpit' };
   let session = null;
   let registrationReady = false;
   let adminOnlyApps = new Set(['cockpit']);
