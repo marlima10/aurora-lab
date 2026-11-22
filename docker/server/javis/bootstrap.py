@@ -15,7 +15,7 @@ import os
 if os.getenv('JAVIS_AI_PROVIDER') == 'gemini':
     cfg.setdefault('chat', {}).update(suggest_next=False, plan_tool=False)
     cfg.setdefault('model', {}).setdefault('auxiliary', {})['auto'] = False
-cfg.setdefault('voice', {}).update(mode='standard', call_engine='basic', ear='off', stt_provider='browser', tts_provider='edge', edge_voice='pt-BR-FranciscaNeural')
+cfg.setdefault('voice', {}).update(mode='standard', call_engine='basic', ear='off', stt_provider='browser', tts_provider='edge', edge_voice='pt-BR-AntonioNeural')
 config.write_settings(cfg)
 brain = Path('/brains/auroralab')
 for name in ('notes', 'reports'):

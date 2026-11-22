@@ -7,7 +7,7 @@ def register():
         code='pt', native='Português (Brasil)', english='Portuguese (Brazil)', script='latin',
         stopwords=('de','do','da','dos','das','para','com','meu','minha','quero','você','não','uma','que','hoje','ontem','treinos'),
         request_words=('português','portugues','portuguese','português brasileiro'),
-        stt='pt', tts={'edge':'pt-BR-FranciscaNeural','openai':'alloy','elevenlabs':''},
+        stt='pt', tts={'edge':'pt-BR-AntonioNeural','openai':'alloy','elevenlabs':''},
         tz_default='America/Sao_Paulo', currency='BRL', first_day=1, number_locale='pt-BR', plural=True,
         nudge='Responda em português brasileiro.',
         weekdays=('segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado','domingo'),
@@ -21,6 +21,9 @@ def voice_proxy():
     class ViaAurora(original):
         def __init__(self,*args,**kwargs):
             kwargs.setdefault('proxy',os.environ.get('HTTPS_PROXY'))
+            voice = kwargs.get('voice', args[1] if len(args) > 1 else '')
+            if voice == 'pt-BR-AntonioNeural':
+                kwargs.setdefault('pitch', '-4Hz')
             super().__init__(*args,**kwargs)
     edge_tts.Communicate = ViaAurora
     original_list=edge_tts.list_voices

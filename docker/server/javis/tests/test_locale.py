@@ -16,7 +16,7 @@ class PortugueseTests(unittest.TestCase):
         lang=lang_registry.get('pt')
         self.assertEqual(lang.number_locale,'pt-BR')
         self.assertEqual(lang.stt,'pt')
-        self.assertEqual(lang.tts['edge'],'pt-BR-FranciscaNeural')
+        self.assertEqual(lang.tts['edge'],'pt-BR-AntonioNeural')
         self.assertEqual(len(lang.weekdays),7)
 
     def test_portuguese_speech_never_becomes_vietnamese(self):
@@ -28,6 +28,12 @@ class PortugueseTests(unittest.TestCase):
                     self.assertEqual(phien_am.speech_plan('Olá, seus treinos estão aqui.',voice,hint),('Olá, seus treinos estão aqui.',voice))
             obj=edge_tts.Communicate('Teste em português','pt-BR-FranciscaNeural')
             self.assertEqual(obj.proxy,'http://fixed-proxy.invalid:3128')
+            male=edge_tts.Communicate('Teste','pt-BR-AntonioNeural',rate='-10%')
+            self.assertEqual(male.tts_config.pitch,'-4Hz')
+            self.assertEqual(male.tts_config.rate,'-10%')
+            explicit=edge_tts.Communicate('Teste',voice='pt-BR-AntonioNeural',pitch='-2Hz')
+            self.assertEqual(explicit.tts_config.pitch,'-2Hz')
+            self.assertEqual(obj.tts_config.pitch,'+0Hz')
 
     def test_dictionary_covers_upstream_and_preserves_placeholders(self):
         translated=json.loads((Path(__file__).resolve().parents[1]/'pt.json').read_text())

@@ -16,9 +16,10 @@ def apply(root=Path('/app/dashboard')):
     replace(root/'voice.js','if (this.vietnameseVoice && !english) utter.voice = this.vietnameseVoice;',
         'const matching = this.synth.getVoices().find(v => v.lang === utter.lang) || this.synth.getVoices().find(v => v.lang.split("-")[0] === utter.lang.split("-")[0]); if (matching) utter.voice = matching;')
     replace(root/'index.html','<select id="voiceSel" name="voice" hidden aria-hidden="true" tabindex="-1">','<select id="voiceSel" name="voice" hidden aria-hidden="true" tabindex="-1"><option value="pt-BR-FranciscaNeural">Francisca — Português (Brasil)</option><option value="pt-BR-AntonioNeural">Antônio — Português (Brasil)</option>')
+    replace(root/'index.html','<select class="js-input" id="rateSel">','<select class="js-input" id="rateSel"><option value="0.90">Calmo · 0,90×</option>')
     replace(root/'dictate.js','if (l.indexOf("en") === 0) return "en-US";', 'if (l.indexOf("pt") === 0) return "pt-BR";\n      if (l.indexOf("en") === 0) return "en-US";')
     replace(root/'voice-catalog.js','auto: "f",','"pt-br-franciscaneural": "f", "pt-br-antonioneural": "m", auto: "f",')
-    replace(root/'index.html','<script src="/static/i18n/index.js', '<script src="/static/aurora-locale.js?v=36"></script><script src="/static/i18n/index.js')
+    replace(root/'index.html','<script src="/static/i18n/index.js', '<script src="/static/aurora-locale.js?v=38"></script><script src="/static/i18n/index.js')
     for name in ('app.js','voice.js','dictate.js','voice-catalog.js'):
         text=(root/'index.html').read_text()
         import re

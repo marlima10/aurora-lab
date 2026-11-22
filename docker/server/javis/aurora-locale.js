@@ -6,5 +6,10 @@
       localStorage.setItem('javis.voice', 'pt-BR-FranciscaNeural');
       localStorage.setItem('aurora.locale.version', '36');
     }
+    if (localStorage.getItem('aurora.voice.profile.version') !== '38') {
+      localStorage.setItem('javis.voice', 'pt-BR-AntonioNeural');
+      localStorage.setItem('javis.rate', '0.90');
+      localStorage.setItem('aurora.voice.profile.version', '38');
+    }
   } catch (_) { /* Native server preference still supplies the language. */ }
 })();
