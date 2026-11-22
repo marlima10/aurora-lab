@@ -219,3 +219,10 @@ Na release 42, Monitor de processos não tem grade de atalhos de aplicativos; ma
 ## Configuração visual do MagicMirror (43.0.0)
 
 `docker/server/auth/static/mirror-config.*` contém a página administrativa, servida em `/auth/mirror/configurar`. GET/POST `/auth/mirror/settings` passam pela sessão administrativa e pelo conector interno. `docker/server/mirror/settings.py` define o esquema limitado e os padrões; a tabela `display_settings` compartilha o banco mirror.sqlite3, incluído no backup. O módulo MMM-Aurora aplica preferências retornadas com seu estado, preservando grants dos aplicativos. O MMM-Remote-Control não é dependência desta implementação.
+
+
+## Avaliação Workout Cool (44.0.0)
+
+`compose.workoutcool-test.yaml` define um projeto independente `auroralab-workoutcool-test`: app Next.js, db PostgreSQL 15, gateway Nginx e backup. Não compõe o COMPOSE_FILE do portal. Rede lab interna para app/db/backup; apenas o gateway acessa a rede auth existente e a rede de entrada com porta ligada ao loopback. HTTPS privado :8444 encaminha para 127.0.0.1:18444. O único perfil delegado é o administrador autorizado do portal.
+
+Adaptadores, importador, preparação privada e ensaio de restauração: `docker/server/workoutcool-test/`. Dados/credenciais em `data/workoutcool-test/` e `secrets/workoutcool-test/`, ignorados pelo Git. Guia: [WORKOUTCOOL-TESTE.md](WORKOUTCOOL-TESTE.md).

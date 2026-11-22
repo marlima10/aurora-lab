@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 44.0.0 — 2026-11-22
+
+Workout Cool em avaliação Docker isolada, cópia privada do openGym/Garmin, login administrativo AuroraLAB, HTTPS e backup PostgreSQL com restauração offline. [Detalhes e limites](RELEASE-44.md).
+
 ## 39.0.0 — 2026-11-22
 
 Removidos OctoPrint, câmera e suas integrações; higienização dos backups históricos autorizada pelo proprietário. Manyfold e demais aplicativos preservados. Veja [RELEASE-39.md](RELEASE-39.md).

@@ -1,0 +1,53 @@
+resolver 127.0.0.11 valid=10s ipv6=off;
+map $request_method $lab_write { default 1; GET 0; HEAD 0; OPTIONS 0; }
+map "$lab_write:$http_origin" $lab_origin_allowed { default 0; "0:" 1; "0:https://__HOST__:8444" 1; "1:https://__HOST__:8444" 1; }
+map $http_upgrade $lab_connection { default upgrade; '' close; }
+server {
+ listen 8080;
+ server_name __HOST__;
+ if ($host != "__HOST__") { return 421; }
+ if ($lab_origin_allowed = 0) { return 403; }
+ server_tokens off;
+ access_log off;
+ client_max_body_size 8m;
+ add_header Cache-Control "no-store" always;
+ add_header X-Content-Type-Options "nosniff" always;
+ add_header Referrer-Policy "same-origin" always;
+ add_header X-Frame-Options "DENY" always;
+ add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com; frame-ancestors 'none'; base-uri 'self'" always;
+ error_page 401 =302 https://__HOST__/auth/;
+ location = /_verify {
+  internal;
+  set $auth_service http://auth:7777;
+  proxy_pass $auth_service/auth/check;
+  proxy_pass_request_body off;
+  proxy_set_header Content-Length "";
+  proxy_set_header Cookie $http_cookie;
+  proxy_set_header X-Aurora-App portal;
+  proxy_set_header X-Aurora-Require-Admin 1;
+  proxy_set_header X-Aurora-Require-Javis 0;
+  proxy_set_header X-Aurora-Require-Power 0;
+  proxy_set_header X-Aurora-Method GET;
+  # This gateway first validates the actual :8444 origin above, then asks central
+  # auth only for an active administrative portal grant. It never forwards credentials to Next.js.
+  proxy_set_header X-Aurora-Original-Origin https://__HOST__;
+ }
+ location ~ ^/api/(?:webhooks|checkout|billing/(?!status)) { return 410; }
+ location / {
+  auth_request /_verify;
+  auth_request_set $lab_identity $upstream_http_x_aurora_email;
+  set $target http://app:3000;
+  proxy_pass $target;
+  proxy_http_version 1.1;
+  proxy_set_header Host $http_host;
+  proxy_set_header X-Forwarded-Host $http_host;
+  proxy_set_header X-Forwarded-Proto https;
+  proxy_set_header X-Aurora-Identity $lab_identity;
+  proxy_set_header X-Aurora-Lab-Secret "__SECRET__";
+  proxy_set_header Cookie "";
+  proxy_set_header Authorization "";
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection $lab_connection;
+  proxy_read_timeout 90s;
+ }
+}
