@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 36.0.0 — 2026-11-21
+
+Javis em português brasileiro: dicionário nativo, reconhecimento e ditado pt-BR, vozes Francisca/Antônio, correção da troca indevida para vietnamita e saída restrita para o TTS gratuito. Veja [RELEASE-36.md](RELEASE-36.md).
+
 ## 35.0.0 — 2026-11-21
 
 Migração do Javis para Gemini API no AuroraServer. Chat e grafo autenticados, entrada privada de chave, cofre nativo, seleção de modelo pelo catálogo real e túnel TLS restrito à API Google. Conectores preservados, ferramentas limitadas às consultas autorizadas e leitura das notas. Retirada da dependência do Claude Desktop. [Guia](JAVIS.md).

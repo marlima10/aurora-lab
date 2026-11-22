@@ -10,9 +10,10 @@ import gemini_egress
 import gemini_runtime
 
 class GeminiIsolationTests(unittest.TestCase):
-    def test_only_google_api_tls_destination_is_allowed(self):
+    def test_only_google_and_native_speech_tls_destinations_are_allowed(self):
         self.assertTrue(gemini_egress.allowed('generativelanguage.googleapis.com:443'))
-        for host in ('google.com:443','generativelanguage.googleapis.com:80','127.0.0.1:443','generativelanguage.googleapis.com.evil.invalid:443','user@generativelanguage.googleapis.com:443'):
+        self.assertTrue(gemini_egress.allowed('speech.platform.bing.com:443'))
+        for host in ('google.com:443','speech.platform.bing.com:80','speech.platform.bing.com.evil.invalid:443','generativelanguage.googleapis.com:80','127.0.0.1:443','generativelanguage.googleapis.com.evil.invalid:443','user@generativelanguage.googleapis.com:443'):
             self.assertFalse(gemini_egress.allowed(host))
     def signature(self):
         def original(mode='full',vault_root=None,include_plugins=True,include_ambient=False,staging=False,workspace_root=None,coding_ctx_cua_phien=None,force_lazy=False,tool_allowlist=None):pass
