@@ -1,6 +1,7 @@
 resolver 127.0.0.11 valid=10s ipv6=off;
 map $request_method $lab_write { default 1; GET 0; HEAD 0; OPTIONS 0; }
 map "$lab_write:$http_origin" $lab_origin_allowed { default 0; "0:" 1; "0:https://__HOST__:8444" 1; "1:https://__HOST__:8444" 1; }
+map $http_cookie $wger_csrf { default ""; "~*(?:^|;)\s*csrftoken=([^;]+)" $1; }
 map $http_upgrade $lab_connection { default upgrade; '' close; }
 server {
  listen 8080;
@@ -32,19 +33,21 @@ server {
   # auth only for an active administrative portal grant. It never forwards credentials to Next.js.
   proxy_set_header X-Aurora-Original-Origin https://__HOST__;
  }
- location ~ ^/api/(?:webhooks|checkout|billing/(?!status)) { return 410; }
+ location /static/ { auth_request /_verify; alias /wger/static/; }
+ location /media/ { auth_request /_verify; alias /wger/media/; }
  location / {
   auth_request /_verify;
   auth_request_set $lab_identity $upstream_http_x_aurora_email;
-  set $target http://app:3000;
+  set $target http://app:8000;
   proxy_pass $target;
   proxy_http_version 1.1;
   proxy_set_header Host $http_host;
   proxy_set_header X-Forwarded-Host $http_host;
   proxy_set_header X-Forwarded-Proto https;
+  proxy_set_header Accept-Language "pt-BR,pt;q=0.9";
   proxy_set_header X-Aurora-Identity $lab_identity;
   proxy_set_header X-Aurora-Lab-Secret "__SECRET__";
-  proxy_set_header Cookie "";
+  proxy_set_header Cookie "csrftoken=$wger_csrf";
   proxy_set_header Authorization "";
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection $lab_connection;

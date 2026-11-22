@@ -221,8 +221,17 @@ Na release 42, Monitor de processos não tem grade de atalhos de aplicativos; ma
 `docker/server/auth/static/mirror-config.*` contém a página administrativa, servida em `/auth/mirror/configurar`. GET/POST `/auth/mirror/settings` passam pela sessão administrativa e pelo conector interno. `docker/server/mirror/settings.py` define o esquema limitado e os padrões; a tabela `display_settings` compartilha o banco mirror.sqlite3, incluído no backup. O módulo MMM-Aurora aplica preferências retornadas com seu estado, preservando grants dos aplicativos. O MMM-Remote-Control não é dependência desta implementação.
 
 
-## Avaliação Workout Cool (44.0.0)
+## Avaliação Workout Cool (44.0.0) — encerrada na 45
+
+O Compose e os adaptadores abaixo foram removidos do estado atual; esta seção é histórica. O teste atual é o wger descrito a seguir.
 
 `compose.workoutcool-test.yaml` define um projeto independente `auroralab-workoutcool-test`: app Next.js, db PostgreSQL 15, gateway Nginx e backup. Não compõe o COMPOSE_FILE do portal. Rede lab interna para app/db/backup; apenas o gateway acessa a rede auth existente e a rede de entrada com porta ligada ao loopback. HTTPS privado :8444 encaminha para 127.0.0.1:18444. O único perfil delegado é o administrador autorizado do portal.
 
 Adaptadores, importador, preparação privada e ensaio de restauração: `docker/server/workoutcool-test/`. Dados/credenciais em `data/workoutcool-test/` e `secrets/workoutcool-test/`, ignorados pelo Git. Guia: [WORKOUTCOOL-TESTE.md](WORKOUTCOOL-TESTE.md).
+
+
+## Avaliação wger (45.0.0)
+
+`compose.wger-test.yaml`: projeto independente `auroralab-wger-test`, app wger 2.7 + db PostgreSQL 15 + gateway Nginx + backup. Rede lab interna para app/db/backup; apenas gateway acessa autenticação e entrada, ligada ao loopback 127.0.0.1:18444. Tailscale HTTPS :8444 atende o teste. Não se acrescenta ao COMPOSE_FILE do portal.
+
+`docker/server/wger-test/`: Dockerfile com imagem oficial fixada, settings/middleware de delegação administrativa, preparação privada, importador, testes sintéticos e restauração offline. `data/wger-test/` e `secrets/wger-test/` são privados e ignorados pelo Git. [Procedimentos](WGER-TESTE.md).

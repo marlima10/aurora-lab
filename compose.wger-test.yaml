@@ -1,29 +1,29 @@
 # Separate evaluation project: never append to the production COMPOSE_FILE.
-name: auroralab-workoutcool-test
+name: auroralab-wger-test
 services:
   db:
     image: postgres:15-bookworm@sha256:8180c3e1b9b603d2988f937dfbe51008bad5c4b07c77f35119695c027a7315ab
-    env_file: ./secrets/workoutcool-test/database.env
-    volumes: ['./data/workoutcool-test/postgres:/var/lib/postgresql/data']
+    env_file: ./secrets/wger-test/database.env
+    volumes: ['./data/wger-test/postgres:/var/lib/postgresql/data']
     networks: [lab]
     mem_limit: 512m
     cpus: 0.5
     healthcheck:
-      test: [CMD-SHELL, 'pg_isready -U workoutcool -d workoutcool_test']
+      test: [CMD-SHELL, 'pg_isready -U wger -d wger_test']
       interval: 10s
       timeout: 5s
       retries: 6
     restart: unless-stopped
     logging: {driver: json-file, options: {max-size: 3m, max-file: '2'}}
   app:
-    image: auroralab-workoutcool-test:44.0.0
-    build: ./docker/server/workoutcool-test
-    env_file: ./secrets/workoutcool-test/app.env
+    image: auroralab-wger-test:45.0.0
+    build: ./docker/server/wger-test
+    env_file: ./secrets/wger-test/app.env
     networks: [lab]
-    volumes: ['./data/workoutcool-test/import:/import:ro']
-    user: '10001:10001'
+    volumes: ['./data/wger-test/import:/import:ro', './data/wger-test/static:/home/wger/static', './data/wger-test/media:/home/wger/media']
+    user: '1000:1000'
     read_only: true
-    tmpfs: ['/tmp:size=128m,mode=1777', '/app/.next/cache:size=64m,uid=10001,gid=10001']
+    tmpfs: ['/tmp:size=128m,mode=1777']
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     mem_limit: 1536m
@@ -31,7 +31,7 @@ services:
     pids_limit: 256
     depends_on: {db: {condition: service_healthy}}
     healthcheck:
-      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/pt').then(r=>{if(r.status>=500)process.exit(1)}).catch(()=>process.exit(1))"]
+      test: [CMD, python3, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v2/version/',timeout=5)"]
       interval: 30s
       timeout: 10s
       retries: 6
@@ -41,7 +41,7 @@ services:
     image: nginx:stable-alpine@sha256:970364228b1e4f932abc22d321932816782cca8a20b85a77552a7cfe9acfb3b5
     user: '101:101'
     ports: ['127.0.0.1:18444:8080']
-    volumes: ['./secrets/workoutcool-test/gateway.conf:/etc/nginx/conf.d/default.conf:ro']
+    volumes: ['./secrets/wger-test/gateway.conf:/etc/nginx/conf.d/default.conf:ro', './data/wger-test/static:/wger/static:ro', './data/wger-test/media:/wger/media:ro']
     networks: [lab, auth, ingress]
     read_only: true
     tmpfs: ['/tmp:size=16m,uid=101,gid=101','/var/cache/nginx:size=16m,uid=101,gid=101','/run:size=1m,uid=101,gid=101']
@@ -53,12 +53,12 @@ services:
     logging: {driver: json-file, options: {max-size: 3m, max-file: '2'}}
   backup:
     image: postgres:15-bookworm@sha256:8180c3e1b9b603d2988f937dfbe51008bad5c4b07c77f35119695c027a7315ab
-    env_file: ./secrets/workoutcool-test/database.env
+    env_file: ./secrets/wger-test/database.env
     entrypoint: [sh, -c]
-    command: ['sleep 300; while true; do stamp=$$(date -u +%Y%m%d-%H%M%S); pg_dump -h db -U workoutcool -d workoutcool_test -Fc -f /backups/workoutcool-test-$$stamp.dump && sha256sum /backups/workoutcool-test-$$stamp.dump > /backups/workoutcool-test-$$stamp.dump.sha256; sleep 86400; done']
-    environment: {PGHOST: db, PGUSER: workoutcool, PGDATABASE: workoutcool_test}
+    command: ['sleep 300; while true; do stamp=$$(date -u +%Y%m%d-%H%M%S); pg_dump -h db -U wger -d wger_test -Fc -f /backups/wger-test-$$stamp.dump && tar czf /backups/wger-media-$$stamp.tar.gz -C /media . && sha256sum /backups/wger-test-$$stamp.dump /backups/wger-media-$$stamp.tar.gz > /backups/wger-test-$$stamp.dump.sha256; sleep 86400; done']
+    environment: {PGHOST: db, PGUSER: wger, PGDATABASE: wger_test}
     networks: [lab]
-    volumes: ['./data/workoutcool-test/backups:/backups']
+    volumes: ['./data/wger-test/backups:/backups', './data/wger-test/media:/media:ro']
     depends_on: {app: {condition: service_healthy}}
     mem_limit: 128m
     cpus: 0.5

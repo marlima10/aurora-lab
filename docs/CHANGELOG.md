@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 45.0.0 — 2026-11-22
+
+Workout Cool retirado e substituído por wger 2.7 em avaliação isolada, com login AuroraLAB, cópia privada do openGym/Garmin, peso corporal nativo e backup PostgreSQL restaurado. [Detalhes](RELEASE-45.md).
+
 ## 44.0.0 — 2026-11-22
 
 Workout Cool em avaliação Docker isolada, cópia privada do openGym/Garmin, login administrativo AuroraLAB, HTTPS e backup PostgreSQL com restauração offline. [Detalhes e limites](RELEASE-44.md).
