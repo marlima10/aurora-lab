@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from store import Store, AccessError, SESSION_SECONDS, ADMIN_EMAIL
+from mirror import query as mirror_query
 
 COOKIE = '__Host-aurora_session'
 APP_PORTS = {'manyfold':3214,'mealie':9925,'actual':5006,'opengym':8081,'cockpit':9090}
@@ -117,6 +118,9 @@ def handler(store, origin, assets=None, apps_config=None):
                         return self.send(200, (assets / name).read_bytes(), content_type=mime)
                 if path == '/auth/session':
                     return self.send(200, self.current())
+                if path in ('/auth/mirror/state','/auth/mirror/news'):
+                    status,result=mirror_query(self.current(),apps_config,path.rsplit('/',1)[1])
+                    return self.send(status,result)
                 if path == '/auth/users':
                     return self.send(200, {'users': store.users(self.current(admin=True)['email'])})
                 if path == '/auth/apps':
@@ -191,6 +195,9 @@ def handler(store, origin, assets=None, apps_config=None):
                     token, csrf = store.authenticate(data.get('email'), data.get('key'), self.headers.get('X-Aurora-Client-IP', self.client_address[0]))
                     return self.send(200, {'ok': True, 'csrf': csrf}, {'Set-Cookie': COOKIE + '=' + token + '; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=' + str(SESSION_SECONDS)})
                 session = self.current(csrf=True)
+                if path in ('/auth/mirror/save','/auth/mirror/weather'):
+                    status,result=mirror_query(session,apps_config,path.rsplit('/',1)[1],data)
+                    return self.send(status,result)
                 if path == '/auth/logout':
                     store.logout(self.token())
                     return self.send(200, {'ok': True}, {'Set-Cookie': COOKIE + '=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0'})

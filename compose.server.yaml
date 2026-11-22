@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     logging: *logging
     healthcheck:
-      test: [CMD, wget, -q, --spider, 'http://127.0.0.1/']
+      test: [CMD, wget, -q, --spider, 'http://127.0.0.1/manifest.json']
       interval: 30s
       timeout: 5s
       retries: 3

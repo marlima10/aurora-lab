@@ -48,3 +48,7 @@ Use os tokens existentes quando adequados. Mantenha Inter com fallback system-ui
 Preserve favicon, ícones e manifest quando a tarefa não pedir mudança de marca. Se arquivos públicos versionados forem alterados, mantenha coerência entre URLs das páginas e APP_SHELL em service-worker.js; atualize CACHE_NAME para que clientes recebam a nova versão.
 
 Registre aqui decisões visuais novas somente quando adotadas no projeto.
+
+## Página inicial MagicMirror
+
+A partir da release 40, `/mirror/` usa tema próprio com paisagem de pôr do sol, vidro translúcido e branco, conforme a referência aprovada. O módulo é `docker/server/mirror/MMM-Aurora`; não aplique este tema automaticamente ao Monitor de processos ou aos outros aplicativos. Dados pessoais ficam fora do service worker e nenhuma informação de exemplo deve ser usada como dado real.

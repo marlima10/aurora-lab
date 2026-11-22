@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 39.0.0
+# Estrutura e arquitetura — AuroraLAB 40.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -32,7 +32,7 @@ aurora-lab/
 ├── compose.server.yaml        # Servidor Linux: projeto auroralab
 ├── compose.opengym.yaml       # API/web openGym e importador Garmin
 ├── compose.power.yaml
-├── compose.printer.yaml
+├── compose.mirror.yaml
 ├── VERSION
 └── README.md
 ```
@@ -205,3 +205,9 @@ Desde a 39.0.0, o módulo Javis inclui tradução nativa brasileira, correções
 ## Remoção de OctoPrint e câmera (39.0.0)
 
 Os dois serviços, seus builds, dispositivos, portas, atalhos, painéis, coleta e permissões foram retirados. O conector Javis mantém apenas a biblioteca Manyfold no papel print; o catálogo Gemini possui nove ferramentas autorizadas, incluindo leitura de notas. A migração 3 da autenticação remove somente os grants OctoPrint. Backups novos não incluem os aplicativos removidos; a higienização histórica autorizada utiliza sanitize_print_backups.py e registra novos hashes, preservando os demais membros. Não reescreve o histórico Git.
+
+## MagicMirror e leitura web (40.0.0)
+
+`docker/server/mirror/` contém a imagem oficial server-only, o módulo visual MMM-Aurora e o conector privado de dados. `compose.mirror.yaml` declara MagicMirror e mirror-api sem portas públicas, rede de saída separada e persistência em `data/mirror`. A fachada autenticada fica em `docker/server/auth/mirror.py`; toda identidade vem da sessão central. O novo proxy `/mirror/` é descrito na [release 40](RELEASE-40.md). O painel anterior está em `site/monitor-processos.html`; o index estático mantém o modo portátil.
+
+O conector Javis `web_reader.py` atende duas ferramentas de leitura pública, em `javis-web`. A rede do motor Gemini continua restrita às duas origens existentes; pesquisas e leitura externa passam pelo conector sem segredos de aplicativos.

@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Aurora Lab">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/app-192.png">
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/aurora.css?v=20261007-2">
+<link rel="stylesheet" href="/portal-health.css?v=20261007-1">
+<title>Aurora Lab · Monitor de processos</title>
+<link rel="stylesheet" href="/aurora-layout.css?v=20261024-v25">
+<link rel="stylesheet" href="/power.css?v=20261024-v24">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo"><span class="logo-mark">✦</span><div><strong>AURORA LAB</strong><small>Print Server & Home Lab</small></div></div>
+    <nav class="side-nav">
+      <a class="active" href="/">⌂ <span>Monitor de processos</span></a>
+
+
+      <a href="#system-card">⚙ <span>Sistema</span></a>
+      <a href="/network.html">⌁ <span>Rede</span></a>
+      <a href="#services-card">✣ <span>Serviços</span></a>
+      <a href="#storage-card">▤ <span>Armazenamento</span></a>
+      <a href="/history.html">◴ <span>Histórico</span></a>
+      <a href="#" onclick="openSamba();return false">▱ <span>Arquivos</span></a>
+      <a href="#backup-card">☁ <span>Backup</span></a>
+      <a href="/diagnostics.html">✥ <span>Diagnóstico</span></a>
+    </nav>
+    <div class="side-foot"><b>AURORA LAB 23.0</b><span id="sideHost">rk322x-box</span></div>
+  </aside>
+
+  <button class="nav-scrim" id="navScrim" type="button" aria-label="Fechar menu" hidden></button>
+  <main class="main">
+    <header class="topbar">
+      <div class="mobile-brand"><button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button><span>✦ AURORA LAB</span></div>
+      <div class="top-status ok"><i></i><div><b id="systemOnline">Sistema Online</b><small id="topUptime">Uptime --</small></div></div>
+      <button class="head-stat power-battery-button" id="powerBatteryButton" type="button" aria-haspopup="dialog" aria-controls="powerDialog" aria-label="Bateria e configurações de economia">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="3" y="8" width="24" height="16" rx="3" stroke="currentColor" stroke-width="2"/><path d="M29 13v6M7 12v8M11 12v8M15 12v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <div><small>Bateria · configurar</small><b id="powerBatteryPercent">—</b><small id="powerBatteryState">Aguardando leitura</small></div>
+      </button>
+      <div class="clockbox"><small id="dateNow">--</small><b id="timeNow">--:--</b></div>
+      <div class="head-stat"><span>▣</span><div><small>IP Local</small><b id="topLocalIp">--</b></div></div>
+      <div class="head-stat"><span>🔒</span><div><small>IP Tailscale</small><b id="topTailIp">--</b></div></div>
+      <div class="head-stat"><span>⌁</span><div><small>Rede</small><b id="topNetwork">--</b></div></div>
+    </header>
+
+    <div id="banner" class="banner">⚠ Dados indisponíveis ou desatualizados.</div>
+
+    <h1 class="panel-title">Monitor de processos</h1>
+    <section class="quick-grid">
+      <button id="installApp" type="button" class="quick q3">⬇ Instalar app no celular ou tablet</button>
+      <button class="quick q3" onclick="openPort(9090)"><span>🛠️</span><div><b>Cockpit</b><small>:9090 · Administração</small></div><i>→</i></button>
+      <button class="quick q4" onclick="openSamba()"><span>📁</span><div><b>Samba</b><small id="sambaPath">Arquivos compartilhados</small></div><i>→</i></button>
+      <button type="button" class="quick q7" onclick="location.href='/opengym'"><span>💪</span><div><b>openGym</b><small>Treinos com acesso seguro</small></div><i>→</i></button>
+      <button type="button" class="quick q7" onclick="location.href='/garmin'"><span>⌚</span><div><b>Garmin → openGym</b><small>Importar atividades executadas</small></div><i>→</i></button>
+      <button type="button" class="quick q7" onclick="location.href='/manyfold'"><span>🧊</span><div><b>Manyfold</b><small>Biblioteca de modelos 3D</small></div><i>→</i></button>
+      <button type="button" class="quick q5" onclick="location.href='/mealie'"><span>🍽️</span><div><b>Mealie</b><small>Receitas e planejamento de refeições</small></div><i>→</i></button>
+      <button type="button" class="quick q6" onclick="location.href='/actual'"><span>💰</span><div><b>Actual Budget</b><small>Organização financeira pessoal</small></div><i>→</i></button>
+      <button type="button" id="javis-shortcut" class="quick q7" hidden onclick="location.href='/javis'"><span aria-hidden="true">✦</span><div><b>Javis OS</b><small>Assistente Gemini no servidor</small></div><i>→</i></button>
+      <button type="button" id="user-management-shortcut" class="quick q7" hidden onclick="location.href='/auth/admin'"><span aria-hidden="true">👥</span><div><b>Gestão de usuários</b><small>Cadastros, permissões e chaves</small></div><i>→</i></button>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel services-panel" id="services-card">
+        <div class="panel-title"><h2>♟ Status dos Serviços</h2><span class="status-count" id="serviceCount">--</span></div>
+        <div id="serviceRows" class="service-list"></div>
+      </article>
+
+      <article class="panel resources-panel" id="system-card">
+        <div class="panel-title"><h2>✣ Recursos do Sistema</h2><span class="live-dot">AO VIVO</span></div>
+        <div class="gauges">
+          <div class="gitem"><div class="gauge" id="g_cpu"><b id="cpu">--</b><small>CPU</small></div><span id="cpuSub">--</span></div>
+          <div class="gitem"><div class="gauge" id="g_mem"><b id="mem">--</b><small>RAM</small></div><span id="memSub">--</span></div>
+          <div class="gitem"><div class="gauge" id="g_disk"><b id="disk">--</b><small>DISCO</small></div><span id="diskSub">--</span></div>
+          <div class="gitem"><div class="gauge" id="g_temp"><b id="temp">--</b><small>TEMP</small></div><span id="tempSub">CPU</span></div>
+        </div>
+        <div class="chart-title"><span>Uso de CPU</span><small>histórico recente</small></div>
+        <div class="chartbox"><svg id="cpuChart" viewBox="0 0 600 130" preserveAspectRatio="none"></svg></div>
+      </article>
+
+      <article class="panel sysinfo-panel">
+        <div class="panel-title"><h2>🖥 Informações do Sistema</h2><span>🐧</span></div>
+        <div class="kv"><span>Hostname</span><b id="hostname">--</b></div>
+        <div class="kv"><span>Sistema</span><b id="osInfo">--</b></div>
+        <div class="kv"><span>Kernel</span><b id="kernelInfo">--</b></div>
+        <div class="kv"><span>Arquitetura</span><b id="archInfo">--</b></div>
+        <div class="kv"><span>CPU</span><b id="cpuInfo">--</b></div>
+        <div class="kv"><span>Memória</span><b id="ramdetail">--</b></div>
+        <div class="kv"><span>Swap</span><b id="swapdetail">--</b></div>
+        <div class="kv"><span>Armazenamento</span><b id="diskdetail">--</b></div>
+        <div class="kv"><span>IP Local</span><b id="localip">--</b></div>
+        <div class="kv"><span>IP Tailscale</span><b id="tailscaleip">--</b></div>
+        <div class="kv"><span>Uptime</span><b id="uptime">--</b></div>
+      </article>
+
+      <article class="panel power-panel" id="energy-card" aria-labelledby="powerHeading">
+        <div class="panel-title">
+          <div><p class="power-eyebrow">AuroraServer / Energia</p><div class="power-title"><h2 id="powerHeading">Consumo e autonomia</h2><span class="power-status" id="powerLive" role="status">Aguardando sensores</span></div></div>
+          <button class="power-btn" id="powerSettingsButton" type="button" aria-haspopup="dialog" aria-controls="powerDialog">Configurar economia ↗</button>
+        </div>
+        <p class="power-subtitle">Acompanhe o notebook, conheça o consumo dos componentes e planeje o gasto mensal.</p>
+        <div class="power-stats">
+          <div class="power-stat"><small>Potência do notebook</small><b class="power-value" id="powerDraw">—</b><p class="power-note" id="powerDrawSource">Aguardando leitura da bateria</p></div>
+          <div class="power-stat"><small>Pacote do processador</small><b class="power-value" id="powerCpu">—</b><p class="power-note">Intel RAPL · CPU e domínios integrados</p></div>
+          <div class="power-stat"><small>Energia acompanhada</small><b class="power-value" id="powerObserved">—</b><p class="power-note" id="powerCoverage">Pacote CPU hoje · somente intervalos observados</p></div>
+          <div class="power-stat"><small>Perfil atual</small><b class="power-value" style="font-size:22px" id="powerProfile">—</b><p class="power-note" id="powerProfileSub">Clique na bateria para configurar</p></div>
+        </div>
+        <div class="power-split">
+          <section class="power-surface" aria-labelledby="powerHistoryTitle">
+            <h3 id="powerHistoryTitle">Potência ao longo do tempo</h3>
+            <div class="power-legend"><span><i></i>Descarga da bateria</span><span><i class="cpu"></i>Pacote CPU</span></div>
+            <svg class="power-chart" id="powerChart" viewBox="0 0 600 145" role="img" aria-label="Histórico recente da potência da bateria e do pacote CPU, em watts"></svg>
+            <p class="power-small" id="powerChartEmpty">O histórico aparece após duas amostras. Não são estimados intervalos sem leitura.</p>
+            <p class="power-small">Uma amostra por minuto · até 90 minutos no gráfico. CPU e GPU integrada podem compartilhar energia; não some as leituras.</p>
+          </section>
+          <section class="power-surface" aria-labelledby="powerGpuTitle">
+            <h3 id="powerGpuTitle">Placas de vídeo</h3>
+            <div class="gpu-list" id="powerGpuList"><p class="power-note">Aguardando identificação das GPUs…</p></div>
+          </section>
+        </div>
+        <hr class="power-divider">
+        <div class="panel-title"><h3 style="margin:0;font-size:14px">Planejamento do gasto energético</h3><span class="power-status">Simulação · 30 dias</span></div>
+        <div class="power-cost-layout">
+          <div>
+            <div class="power-inputs">
+              <label for="powerTariff">Tarifa total (R$/kWh)<input id="powerTariff" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="Sua tarifa"></label>
+              <label for="powerAwake">Potência ligado (W)<input id="powerAwake" type="number" inputmode="decimal" min="0" max="10000" step="0.1" placeholder="Medida na tomada"></label>
+              <label for="powerSleep">Potência suspenso (W)<input id="powerSleep" type="number" inputmode="decimal" min="0" max="10000" step="0.1" placeholder="Informe a medição"></label>
+              <label for="powerNightHours">Horas suspenso por dia<input id="powerNightHours" type="number" inputmode="decimal" min="0" max="24" step="0.5" value="7"></label>
+            </div>
+            <button class="power-btn" id="powerEstimateFromBattery" style="margin-top:10px" type="button" disabled>Usar descarga atual como estimativa</button>
+            <p class="power-small">Parâmetros salvos somente neste navegador.</p>
+          </div>
+          <div>
+            <div class="power-cost-grid">
+              <div class="power-cost-cell"><small>Ligado 24 h por dia</small><b id="powerCost24">—</b><span class="power-small" id="powerKwh24">Informe a potência</span></div>
+              <div class="power-cost-cell"><small>Com suspensão simulada</small><b id="powerCostNight">—</b><span class="power-small" id="powerKwhNight">Preencha os parâmetros</span></div>
+              <div class="power-cost-cell saving"><small>Economia estimada</small><b id="powerSavings">—</b><span class="power-small" id="powerSavingsKwh">Comparação estimada</span></div>
+            </div>
+            <p class="power-note" id="powerCostNote" role="status">Informe a tarifa e as potências para comparar.</p>
+          </div>
+        </div>
+        <p class="power-notice">O consumo na tomada precisa de wattímetro ou tomada com medição. A bateria informa sua descarga, e o RAPL acompanha componentes da CPU. A suspensão das 00h às 07h é apenas uma simulação até validar o despertar automático no notebook.</p>
+      </article>
+      <article class="panel" id="energy-history-card">
+        <div class="panel-title"><h2>Histórico de energia</h2><span>CPU e bateria · até 90 dias</span></div>
+        <p class="power-note">Energia observada, sem preencher períodos desligados. CPU e descarga da bateria são medidas diferentes e não devem ser somadas. Os valores abaixo não representam a conta total da tomada.</p>
+        <p id="energyMonth" role="status">Aguardando leituras…</p>
+        <div class="energy-history-scroll"><table class="energy-history"><caption>Consumo diário e custo parcial da CPU pela tarifa configurada acima</caption><thead><tr><th>Dia</th><th>CPU kWh</th><th>Horas CPU</th><th>Descarga kWh</th><th>Horas bateria</th><th>Custo CPU</th></tr></thead><tbody id="energyDaily"></tbody></table></div>
+        <p class="power-note">O histórico começa nesta versão; dias antigos não são reconstruídos por estimativa. A tarifa fica salva neste navegador e recalcula todos os valores exibidos.</p>
+      </article>
+      <article class="panel network-panel">
+        <div class="panel-title"><h2>⌁ Rede</h2><span class="online" id="networkStatus">● Conectado</span></div>
+        <div class="net-stats">
+          <div><small>Interface</small><b id="netIface">--</b></div>
+          <div><small>Gateway</small><b id="gateway">--</b></div>
+          <div><small>Dispositivos online</small><b id="onlineDevices">--</b></div>
+          <div><small>Dispositivos conhecidos</small><b id="knownDevices">--</b></div>
+        </div>
+        <div class="mini-chart"><svg id="netChart" viewBox="0 0 400 90" preserveAspectRatio="none"></svg></div>
+        <a class="panel-link" href="/network.html">Ver monitor de rede →</a>
+      </article>
+
+      <article class="panel storage-panel" id="storage-card">
+        <div class="panel-title"><h2>▤ Armazenamento</h2><span id="storageTotal">--</span></div>
+        <div class="storage-body">
+          <div class="disk-ring" id="diskRing"><b id="diskPct">--</b><small>Usado</small></div>
+          <div class="storage-legend">
+            <div><i class="used"></i><span>Usado</span><b id="diskUsed">--</b></div>
+            <div><i class="free"></i><span>Livre</span><b id="diskFree">--</b></div>
+            <div><i class="total"></i><span>Total</span><b id="diskTotal">--</b></div>
+          </div>
+        </div>
+        <div class="storage-bar"><i id="storageBar"></i></div>
+        <div class="storage-small">
+          <span>Prints <b id="prints">--</b></span>
+        </div>
+      </article>
+
+      <article class="panel history-panel">
+        <div class="panel-title"><h2>◴ Histórico do Servidor</h2><a href="/history.html">Ver todos →</a></div>
+        <div class="history-chart"><svg id="historyChart" viewBox="0 0 500 150" preserveAspectRatio="none"></svg></div>
+        <div class="history-legend"><span><i class="c1"></i>CPU</span><span><i class="c2"></i>RAM</span><span><i class="c3"></i>Temperatura</span></div>
+      </article>
+
+      <article class="panel sensors-panel">
+        <div class="panel-title"><h2>🌡 Temperatura e Sensores</h2></div>
+        <div class="sensor"><span>CPU (SoC)</span><b id="sensorCpu">--</b><div><i id="sensorCpuBar"></i></div></div>
+        <div class="sensor"><span>Load 1 min</span><b id="load">--</b><div><i id="loadBar"></i></div></div>
+      </article>
+
+      <article class="panel" id="alerts-card">
+        <div class="panel-title"><h2>Alertas do servidor</h2><span id="serverAlertSummary" role="status">Consultando…</span></div>
+        <div id="serverAlerts" aria-live="polite"></div>
+        <p class="power-note">Serviços indisponíveis, disco acima de 80% (crítico em 90%) e backup com falha ou atrasado. Ocorrências confirmadas por 30 segundos. Os avisos aparecem aqui enquanto o portal estiver aberto.</p>
+        <details><summary>Histórico de alertas e recuperações</summary><div id="serverAlertHistory" class="operations-history"></div></details>
+      </article>
+      <article class="panel backup-panel" id="backup-card">
+        <div class="panel-title"><h2>☁ Backup & Dados</h2><span class="safe">Verificação</span></div>
+        <div class="backup-grid">
+          <div><small>Logs sistema</small><b id="systemlogs">--</b></div>
+          <div><small>Cache APT</small><b id="aptcache">--</b></div>
+          <div><small>Último dado</small><b id="stamp">--</b></div>
+        </div>
+        <div class="backup-health" id="restoreHealth" role="status">Consultando teste de restauração…</div>
+        <div class="backup-health" id="backupHealth" role="status" aria-live="polite">Verificando backup do servidor…</div>
+        <div class="note">Backups completos permanecem fora do webroot por segurança.</div>
+      </article>
+    </section>
+  </main>
+</div>
+
+<script src="/mobile-nav.js?v=20261007-1" defer></script>
+<script src="/pwa.js?v=20261122-v40" defer></script>
+<script src="/aurora.js?v=20261121-v39"></script>
+<script>
+document.addEventListener('aurora:session', event => { for(const id of ['user-management-shortcut','javis-shortcut']) { const shortcut = document.getElementById(id); if(shortcut) shortcut.hidden = !event.detail?.admin; } });
+const val=(v,f='--')=>(v===undefined||v===null||v==='')?f:v;
+function fmtTime(s){s=Number(s);if(!isFinite(s)||s<=0)return '--';s=Math.round(s);let h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return (h?h+'h ':'')+String(m).padStart(2,'0')+'min '+String(ss).padStart(2,'0')+'s'}
+function fmtDate(){let d=new Date();dateNow.textContent=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'long'});timeNow.textContent=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+function scrollToId(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'})}
+function openSamba(){let u='\\\\'+location.hostname+'\\';if(navigator.clipboard)navigator.clipboard.writeText(u).catch(()=>{});alert('Samba: '+u+'\n\nNo Windows, pressione Win+R e cole o endereço.')}
+function openOptional(port,name){if(confirm(name+' será aberto em '+location.hostname+':'+port+'.\n\nSe o serviço ainda não estiver instalado, a página não responderá.'))openPort(port)}
+function lvl(v,w,c){return v>=c?'var(--red)':v>=w?'var(--orange)':'var(--green)'}
+function gauge(k,v,pct,w,c){let g=$('g_'+k);g.style.setProperty('--p',Math.min(100,Math.max(0,Number(pct)||0)));g.style.setProperty('--c',lvl(Number(v)||0,w,c))}
+function serviceRow(icon,name,state,extra){let on=state==='online';return `<div class="service-row"><span class="svc-icon">${icon}</span><b>${esc(name)}</b><span class="${on?'online':'offline'}">● ${on?'Online':'Offline'}</span><small>${esc(extra||'')}</small></div>`}
+function poly(svgId,data,key,max,color,fill){let svg=$(svgId);if(!svg||data.length<2){if(svg)svg.innerHTML='';return}let w=600,h=130,pts=data.slice(-60).map((x,i)=>{let v=Math.max(0,Math.min(max,Number(x[key])||0));return `${(i*w/(Math.min(60,data.length)-1)).toFixed(1)},${(h-(v/max)*(h-18)-8).toFixed(1)}`}).join(' ');svg.innerHTML=`<defs><linearGradient id="gr-${svgId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".35"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="3" vector-effect="non-scaling-stroke"/><polygon points="0,${h} ${pts} ${w},${h}" fill="url(#gr-${svgId})"/>`}
+function multiHistory(data){let svg=$('historyChart');if(!svg||data.length<2){if(svg)svg.innerHTML='';return}let a=data.slice(-120),w=500,h=150;function pts(k,max){return a.map((x,i)=>`${(i*w/(a.length-1)).toFixed(1)},${(h-10-(Math.min(max,Math.max(0,Number(x[k])||0))/max)*(h-20)).toFixed(1)}`).join(' ')}svg.innerHTML=`<line x1="0" y1="40" x2="${w}" y2="40" class="gridline"/><line x1="0" y1="80" x2="${w}" y2="80" class="gridline"/><line x1="0" y1="120" x2="${w}" y2="120" class="gridline"/><polyline points="${pts('cpu',100)}" class="line cpu"/><polyline points="${pts('memory',100)}" class="line mem"/><polyline points="${pts('temperature',100)}" class="line tmp"/>`}
+async function loadHistory(){if(document.hidden)return;try{let x=await json('/history.json');H=Array.isArray(x)?x:(x.history||x.data||[]);poly('cpuChart',H,'cpu',100,'#2fa8ff');multiHistory(H)}catch(e){}}
+async function loadNetwork(){if(document.hidden)return;try{let n=await json('/network.json');let arr=Array.isArray(n)?n:(n.devices||[]);let online=arr.filter(x=>x.online===true||x.status==='online'||x.alive===true).length;onlineDevices.textContent=online;knownDevices.textContent=arr.length;NH.push({v:online});if(NH.length>60)NH.shift();let fake=NH.map(x=>({v:x.v}));let svg=$('netChart');if(fake.length>1){let w=400,h=90,max=Math.max(5,...fake.map(x=>x.v));let pts=fake.map((x,i)=>`${i*w/(fake.length-1)},${h-8-(x.v/max)*(h-16)}`).join(' ');svg.innerHTML=`<polyline points="${pts}" fill="none" stroke="#2ee6d6" stroke-width="3" vector-effect="non-scaling-stroke"/>`}}catch(e){onlineDevices.textContent='--';knownDevices.textContent='--'}}
+async function update(){
+ if(document.hidden)return;
+ try{
+  let d=await json('/status.json'),t=d.thresholds||{};
+  let stale=!d.generated||Date.now()-Date.parse(d.generated)>30000;banner.style.display=stale?'block':'none';
+  stamp.textContent=age(d.generated)+' atrás';hostname.textContent=val(d.hostname);sideHost.textContent=val(d.hostname);topLocalIp.textContent=val(d.local_ip);topTailIp.textContent=val(d.tailscale_ip,'Offline');
+  localip.textContent=val(d.local_ip);tailscaleip.textContent=val(d.tailscale_ip,'Offline');uptime.textContent=val(d.uptime);topUptime.textContent='Uptime '+val(d.uptime);
+  sambaPath.textContent='\\\\'+val(d.local_ip,location.hostname)+'\\';
+  cpu.textContent=val(d.cpu,0)+'%';mem.textContent=val(d.memory,0)+'%';disk.textContent=val(d.disk,0)+'%';temp.textContent=val(d.temperature,0)+'°C';
+  cpuSub.textContent=val(d.cores)+' núcleos · load '+val(d.load);memSub.textContent=val(d.memory_used,0)+' / '+val(d.memory_total,0)+' MB';diskSub.textContent=val(d.disk_used)+' / '+val(d.disk_total);tempSub.textContent='CPU / SoC';
+  gauge('cpu',d.cpu,d.cpu,70,90);gauge('mem',d.memory,d.memory,80,90);gauge('disk',d.disk,d.disk,t.disk?.warn??80,t.disk?.crit??90);gauge('temp',+d.temperature,+d.temperature,t.temperature?.warn??75,t.temperature?.crit??85);
+  osInfo.textContent=val(d.os,'Debian');kernelInfo.textContent=val(d.kernel);archInfo.textContent=val(d.arch);cpuInfo.textContent=val(d.cpu_model,(val(d.cores)+' cores'));ramdetail.textContent=val(d.memory_used,0)+' / '+val(d.memory_total,0)+' MB';swapdetail.textContent=val(d.swap_used,0)+' / '+val(d.swap_total,0)+' MB';diskdetail.textContent=val(d.disk_used)+' / '+val(d.disk_total)+' · livre '+val(d.disk_free);
+  netIface.textContent=val(d.interface);gateway.textContent=val(d.gateway);topNetwork.textContent=d.interface?d.interface:'Conectado';networkStatus.textContent='● '+(d.interface?'Conectado':'Rede');
+  let sv=[['🌐','Nginx (Portal)',d.nginx,':80'],['📁','Samba (Arquivos)',d.samba,':445'],['🛠️','Cockpit (Sistema)',d.cockpit,':9090'],['💪','openGym',d.opengym,':8081 · HTTPS'],['🔒','Tailscale (VPN)',d.tailscale,val(d.tailscale_ip)]];
+  for(const [key,icon,label,port] of [['manyfold','🧊','Manyfold',3214],['mealie','🍽️','Mealie',9925],['actual','💰','Actual Budget',5006]])if(key in d)sv.push([icon,label,d[key],':'+port+' · HTTPS']);
+  serviceRows.innerHTML=sv.map(x=>serviceRow(...x)).join('');let ons=sv.filter(x=>x[2]==='online').length;serviceCount.textContent=ons+'/'+sv.length+' Online';systemOnline.textContent=(ons===sv.length?'Sistema Online':'Atenção: serviço offline');document.querySelector('.top-status').classList.toggle('warn',ons!==sv.length);
+  sensorCpu.textContent=val(d.temperature,0)+'°C';load.textContent=val(d.load);sensorCpuBar.style.width=Math.min(100,Number(d.temperature||0))+'%';loadBar.style.width=Math.min(100,(Number(d.load||0)/Math.max(1,Number(d.cores||1)))*100)+'%';
+  diskPct.textContent=val(d.disk,0)+'%';diskRing.style.setProperty('--p',Number(d.disk)||0);diskUsed.textContent=val(d.disk_used);diskFree.textContent=val(d.disk_free);diskTotal.textContent=val(d.disk_total);storageTotal.textContent=val(d.disk_total);storageBar.style.width=Math.min(100,Number(d.disk)||0)+'%';prints.textContent=val(d.prints);systemlogs.textContent=val(d.system_logs);aptcache.textContent=val(d.apt_cache);
+ }catch(e){console.error(e);banner.style.display='block';systemOnline.textContent='Dados indisponíveis'}
+}
+function updateBackupHealth(){let el=document.getElementById('backupHealth');fetch('/api/fitness-backup.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('sem estado');return r.json()}).then(d=>{let stamp=Date.parse(d.time),date=Number.isFinite(stamp)?new Date(stamp).toLocaleString('pt-BR'):'horário indisponível',fresh=Number.isFinite(stamp)&&Date.now()-stamp<36*60*60*1000;if(d.status==='ok'&&d.verified&&fresh){el.dataset.state='ok';el.textContent=`✓ Backup verificado · ${date} · ${d.file||'arquivo protegido'}`}else if(d.status==='ok'&&d.verified){el.dataset.state='stale';el.textContent=`⚠ Último backup verificado em ${date}; novo backup atrasado.`}else{el.dataset.state='error';el.textContent=`⚠ Última tentativa falhou · ${date} · ${d.message||'verificação pendente'}`}}).catch(()=>{el.dataset.state='unknown';el.textContent='Sem resultado de backup registrado ainda.'})}fmtDate();setInterval(fmtDate,1000);updateBackupHealth();setInterval(updateBackupHealth,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork()}});
+update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
+</script>
+<script src="/aurora-layout.js?v=20261122-v40" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+  <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
+  <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
+  <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>
+  <form id="powerSettingsForm">
+    <fieldset class="power-profiles"><legend>Perfil de uso</legend>
+      <label class="power-profile"><input type="radio" name="powerProfileChoice" value="eco" disabled><b>Economia máxima</b><small>Prioriza eficiência e desativa o turbo. Menor desempenho de pico.</small></label>
+      <label class="power-profile"><input type="radio" name="powerProfileChoice" value="balanced" disabled><b>Equilibrado</b><small>Eficiência no uso comum, com turbo disponível quando necessário.</small></label>
+      <label class="power-profile"><input type="radio" name="powerProfileChoice" value="performance" disabled><b>Desempenho</b><small>Prioriza resposta rápida. Pode consumir mais energia.</small></label>
+    </fieldset>
+    <p class="power-small" id="powerControlNote">Aguardando os controles do notebook.</p>
+    <label class="field" for="powerBrightness" style="margin-top:16px">Brilho da tela</label>
+    <div class="power-brightness"><input id="powerBrightness" type="range" min="5" max="100" step="5" value="50" disabled><output id="powerBrightnessValue" for="powerBrightness">—</output></div>
+    <label class="field" for="powerAdminKey">Chave administrativa do painel<input id="powerAdminKey" type="password" autocomplete="off" spellcheck="false" placeholder="Informe para autorizar alterações"></label>
+    <p class="power-small">A chave é fornecida ao administrador. Não use a senha do Debian. Ela fica somente na memória desta aba enquanto aberta.</p>
+    <p class="power-warning" id="powerHttpWarning" role="note" hidden><span aria-hidden="true">⚠</span> Você está em HTTP: a chave trafega sem criptografia na rede local. Para alterar com mais segurança, abra o portal pelo endereço HTTPS do Tailscale.</p>
+    <details><summary>Mais formas de economizar</summary><ul><li>Configure o apagamento da tela após 2–5 minutos no Debian.</li><li>Prefira cabo de rede quando disponível. Não desative o Wi-Fi que mantém seu acesso.</li><li>A NVIDIA está sendo monitorada; o painel não altera drivers nem força o desligamento da GPU.</li><li>Suspensão 00h–07h: desativada até testar o RTC com acesso físico. Não suspender durante impressão, backup ou atualização.</li></ul></details>
+    <div class="power-feedback" id="powerFeedback" role="status" aria-live="polite"></div>
+    <div class="power-dialog-actions"><button class="power-btn" id="powerCancel" type="button">Fechar</button><button class="power-btn primary" id="powerApply" type="submit" disabled>Aplicar economia</button></div>
+  </form>
+</dialog>
+<script src="/power.js?v=20261024-v24" defer></script>
+<script src="/operations.js?v=20261024-v23" defer></script>
+</body></html>

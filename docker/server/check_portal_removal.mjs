@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
-const root=process.argv[2], html=fs.readFileSync(root+'/site/index.html','utf8');
+const root=process.argv[2], html=fs.readFileSync(root+'/site/monitor-processos.html','utf8');
 assert(!/camera-card|printer-card|OctoPrint|camera-stream/.test(html));
 const element=()=>({textContent:'',innerHTML:'',dataset:{},style:{setProperty(){}},classList:{toggle(){},add(){},remove(){}},addEventListener(){}});
 const ids=Object.fromEntries([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>[m[1],element()]));

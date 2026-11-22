@@ -27,7 +27,7 @@ def prepare(root):
         apps[key] = apps.get(key) or secrets.token_urlsafe(48)
     write(apps_path, apps)
     existing = json.loads((private/'mcp.json').read_text()) if (private/'mcp.json').exists() else {}
-    tokens = {role: existing.get('connectors', {}).get(role) or secrets.token_urlsafe(48) for role in ('fitness', 'finance', 'food', 'print')}
+    tokens = {role: existing.get('connectors', {}).get(role) or secrets.token_urlsafe(48) for role in ('fitness', 'finance', 'food', 'print', 'web')}
     cfg = {'token': existing.get('token') or secrets.token_urlsafe(48), 'authToken': apps['_javis_connector_secret'], 'connectors': tokens}
     write(private/'mcp.json', cfg)
     write(private/'bootstrap.json', {'token': cfg['token']}, 10001)
@@ -41,6 +41,7 @@ def prepare(root):
                     native[key] = previous[key]
         write(private/(role+'.json'), dict(native, token=tokens[role]))
     write(private/'print.json', {'token': tokens['print'], 'apps': {app: apps[app] for app in ('manyfold',)}})
+    write(private/'web.json', {'token':tokens['web']})
     control = private/'admin.env'
     if not control.exists():
         write(control, 'JAVIS_ADMIN_USER='+OWNER+'\nJAVIS_ADMIN_PASSWORD='+secrets.token_urlsafe(64)+'\n', 10001)
