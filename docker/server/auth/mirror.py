@@ -5,8 +5,10 @@ import urllib.error
 
 def query(session,cfg,action,value=None):
     if 'portal' not in session['grants']:raise ValueError('Portal não autorizado.')
-    payload={'owner':session['email'],'identity':session['grants'].get('opengym'),'action':action}
-    if action=='weather':payload.update(value or {})
+    payload={'owner':session['email'],'identity':session['grants'].get('opengym'),'action':action,'admin':session.get('admin') is True}
+    if action=='weather':
+        coordinates=value if isinstance(value,dict) else {}
+        payload.update(lat=coordinates.get('lat'),lon=coordinates.get('lon'))
     elif value is not None:payload['value']=value
     key=cfg.get('_mirror_secret','')
     if len(key)<32:return 503,{'error':'Painel ainda não configurado.'}

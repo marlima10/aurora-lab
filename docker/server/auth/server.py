@@ -116,6 +116,18 @@ def handler(store, origin, assets=None, apps_config=None):
                 for name, mime in (('app.js', 'text/javascript; charset=utf-8'), ('app.css', 'text/css; charset=utf-8')):
                     if path == '/auth/' + name:
                         return self.send(200, (assets / name).read_bytes(), content_type=mime)
+                if path == '/auth/mirror/configurar':
+                    try:session=self.current()
+                    except AccessError:return self.send(302,b'',{'Location':'/auth/'})
+                    if not session['admin']:raise AccessError('Somente o administrador pode configurar a tela.')
+                    return self.send(200,(assets/'mirror-config.html').read_bytes(),content_type='text/html; charset=utf-8')
+                for name,mime in (('mirror-config.js','text/javascript; charset=utf-8'),('mirror-config.css','text/css; charset=utf-8')):
+                    if path == '/auth/mirror/'+name:
+                        self.current(admin=True)
+                        return self.send(200,(assets/name).read_bytes(),content_type=mime)
+                if path == '/auth/mirror/settings':
+                    status,result=mirror_query(self.current(admin=True),apps_config,'settings-get')
+                    return self.send(status,result)
                 if path == '/auth/session':
                     return self.send(200, self.current())
                 if path in ('/auth/mirror/state','/auth/mirror/news'):
@@ -195,6 +207,9 @@ def handler(store, origin, assets=None, apps_config=None):
                     token, csrf = store.authenticate(data.get('email'), data.get('key'), self.headers.get('X-Aurora-Client-IP', self.client_address[0]))
                     return self.send(200, {'ok': True, 'csrf': csrf}, {'Set-Cookie': COOKIE + '=' + token + '; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=' + str(SESSION_SECONDS)})
                 session = self.current(csrf=True)
+                if path == '/auth/mirror/settings':
+                    status,result=mirror_query(self.current(csrf=True,admin=True),apps_config,'settings-save',data)
+                    return self.send(status,result)
                 if path in ('/auth/mirror/save','/auth/mirror/weather'):
                     status,result=mirror_query(session,apps_config,path.rsplit('/',1)[1],data)
                     return self.send(status,result)

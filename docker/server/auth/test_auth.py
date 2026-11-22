@@ -181,6 +181,33 @@ class HttpAuthenticationTests(Fixture, unittest.TestCase):
         connection.close()
         return record
 
+    def test_mirror_configuration_sends_anonymous_visitors_to_login(self):
+        connection=http.client.HTTPConnection(*self.http.server_address,timeout=5)
+        connection.request('GET','/auth/mirror/configurar')
+        response=connection.getresponse()
+        self.assertEqual(response.status,302);self.assertEqual(response.getheader('Location'),'/auth/')
+        response.read();connection.close()
+
+    def test_mirror_settings_are_admin_only_even_with_forged_headers(self):
+        key=self.store.issue(ADMIN_EMAIL,'person@example.test')
+        token,csrf=self.login('person@example.test',key)
+        headers={'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf,'X-Aurora-Admin':'1'}
+        for path in ('/auth/mirror/configurar','/auth/mirror/settings','/auth/mirror/mirror-config.js','/auth/mirror/mirror-config.css'):
+            self.assertEqual(self.request(path,headers=headers)[0],403)
+        self.assertEqual(self.request('/auth/mirror/settings',{'admin':True},headers)[0],403)
+
+    def test_mirror_settings_require_admin_csrf_and_exact_origin(self):
+        from unittest.mock import patch
+        token,csrf=self.login();headers={'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf}
+        with patch('server.mirror_query',return_value=(200,{'settings':{},'defaults':{}})) as query:
+            self.assertEqual(self.request('/auth/mirror/settings',headers=headers)[0],200)
+            self.assertEqual(query.call_args.args[2],'settings-get')
+            self.assertTrue(query.call_args.args[0]['admin'])
+            self.assertEqual(self.request('/auth/mirror/settings',{},headers|{'X-Aurora-CSRF':'wrong'})[0],403)
+            self.assertEqual(self.request('/auth/mirror/settings',{},headers|{'Origin':'https://attacker.example.test'})[0],403)
+            self.assertEqual(self.request('/auth/mirror/settings',{},headers)[0],200)
+            self.assertEqual(query.call_args.args[2],'settings-save')
+
     def test_cookie_is_host_only_secure_httponly_and_no_store(self):
         status, headers, body = self.request('/auth/login', {'email':ADMIN_EMAIL, 'key':self.key})
         self.assertEqual(status, 200)

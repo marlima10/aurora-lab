@@ -1,4 +1,4 @@
-# AuroraLAB 42.0.0
+# AuroraLAB 43.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
@@ -139,3 +139,5 @@ Nova tela pessoal com relógio, clima pela localização do aparelho, calendári
 A [release 41](docs/RELEASE-41.md) acrescenta compatibilidade com PWAs instaladas anteriormente, sem alterar a tag 40 ou os dados pessoais.
 
 A [release 42](docs/RELEASE-42.md) simplifica o Monitor de processos removendo os atalhos duplicados dos aplicativos; o lançador permanece na página inicial.
+
+A [release 43](docs/RELEASE-43.md) adiciona a página administrativa **Configurar tela** para os blocos e a aparência do MagicMirror.
