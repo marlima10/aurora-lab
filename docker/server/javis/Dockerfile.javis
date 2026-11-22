@@ -2,8 +2,12 @@ FROM ghcr.io/blogminhquy/javis-os@sha256:844de16180d2295ceccdee610715378f0a01bc2
 USER root
 COPY source.lock.json /opt/aurora/source.lock.json
 RUN python -c "import json,pathlib,hashlib; s=json.loads(pathlib.Path('/opt/aurora/source.lock.json').read_text()); assert pathlib.Path('/app/VERSION').read_text().strip()==s['version']; assert all(hashlib.sha256((pathlib.Path('/app')/n).read_bytes()).hexdigest()==h for n,h in s['verifiedFiles'].items())"
-COPY aurora_entry.py gemini_runtime.py /app/server/
+COPY aurora_entry.py gemini_runtime.py locale_runtime.py /app/server/
+COPY localize_assets.py /opt/aurora/localize_assets.py
+COPY pt.json /app/dashboard/i18n/pt.json
+COPY aurora-locale.js /app/dashboard/aurora-locale.js
+RUN python /opt/aurora/localize_assets.py
 COPY stdio_bridge.py bootstrap.py aurora-mode.js aurora-mode.css gemini-setup.html /opt/aurora/
-RUN python -c "import pathlib;p=pathlib.Path('/app/dashboard/index.html');s=p.read_text();p.write_text(s.replace('</body>','<link rel=\"stylesheet\" href=\"/aurora-mode.css?v=35\"><script src=\"/aurora-mode.js?v=35\"></script></body>'))"
+RUN python -c "import pathlib;p=pathlib.Path('/app/dashboard/index.html');s=p.read_text();p.write_text(s.replace('</body>','<link rel=\"stylesheet\" href=\"/aurora-mode.css?v=36\"><script src=\"/aurora-mode.js?v=36\"></script></body>'))"
 USER 10001:10001
 CMD ["python", "-m", "uvicorn", "aurora_entry:app", "--app-dir", "/app/server", "--host", "0.0.0.0", "--port", "7777", "--proxy-headers", "--forwarded-allow-ips", "*"]

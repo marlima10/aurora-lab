@@ -4,11 +4,17 @@ import json
 import os
 from pathlib import Path
 import config
+
+if os.getenv("JAVIS_AI_PROVIDER") == "gemini":
+    import locale_runtime
+    locale_runtime.register()
+
 import main
 
 if os.getenv('JAVIS_AI_PROVIDER') == 'gemini':
     import gemini_runtime
     gemini_runtime.install(main)
+    locale_runtime.voice_proxy()
 
 SESSION = ''
 ASSETS = Path('/opt/aurora')

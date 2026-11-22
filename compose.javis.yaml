@@ -20,7 +20,7 @@ x-javis-reader: &reader
 services:
   javis:
     build: {context: ./docker/server/javis, dockerfile: Dockerfile.javis}
-    image: auroralab-javis-os:35.0.0
+    image: auroralab-javis-os:36.0.0
     user: '10001:10001'
     env_file: ./secrets/javis/admin.env
     environment:
@@ -54,7 +54,7 @@ services:
     restart: unless-stopped
     logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
   javis-ai-egress:
-    image: auroralab-javis-egress:35.0.0
+    image: auroralab-javis-egress:36.0.0
     build: {context: ./docker/server/javis, dockerfile: Dockerfile.egress}
     user: '65534:65534'
     networks: [javis, javis-outbound]

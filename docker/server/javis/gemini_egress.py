@@ -1,15 +1,15 @@
-"""TLS tunnel to the fixed Gemini API host. No decrypted traffic or credential logs."""
+"""TLS tunnel to the fixed Gemini and native free speech hosts. No decrypted traffic or credential logs."""
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import select
 import socket
 import threading
 import time
 
-DESTINATION = ('generativelanguage.googleapis.com', 443)
+DESTINATIONS = {'generativelanguage.googleapis.com':443, 'speech.platform.bing.com':443}
 SLOTS = threading.BoundedSemaphore(8)
 
 def allowed(target):
-    return target.lower() == DESTINATION[0]+':443'
+    return target.lower() in {host+':443' for host in DESTINATIONS}
 
 class Handler(BaseHTTPRequestHandler):
     protocol_version='HTTP/1.1'
@@ -23,7 +23,7 @@ class Handler(BaseHTTPRequestHandler):
         if not SLOTS.acquire(False):
             self.send_error(429,'Busy');return
         try:
-            with socket.create_connection(DESTINATION,timeout=15) as remote:
+            with socket.create_connection((self.path.lower().rsplit(':',1)[0],443),timeout=15) as remote:
                 self.send_response(200,'Connection Established');self.end_headers()
                 self.wfile.flush()
                 sockets=[self.connection,remote];end=time.monotonic()+300
