@@ -230,8 +230,10 @@ O Compose e os adaptadores abaixo foram removidos do estado atual; esta seção 
 Adaptadores, importador, preparação privada e ensaio de restauração: `docker/server/workoutcool-test/`. Dados/credenciais em `data/workoutcool-test/` e `secrets/workoutcool-test/`, ignorados pelo Git. Guia: [WORKOUTCOOL-TESTE.md](WORKOUTCOOL-TESTE.md).
 
 
-## Avaliação wger (45.0.0)
+## Avaliação wger (45.0.0) — encerrada na 46
 
-`compose.wger-test.yaml`: projeto independente `auroralab-wger-test`, app wger 2.7 + db PostgreSQL 15 + gateway Nginx + backup. Rede lab interna para app/db/backup; apenas gateway acessa autenticação e entrada, ligada ao loopback 127.0.0.1:18444. Tailscale HTTPS :8444 atende o teste. Não se acrescenta ao COMPOSE_FILE do portal.
+O projeto independente auroralab-wger-test foi removido. Seu Compose, adaptadores, banco, uploads, credenciais e backups próprios não compõem a implantação atual. A rota privada :8444 também foi retirada. O backup misto que incluía configurações do teste foi higienizado preservando os demais arquivos. As fontes antigas continuam disponíveis somente no histórico Git/release 45.
 
-`docker/server/wger-test/`: Dockerfile com imagem oficial fixada, settings/middleware de delegação administrativa, preparação privada, importador, testes sintéticos e restauração offline. `data/wger-test/` e `secrets/wger-test/` são privados e ignorados pelo Git. [Procedimentos](WGER-TESTE.md).
+## Treinos após a release 46
+
+OpenGym e o serviço Garmin existentes permanecem independentes e ativos, conforme compose.opengym.yaml e os overlays de produção. A retirada do teste não altera seu armazenamento, identidades, sincronização ou endereço de acesso. [Registro](RELEASE-46.md).
