@@ -53,18 +53,7 @@
     <div id="banner" class="banner">⚠ Dados indisponíveis ou desatualizados.</div>
 
     <h1 class="panel-title">Monitor de processos</h1>
-    <section class="quick-grid">
-      <button id="installApp" type="button" class="quick q3">⬇ Instalar app no celular ou tablet</button>
-      <button class="quick q3" onclick="openPort(9090)"><span>🛠️</span><div><b>Cockpit</b><small>:9090 · Administração</small></div><i>→</i></button>
-      <button class="quick q4" onclick="openSamba()"><span>📁</span><div><b>Samba</b><small id="sambaPath">Arquivos compartilhados</small></div><i>→</i></button>
-      <button type="button" class="quick q7" onclick="location.href='/opengym'"><span>💪</span><div><b>openGym</b><small>Treinos com acesso seguro</small></div><i>→</i></button>
-      <button type="button" class="quick q7" onclick="location.href='/garmin'"><span>⌚</span><div><b>Garmin → openGym</b><small>Importar atividades executadas</small></div><i>→</i></button>
-      <button type="button" class="quick q7" onclick="location.href='/manyfold'"><span>🧊</span><div><b>Manyfold</b><small>Biblioteca de modelos 3D</small></div><i>→</i></button>
-      <button type="button" class="quick q5" onclick="location.href='/mealie'"><span>🍽️</span><div><b>Mealie</b><small>Receitas e planejamento de refeições</small></div><i>→</i></button>
-      <button type="button" class="quick q6" onclick="location.href='/actual'"><span>💰</span><div><b>Actual Budget</b><small>Organização financeira pessoal</small></div><i>→</i></button>
-      <button type="button" id="javis-shortcut" class="quick q7" hidden onclick="location.href='/javis'"><span aria-hidden="true">✦</span><div><b>Javis OS</b><small>Assistente Gemini no servidor</small></div><i>→</i></button>
-      <button type="button" id="user-management-shortcut" class="quick q7" hidden onclick="location.href='/auth/admin'"><span aria-hidden="true">👥</span><div><b>Gestão de usuários</b><small>Cadastros, permissões e chaves</small></div><i>→</i></button>
-    </section>
+    <p><button id="installApp" type="button" class="fitness-btn">Instalar app no celular ou tablet</button></p>
 
     <section class="dashboard-grid">
       <article class="panel services-panel" id="services-card">
@@ -220,7 +209,6 @@
 <script src="/pwa.js?v=20261122-v40" defer></script>
 <script src="/aurora.js?v=20261121-v39"></script>
 <script>
-document.addEventListener('aurora:session', event => { for(const id of ['user-management-shortcut','javis-shortcut']) { const shortcut = document.getElementById(id); if(shortcut) shortcut.hidden = !event.detail?.admin; } });
 const val=(v,f='--')=>(v===undefined||v===null||v==='')?f:v;
 function fmtTime(s){s=Number(s);if(!isFinite(s)||s<=0)return '--';s=Math.round(s);let h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return (h?h+'h ':'')+String(m).padStart(2,'0')+'min '+String(ss).padStart(2,'0')+'s'}
 function fmtDate(){let d=new Date();dateNow.textContent=d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'long'});timeNow.textContent=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
@@ -241,7 +229,6 @@ async function update(){
   let stale=!d.generated||Date.now()-Date.parse(d.generated)>30000;banner.style.display=stale?'block':'none';
   stamp.textContent=age(d.generated)+' atrás';hostname.textContent=val(d.hostname);sideHost.textContent=val(d.hostname);topLocalIp.textContent=val(d.local_ip);topTailIp.textContent=val(d.tailscale_ip,'Offline');
   localip.textContent=val(d.local_ip);tailscaleip.textContent=val(d.tailscale_ip,'Offline');uptime.textContent=val(d.uptime);topUptime.textContent='Uptime '+val(d.uptime);
-  sambaPath.textContent='\\\\'+val(d.local_ip,location.hostname)+'\\';
   cpu.textContent=val(d.cpu,0)+'%';mem.textContent=val(d.memory,0)+'%';disk.textContent=val(d.disk,0)+'%';temp.textContent=val(d.temperature,0)+'°C';
   cpuSub.textContent=val(d.cores)+' núcleos · load '+val(d.load);memSub.textContent=val(d.memory_used,0)+' / '+val(d.memory_total,0)+' MB';diskSub.textContent=val(d.disk_used)+' / '+val(d.disk_total);tempSub.textContent='CPU / SoC';
   gauge('cpu',d.cpu,d.cpu,70,90);gauge('mem',d.memory,d.memory,80,90);gauge('disk',d.disk,d.disk,t.disk?.warn??80,t.disk?.crit??90);gauge('temp',+d.temperature,+d.temperature,t.temperature?.warn??75,t.temperature?.crit??85);
