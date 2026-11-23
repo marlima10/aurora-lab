@@ -220,6 +220,35 @@ class HttpAuthenticationTests(Fixture, unittest.TestCase):
         key=self.store.issue(ADMIN_EMAIL,'person@example.test');token,csrf=self.login('person@example.test',key)
         self.assertEqual(self.request('/auth/mirror/locations',{'query':'Jacareí, SP'},{'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf,'X-Aurora-Admin':'1'})[0],403)
 
+    def test_background_upload_requires_admin_csrf_origin_and_raster_type(self):
+        from unittest.mock import patch
+        token,csrf=self.login();headers={'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf,'Content-Type':'image/png','Origin':'https://portal.example.test'}
+        def upload(extra=None):
+            connection=http.client.HTTPConnection(*self.http.server_address,timeout=5)
+            connection.request('POST','/auth/mirror/backgrounds/upload',b'fixture-image',headers|(extra or {}))
+            response=connection.getresponse();status=response.status;response.read();connection.close();return status
+        with patch('server.mirror_upload',return_value=(200,{'uploadedId':'a'*64})) as forwarded:
+            self.assertEqual(upload(),200);self.assertEqual(forwarded.call_args.args[2],b'fixture-image')
+            forwarded.reset_mock()
+            for extra in [{'X-Aurora-CSRF':'wrong'},{'Origin':'https://other.test'},{'Content-Type':'image/svg+xml'},{'Content-Length':str(12*1024*1024+1)}]:
+                self.assertIn(upload(extra),(400,403,413))
+            forwarded.assert_not_called()
+            key=self.store.issue(ADMIN_EMAIL,'person@example.test');normal,othercsrf=self.login('person@example.test',key)
+            self.assertEqual(upload({'Cookie':COOKIE+'='+normal,'X-Aurora-CSRF':othercsrf,'X-Aurora-Admin':'1'}),403)
+
+    def test_background_list_is_admin_only_and_image_requires_session(self):
+        from unittest.mock import patch
+        key=self.store.issue(ADMIN_EMAIL,'person@example.test');token,csrf=self.login('person@example.test',key)
+        headers={'Cookie':COOKIE+'='+token}
+        self.assertEqual(self.request('/auth/mirror/backgrounds',headers=headers)[0],403)
+        connection=http.client.HTTPConnection(*self.http.server_address,timeout=5)
+        connection.request('GET','/auth/mirror/backgrounds/'+'a'*64)
+        response=connection.getresponse();self.assertEqual(response.status,403);response.read();connection.close()
+        admin,_=self.login()
+        with patch('server.mirror_query',return_value=(200,{'images':[]})) as query:
+            self.assertEqual(self.request('/auth/mirror/backgrounds',headers={'Cookie':COOKIE+'='+admin})[0],200)
+            self.assertEqual(query.call_args.args[2],'backgrounds')
+
     def test_cookie_is_host_only_secure_httponly_and_no_store(self):
         status, headers, body = self.request('/auth/login', {'email':ADMIN_EMAIL, 'key':self.key})
         self.assertEqual(status, 200)
