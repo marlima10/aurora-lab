@@ -1,6 +1,7 @@
 /* AuroraLAB home: a real MagicMirror module, isolated per central identity. */
 Module.register('MMM-Aurora', {
   defaults:{},
+  getScripts(){return [this.file('backgrounds.js')]},
   getStyles(){return [this.file('aurora-mirror.css')]},
   start(){this.state=null;this.session=null;this.month=new Date();this.weatherKey=null;this.loading=false;this.timer=setInterval(()=>{this.refresh();this.news();if(this.state?.settings?.weatherLocation)this.weather()},300000)},
   getDom(){
@@ -31,6 +32,7 @@ Module.register('MMM-Aurora', {
   async refresh(){if(this.loading)return;this.loading=true;try{this.session=await this.api('session');this.root.querySelectorAll('[data-admin]').forEach(e=>{e.hidden=!this.session.admin});this.root.querySelectorAll('[data-app]').forEach(e=>{e.hidden=!Object.hasOwn(this.session.grants,e.dataset.app)});this.state=await this.api('mirror/state');this.applySettings();this.render();this.status('Atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}))}catch(e){this.status(e.message);if(!this.state){this.text('reminders','Entre na sua conta ou tente atualizar a página.');this.text('rings','Dados indisponíveis.');this.text('chart','Dados indisponíveis.')}}finally{this.loading=false}},
   async save(value){const result=await this.api('mirror/save',value);Object.assign(this.state,result);this.render();this.status('Alteração salva.')},
   bind(){
+    this.backgroundRotation=new window.AuroraMirrorBackgrounds(this.root);
     window.addEventListener('storage',e=>{if(e.key==='aurora.mirror.settings.updated')this.refresh()});document.addEventListener('visibilitychange',()=>{if(!document.hidden)this.refresh()});
     this.el('add-reminder').onclick=()=>this.open('reminder');this.el('notes').onclick=()=>this.open('reminder');this.el('add-event').onclick=()=>this.open('event');this.el('goals').onclick=()=>this.open('goals');
     this.el('calendar-link').onclick=()=>{this.el('calendar').scrollIntoView({behavior:'smooth',block:'center'});this.el('add-event').focus()};
@@ -43,7 +45,7 @@ Module.register('MMM-Aurora', {
     if(kind==='goals'){const g=this.state.goals||{};field('Treinos por semana','sessions','number',g.sessions,1,100);field('Minutos por semana','minutes','number',g.minutes,1,100000);field('Calorias por semana','calories','number',g.calories,1,100000)}else{field('Título','title','text','');if(kind==='event')field('Data','day','date',this.day(new Date()))}this.el('dialog').showModal();
   },
   applySettings(){
-    const prefs=this.state.settings;if(!prefs)return;
+    const prefs=this.state.settings;if(!prefs)return;this.backgroundRotation?.configure(prefs);
     const standard=['clock','weather','reminders','calendar','goals','history','news'],grid=this.root.querySelector('.mirror-grid'),dock=this.root.querySelector('.dock');
     const custom=prefs.fontScale!==100||prefs.order.join()!==standard.join()||Object.values(prefs.widgets).some(v=>!v);
     this.root.classList.toggle('settings-custom',custom);

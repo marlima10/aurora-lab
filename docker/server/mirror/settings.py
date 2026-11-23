@@ -1,10 +1,11 @@
 """Bounded display preferences; no JS, commands, filesystem paths or arbitrary URLs."""
 import copy
 import math
+import re
 from holidays import REGIONS
 WIDGETS=('clock','weather','reminders','calendar','goals','history','news')
 SHORTCUTS=('opengym','mealie','javis','reminders','calendar','manyfold','actual','monitor')
-DEFAULTS={'widgets':{k:True for k in WIDGETS},'order':list(WIDGETS),'shortcuts':{k:True for k in SHORTCUTS},'clock24':True,'temperatureUnit':'C','backgroundDim':35,'panelOpacity':40,'blur':9,'fontScale':100,'refreshMinutes':5,'newsCount':5,'weatherLocation':None,'calendarView':'month','holidayRegion':'BR'}
+DEFAULTS={'widgets':{k:True for k in WIDGETS},'order':list(WIDGETS),'shortcuts':{k:True for k in SHORTCUTS},'clock24':True,'temperatureUnit':'C','backgroundDim':35,'panelOpacity':40,'blur':9,'fontScale':100,'refreshMinutes':5,'newsCount':5,'weatherLocation':None,'calendarView':'month','holidayRegion':'BR','backgroundMode':'default','backgroundImages':[],'backgroundSeconds':60}
 
 def defaults():return copy.deepcopy(DEFAULTS)
 
@@ -23,6 +24,10 @@ def validate(value):
     for name,low,high in (('backgroundDim',15,85),('panelOpacity',20,85),('blur',0,16),('fontScale',80,125),('refreshMinutes',5,60),('newsCount',1,8)):
         if type(value[name])!=int or not low<=value[name]<=high:raise ValueError('Valor fora do intervalo permitido.')
     if value['calendarView'] not in ('month','week') or value['holidayRegion'] not in REGIONS:raise ValueError('Calendário inválido.')
+    if value['backgroundMode'] not in ('default','fixed','slideshow'):raise ValueError('Modo de fundo inválido.')
+    if type(value['backgroundSeconds'])!=int or not 15<=value['backgroundSeconds']<=3600:raise ValueError('Intervalo entre 15 e 3.600 segundos.')
+    images=value['backgroundImages']
+    if not isinstance(images,list) or len(images)>50 or any(not isinstance(x,str) or not re.fullmatch(r'[a-f0-9]{64}',x) for x in images) or len(images)!=len(set(images)):raise ValueError('Seleção de imagens inválida.')
     loc=value['weatherLocation']
     if loc is not None:
         if not isinstance(loc,dict) or set(loc)!={'name','lat','lon'}:raise ValueError('Local inválido.')

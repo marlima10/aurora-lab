@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 48.0.0
+# Estrutura e arquitetura — AuroraLAB 49.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -253,3 +253,11 @@ O esquema limitado de display_settings ganha weatherLocation, calendarView e hol
 A tabela holiday_events recebe um catálogo idempotente de 2026–2030 definido em docker/server/mirror/holidays.py, com escopo e fonte legal. É separado de entries e goals, não ocupa a cota de eventos pessoais e não é apagado pela exclusão de um evento particular. Os escopos disponíveis são Brasil, Brasil/SP e Brasil/SP/Jacareí. Mês/Semana pode ser alternado durante a sessão; a opção administrativa define o padrão persistido.
 
 O módulo MMM-Aurora oculta visualmente os títulos redundantes dos três blocos superiores, preservando seus nomes acessíveis; remove suas superfícies/bordas e reduz as fontes. A barra de aplicativos quebra linhas e o Jarvis usa SVG local com nome acessível. A restrição administrativa do Jarvis e as permissões dos outros aplicativos permanecem vigentes. Consulte [MAGICMIRROR.md](MAGICMIRROR.md).
+
+## Galeria do MagicMirror (49.0.0)
+
+`docker/server/mirror/gallery.py` gerencia o diretório `data/mirror/backgrounds`, com originais e derivados JPEG/miniaturas em `.rendered`. Pillow 13.0.0 valida e reduz as imagens para tela, respeitando orientação e removendo metadados das cópias servidas. A API Mirror tem limite de 512 MiB para lidar com fotos de alta resolução; a galeria serializa a decodificação. Imagens pessoais nunca entram no Git ou no contexto Docker.
+
+GET `/auth/mirror/backgrounds` lista a galeria para o administrador. POST `/auth/mirror/backgrounds/upload` recebe bytes raster, exige administrador, CSRF e origem exata antes de ler o corpo e tem limite separado de 12 MiB. JSON comum continua limitado a 8 KiB. GET `/auth/mirror/backgrounds/<sha256>` e `/thumb` exigem sessão com acesso ao portal e encaminham somente JPEG validado, sem cache público. Caminhos fornecidos por clientes não são usados para ler arquivos.
+
+As preferências `backgroundMode`, `backgroundImages` e `backgroundSeconds` estendem o esquema persistente. A sequência em `MMM-Aurora/backgrounds.js` carrega a foto antes de trocar, cancela respostas antigas após reconfiguração e pausa o temporizador quando o documento fica oculto. O pôr do sol original é a opção padrão e a reserva para uma seleção indisponível. Os recursos privados não entram no service worker.

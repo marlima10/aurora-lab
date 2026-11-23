@@ -1,10 +1,12 @@
-# AuroraLAB 48.0.0
+# AuroraLAB 49.0.0
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
 Este README acompanha a versão registrada em [`VERSION`](VERSION). Os guias operacionais ficam em [`docs/`](docs/); os padrões de trabalho, em [`skills/`](skills/).
 
 ## Tela inicial MagicMirror
+
+A release 49 acrescenta galeria privada, envio de fotos pelo navegador e fundo fixo ou em sequência, com seleção e intervalo salvos no servidor. [Como usar as imagens](docs/MAGICMIRROR.md#imagens-de-fundo) · [Revisão da release](docs/RELEASE-49.md).
 
 A release 48 simplifica os blocos superiores, grava a cidade do clima sem GPS e acrescenta calendário mensal/semanal com feriados de 2026 a 2030. O atalho Jarvis ganha ícone próprio e barra adaptada ao tablet. [Configuração](docs/MAGICMIRROR.md) · [Revisão da release](docs/RELEASE-48.md).
 

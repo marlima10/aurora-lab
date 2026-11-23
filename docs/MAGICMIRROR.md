@@ -31,3 +31,22 @@ A barra de aplicativos ajusta suas linhas ao espaço disponível. O Jarvis tem �
 Testes sintéticos Python em docker/server/mirror/test_*.py, autenticação em docker/server/auth/test_auth.py e verificações Node check_settings.mjs, check_calendar.mjs e check_pwa.mjs. Executar os scripts Node passando a raiz do repositório. As imagens alteradas são magicmirror, mirror-api e auth; openGym/Garmin e suas imagens não precisam ser reconstruídos.
 
 O backup inclui mirror.sqlite3, preferências, catálogo e dados pessoais. Ao voltar para código anterior à release 48, restaurar coerentemente o snapshot anterior do Mirror: seu esquema antigo de configurações não reconhece as novas chaves. Não sobrepor um banco em uso. Seguir ATUALIZACAO.md.
+
+## Imagens de fundo
+
+Entre como administrador e abra **Configurar tela → Imagens de fundo**.
+
+1. Em **Adicionar imagens**, escolha uma ou mais fotos do computador, tablet ou celular.
+2. Clique em **Enviar imagens** e aguarde a confirmação. Os arquivos já ficam guardados na pasta do servidor; fotos repetidas não são duplicadas.
+3. Marque as fotos que devem participar. Escolha **Alternar imagens selecionadas**, **Uma imagem selecionada** ou **Pôr do sol original**.
+4. Informe **Trocar a cada (segundos)**, de 15 até 3.600, e clique em **Salvar configurações**.
+
+O padrão inicial é 60 segundos. As fotos seguem a ordem em que são selecionadas; a opção fixa usa a primeira. A seleção é compartilhada com os usuários do portal. Enviar fotos não ativa a sequência até salvar a configuração. A troca pausa em segundo plano e só aplica uma foto depois de ela carregar.
+
+Aceita JPG, PNG e WebP sem animação, até 12 MiB e 50 megapixels por imagem, com até 50 fotos na galeria. HEIC não é formato de envio: exporte a foto como JPEG quando o aparelho não fizer essa conversão. As cópias exibidas são ajustadas para a tela, respeitam a orientação e não carregam EXIF; os originais enviados permanecem privados no servidor. Não são enviados a serviços de IA.
+
+Nesta instalação, a pasta é `/srv/auroralab/data/mirror/backgrounds`. Também é possível copiar fotos por SSH/SFTP com permissão administrativa; os arquivos devem ser legíveis pelo serviço Mirror (UID 65534). Depois clique em **Atualizar galeria** para selecionar os novos arquivos. O envio pelo próprio painel dispensa mexer em permissões. A pasta `.rendered` é gerada pelo serviço e contém as cópias de exibição; não é o local para colocar fotos novas.
+
+Desmarcar uma foto a retira da sequência, preservando o arquivo. Esta release não acrescenta exclusão definitiva pelo navegador. Arquivos inválidos, links simbólicos e itens além do limite não são disponibilizados na galeria. Uma foto retirada manualmente da pasta deixa de ser disponibilizada; se uma imagem selecionada não carregar, o aplicativo tenta outra ou usa o fundo original.
+
+A pasta e as preferências entram no backup Mirror já existente. Para retorno a código anterior à release 49, use o snapshot anterior do SQLite com suas imagens/código correspondentes: o esquema estrito anterior não reconhece os novos campos. Consulte ATUALIZACAO.md antes de restaurar sobre qualquer banco.

@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import datetime as dt
 import settings
 import holidays
+from gallery import Gallery,MAX_BYTES
 import hmac
 import json
 import math
@@ -29,7 +30,7 @@ def fetch(url,headers=None):
 
 class Data:
     def __init__(self,path):
-        self.path=path;self.cache={};self.lock=threading.Lock()
+        self.path=path;self.cache={};self.lock=threading.Lock();self.gallery=Gallery(Path(path).parent/"backgrounds")
         with self.db() as db:
             db.execute('CREATE TABLE IF NOT EXISTS entries(id TEXT PRIMARY KEY,owner TEXT NOT NULL,kind TEXT NOT NULL,title TEXT NOT NULL,day TEXT NOT NULL,done INTEGER NOT NULL DEFAULT 0)')
             db.execute('CREATE TABLE IF NOT EXISTS goals(owner TEXT PRIMARY KEY,sessions INTEGER NOT NULL,minutes INTEGER NOT NULL,calories INTEGER NOT NULL)')
@@ -50,6 +51,9 @@ class Data:
         return settings.validate(json.loads(row[0])) if row else settings.defaults()
     def save_settings(self,value):
         value=settings.validate(value)
+        if value['backgroundMode']!='default':
+            available={image['id'] for image in self.gallery.scan()['images']}
+            if not value['backgroundImages'] or any(identifier not in available for identifier in value['backgroundImages']):raise ValueError('Selecione imagens disponíveis na galeria.')
         with self.db() as db:db.execute('INSERT INTO display_settings VALUES(1,?) ON CONFLICT(id) DO UPDATE SET value=excluded.value',(json.dumps(value),))
         return value
     def state(self,owner):
@@ -148,13 +152,30 @@ def run():
             raw=json.dumps(value,ensure_ascii=False).encode();self.send_response(status)
             for k,v in {'Content-Type':'application/json','Content-Length':str(len(raw)),'Cache-Control':'no-store'}.items():self.send_header(k,v)
             self.end_headers();self.wfile.write(raw)
-        def do_GET(self):self.send(200 if self.path=='/health' else 404,{'status':'ok'} if self.path=='/health' else {})
+        def image(self,raw):
+            self.send_response(200)
+            for key,value in {'Content-Type':'image/jpeg','Content-Length':str(len(raw)),'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}.items():self.send_header(key,value)
+            self.end_headers();self.wfile.write(raw)
+        def do_GET(self):
+            if self.path=='/health':return self.send(200,{'status':'ok'})
+            if not hmac.compare_digest(self.headers.get('Authorization',''),'Bearer '+cfg['token']):return self.send(403,{})
+            parts=self.path.split('/')
+            try:
+                if len(parts) not in (3,4) or parts[1]!='backgrounds' or (len(parts)==4 and parts[3]!='thumb'):return self.send(404,{})
+                return self.image(data.gallery.image(parts[2],len(parts)==4))
+            except (ValueError,FileNotFoundError):return self.send(404,{})
         def do_POST(self):
             if not slots.acquire(False):return self.send(503,{'error':'Aguarde um instante.'})
             try:
                 self.connection.settimeout(20)
                 if not hmac.compare_digest(self.headers.get('Authorization',''),'Bearer '+cfg['token']):return self.send(403,{'error':'Não autorizado.'})
                 size=int(self.headers.get('Content-Length','0'))
+                if self.path=='/backgrounds/upload':
+                    if self.headers.get('X-Aurora-Admin')!='1':return self.send(403,{})
+                    if self.headers.get('Transfer-Encoding') or not 0<size<=MAX_BYTES:return self.send(413,{'error':'Envie uma imagem de até 12 MB.'})
+                    if self.headers.get('Content-Type') not in ('image/jpeg','image/png','image/webp'):return self.send(400,{'error':'Use JPG, PNG ou WebP.'})
+                    try:return self.send(200,data.gallery.upload(self.rfile.read(size),urllib.parse.unquote(self.headers.get('X-Image-Name','imagem'))[:160]))
+                    except ValueError as error:return self.send(400,{'error':str(error)})
                 if self.path!='/query' or self.headers.get('Transfer-Encoding') or not 0<size<=8192:raise ValueError('Conteúdo inválido.')
                 v=json.loads(self.rfile.read(size));owner=v.get('owner');action=v.get('action')
                 if not isinstance(owner,str) or not 1<=len(owner)<=254:raise ValueError('Perfil inválido.')
@@ -166,6 +187,9 @@ def run():
                     try:result['fitness']=fitness(cfg,v.get('identity'))
                     except Exception:result['fitness']={'available':False,'reason':'openGym indisponível no momento.'}
                 elif action=='news':result=news(data)
+                elif action=='backgrounds':
+                    if v.get('admin') is not True:return self.send(403,{})
+                    result=data.gallery.scan()
                 elif action=='locations':
                     if v.get('admin') is not True:return self.send(403,{'error':'Somente o administrador pode configurar a cidade.'})
                     result=locations(data,(v.get('value') or {}).get('query'))

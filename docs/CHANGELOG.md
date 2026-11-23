@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 49.0.0 — 2026-11-22
+
+Galeria privada do MagicMirror, upload de fotos, seleção e fundo fixo ou em sequência, com intervalo salvo e pausa em segundo plano. [Revisão detalhada](RELEASE-49.md).
+
 ## 48.0.0 — 2026-11-22
 
 MagicMirror com blocos superiores limpos, cidade salva sem GPS, calendário mensal/semanal e feriados nacionais/SP/Jacareí até 2030. Ícone Jarvis e barra ajustados ao tablet. [Revisão detalhada](RELEASE-48.md).

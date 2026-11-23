@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from store import Store, AccessError, SESSION_SECONDS, ADMIN_EMAIL
-from mirror import query as mirror_query
+from mirror import query as mirror_query, upload as mirror_upload, image as mirror_image, MAX_IMAGE_BYTES
 
 COOKIE = '__Host-aurora_session'
 APP_PORTS = {'manyfold':3214,'mealie':9925,'actual':5006,'opengym':8081,'cockpit':9090}
@@ -48,6 +48,8 @@ def handler(store, origin, assets=None, apps_config=None):
         raise ValueError('Configure a origem HTTPS exata, sem caminho.')
     assets = assets or Path(__file__).parent / 'static'
     apps_config = apps_config or {}
+
+    upload_slots=threading.BoundedSemaphore(1)
 
     class Handler(BaseHTTPRequestHandler):
         server_version = 'AuroraAuth'
@@ -128,6 +130,14 @@ def handler(store, origin, assets=None, apps_config=None):
                 if path == '/auth/mirror/settings':
                     status,result=mirror_query(self.current(admin=True),apps_config,'settings-get')
                     return self.send(status,result)
+                if path == '/auth/mirror/backgrounds':
+                    status,result=mirror_query(self.current(admin=True),apps_config,'backgrounds')
+                    return self.send(status,result)
+                if path.startswith('/auth/mirror/backgrounds/'):
+                    parts=path.split('/')
+                    if len(parts) not in (5,6) or (len(parts)==6 and parts[5]!='thumb'):return self.send(404,{})
+                    status,raw=mirror_image(self.current(),apps_config,parts[4],len(parts)==6)
+                    return self.send(status,raw,content_type='image/jpeg')
                 if path == '/auth/session':
                     return self.send(200, self.current())
                 if path in ('/auth/mirror/state','/auth/mirror/news'):
@@ -194,8 +204,20 @@ def handler(store, origin, assets=None, apps_config=None):
                 if self.headers.get('Transfer-Encoding'):
                     return self.send(400, {'error': 'Formato de corpo não aceito.'})
                 size = int(self.headers.get('Content-Length', '0'))
-                if not 0 < size <= 8192:
+                if path != '/auth/mirror/backgrounds/upload' and not 0 < size <= 8192:
                     return self.send(413, {'error': 'Conteúdo excede o limite.'})
+                if path == '/auth/mirror/backgrounds/upload':
+                    session=self.current(csrf=True,admin=True)
+                    if self.headers.get('Origin')!=origin:return self.send(403,{'error':'Origem não autorizada.'})
+                    self.connection.settimeout(60)
+                    content_type=self.headers.get('Content-Type','')
+                    if not 0<size<=MAX_IMAGE_BYTES:return self.send(413,{'error':'Envie uma imagem de até 12 MB.'})
+                    if content_type not in ('image/jpeg','image/png','image/webp'):return self.send(400,{'error':'Use JPG, PNG ou WebP.'})
+                    if not upload_slots.acquire(False):return self.send(503,{'error':'Aguarde o envio atual terminar.'})
+                    try:
+                        status,result=mirror_upload(session,apps_config,self.rfile.read(size),content_type,self.headers.get('X-Image-Name','imagem')[:800])
+                        return self.send(status,result)
+                    finally:upload_slots.release()
                 raw = self.rfile.read(size)
                 if self.headers.get('Origin') != origin or self.headers.get('Content-Type', '').split(';')[0] != 'application/json':
                     return self.send(403, {'error': 'Origem não autorizada.'})
