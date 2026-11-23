@@ -1,6 +1,6 @@
 services:
   opengym-api:
-    image: ghcr.io/duartesantos8/opengym-api:1.4.1@sha256:4bc07fe7d1f05a57c0fa25da3563d54dfe27223506637d67fc64088a2a2f140b
+    image: ghcr.io/duartesantos8/opengym-api:1.4.5@sha256:397c83e9ac33a413bc8f21e66b2e55038100fc7f9da900d80be28b30fbb12ea8
     env_file: ./secrets/opengym.env
     environment:
       PORT: '3000'
@@ -17,7 +17,7 @@ services:
       driver: json-file
       options: {max-size: 10m, max-file: '3'}
   opengym-web:
-    image: auroralab-opengym-web:22.0.0
+    image: auroralab-opengym-web:47.0.0
     build: ./docker/server/opengym
     ports: ['127.0.0.1:8081:80']
     environment:

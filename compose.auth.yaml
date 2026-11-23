@@ -94,7 +94,7 @@ services:
     build:
       context: ./docker/server/auth
       dockerfile: Dockerfile.opengym
-    image: auroralab-opengym-api-sso:25.0.0
+    image: auroralab-opengym-api-sso:47.0.0
     env_file: ./secrets/sso/opengym.env
     environment: {AURORA_SSO_ENABLED: '1'}
   opengym-garmin:

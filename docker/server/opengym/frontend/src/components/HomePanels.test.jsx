@@ -45,3 +45,14 @@ it('native sync preserves layout against an unrelated newer workout',()=>{
  const garmin=structuredClone(base);garmin.workouts=[{id:'garmin-new',d:'2026-10-21',start:1,entries:[]}];garmin._ts=stampChange(base,garmin,30)
  const merged=mergeStates(layout,garmin);expect(merged.auroraHomePanels).toEqual(['calories','progress']);expect(merged.workouts.map(w=>w.id)).toEqual(['garmin-new'])
 })
+
+it('optional native cards leave no empty slot and reappear in their saved position',async()=>{
+ const Empty=({show})=>show?<div className="card">Extra</div>:null;
+ const rows=show=>[...panels,{id:'recap',title:'Resumo',content:<Empty show={show}/>}];
+ await act(async()=>root.render(<HomePanels panels={rows(false)}/>));
+ expect(host.querySelector('[data-home-panel="recap"]').hidden).toBe(true);
+ click('Organizar painéis');expect(button('Mover Calorias para baixo').disabled).toBe(true);
+ await act(async()=>root.render(<HomePanels panels={rows(true)}/>));
+ expect(host.querySelector('[data-home-panel="recap"]').hidden).toBe(false);
+ expect(useStore.getState().writes).toBe(0);
+});

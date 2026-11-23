@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useStore } from '../store/useStore.js'
 import { panelOrder, movePanel } from '../lib/home-panels.js'
 import './home-panels.css'
@@ -9,15 +9,31 @@ export default function HomePanels({ panels }) {
   const [draft, setDraft] = useState(null)
   const [dragging, setDragging] = useState(null)
   const [message, setMessage] = useState('')
+  const container = useRef(null)
+  const [empty, setEmpty] = useState([])
   const gesture = useRef(null)
   const order = draft || panelOrder(saved)
   const visible = order.filter(id => panels.some(panel => panel.id === id && panel.content))
+  const displayed = visible.filter(id => !empty.includes(id))
+  useLayoutEffect(() => {
+    const refresh = () => {
+      const next = [...(container.current?.querySelectorAll('[data-home-content]') || [])]
+        .filter(node => !node.childElementCount && !node.textContent.trim())
+        .map(node => node.getAttribute('data-home-content')).sort()
+      setEmpty(old => JSON.stringify(old) === JSON.stringify(next) ? old : next)
+    }
+    refresh()
+    const observer = new MutationObserver(refresh)
+    if (container.current) observer.observe(container.current, { childList: true, subtree: true, characterData: true })
+    return () => observer.disconnect()
+  }, [panels])
+
   const commit = (next, title) => {
     if (JSON.stringify(next) !== JSON.stringify(panelOrder(saved))) useStore.getState().update(s => { s.auroraHomePanels = next })
     setMessage(title + ': ordem atualizada.');setDraft(null)
   }
   const move = (id, direction) => {
-    const index = visible.indexOf(id), target = visible[index + direction]
+    const index = displayed.indexOf(id), target = displayed[index + direction]
     if (target) commit(movePanel(saved, id, target), panels.find(p => p.id === id).title)
   }
   const down = (event, id) => {
@@ -31,7 +47,7 @@ export default function HomePanels({ panels }) {
     const current = gesture.current
     if (!current || current.pointerId !== event.pointerId) return
     const over = document.elementFromPoint?.(event.clientX, event.clientY)?.closest('[data-home-panel]')?.getAttribute('data-home-panel')
-    if (over && over !== current.id && visible.includes(over)) {
+    if (over && over !== current.id && displayed.includes(over)) {
       current.order = movePanel(current.order, current.id, over);setDraft(current.order)
     }
     if (event.clientY < 75) window.scrollBy(0, -18)
@@ -64,23 +80,24 @@ export default function HomePanels({ panels }) {
       window.removeEventListener('blur', cancel)
     }
   }, [dragging])
-  return <section className="aurora-home-panels" aria-label="Painéis da página inicial">
+  return <section ref={container} className="aurora-home-panels" aria-label="Painéis da página inicial">
     <div className="aurora-arrange-toolbar">
       <button className="aurora-arrange-toggle" aria-pressed={editing} onClick={() => { cancel();setEditing(v => !v) }}>{editing ? 'Concluir organização' : 'Organizar painéis'}</button>
       {editing && <button onClick={() => commit(panelOrder(), 'Layout padrão')}>Restaurar ordem padrão</button>}
     </div>
     {editing && <p className="small muted">Arraste pela alça ⠿ ou use as setas para mover. No teclado, use ↑ e ↓ na alça; Esc cancela o arraste. A ordem fica no seu perfil e acompanha a sincronização do openGym.</p>}
     <p className="aurora-panel-announcement" role="status" aria-live="polite">{message}</p>
-    {visible.map((id, index) => {
+    {visible.map(id => {
+      const index = displayed.indexOf(id)
       const panel = panels.find(p => p.id === id)
-      return <section key={id} data-home-panel={id} aria-label={panel.title} className={'aurora-home-panel' + (editing ? ' arranging' : '') + (dragging === id ? ' dragging' : '')}>
+      return <section key={id} hidden={empty.includes(id)} data-home-panel={id} aria-label={panel.title} className={'aurora-home-panel' + (editing ? ' arranging' : '') + (dragging === id ? ' dragging' : '')}>
         {editing && <div className="aurora-panel-handlebar">
           <button className="aurora-panel-handle" aria-label={'Arrastar painel ' + panel.title} onPointerDown={e => down(e, id)}
             onKeyDown={e => { if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault();move(id, e.key === 'ArrowUp' ? -1 : 1) } else if (e.key === 'Escape') cancel() }}>⠿ <span>{panel.title}</span></button>
           <button disabled={index === 0} aria-label={'Mover ' + panel.title + ' para cima'} onClick={() => move(id, -1)}>↑</button>
-          <button disabled={index === visible.length - 1} aria-label={'Mover ' + panel.title + ' para baixo'} onClick={() => move(id, 1)}>↓</button>
+          <button disabled={index === displayed.length - 1} aria-label={'Mover ' + panel.title + ' para baixo'} onClick={() => move(id, 1)}>↓</button>
         </div>}
-        {panel.content}
+        <div className="aurora-home-content" data-home-content={id}>{panel.content}</div>
       </section>
     })}
   </section>

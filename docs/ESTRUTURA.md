@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 43.0.0
+# Estrutura e arquitetura — AuroraLAB 47.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -237,3 +237,11 @@ O projeto independente auroralab-wger-test foi removido. Seu Compose, adaptadore
 ## Treinos após a release 46
 
 OpenGym e o serviço Garmin existentes permanecem independentes e ativos, conforme compose.opengym.yaml e os overlays de produção. A retirada do teste não altera seu armazenamento, identidades, sincronização ou endereço de acesso. [Registro](RELEASE-46.md).
+
+## openGym 1.4.5 — release 47
+
+Frontend reconstruído do commit upstream `2d70e026effc6602f513555166a97443520f0572` e API oficial 1.4.5 com adaptador SSO verificado por SHA-256. `docker/server/opengym/charts.patch` adapta Home/Stats/LineChart/service worker; os componentes Aurora ficam no overlay frontend. A navegação nativa de Estatísticas conserva Visão geral, Corpo, Exercícios e Esforço quando aplicável aos dados/módulos. Metas, minutos e calorias ficam na Visão geral; o progresso continua em Exercícios e no Início.
+
+Os cartões nativos respeitam os módulos do perfil. HomePanels conserva IDs/ordem anteriores e remove visualmente os espaços de componentes que retornam vazio, sem desmontá-los para sempre. Recapitulacão, resumo anual, recuperação, deload e desafios são identificadores adicionais. Não há migração para outro banco nem substituição do conector Garmin pelo suporte nativo a relógios.
+
+A API 1.4.5 pede confirmação adicional em operações sensíveis. O adaptador aceita a identidade central validada somente para `pair`, necessário à autorização existente do agendador Garmin. Alterações de senha, e-mail, passkey e conta mantêm as verificações nativas. Tokens existentes e o segredo de sessão devem ser preservados. Consulte [release 47](RELEASE-47.md).

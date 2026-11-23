@@ -1,3 +1,4 @@
+import CardHead from './CardHead.jsx'
 import { useEffect, useState } from 'react'
 import './aurora-upgrades.css'
 export default function GarminSummary() {
@@ -29,7 +30,7 @@ export default function GarminSummary() {
   const auto=state?.auto || {}, busy=state?.busy || pending
   const date = value => value ? new Date(value).toLocaleString('pt-BR') : 'Ainda não realizada'
   return <section className="card aurora-upgrade" aria-label="Sincronização Garmin">
-    <h2>Garmin</h2><p>{!state ? 'Consultando sincronização…' : state.connected ? auto.enabled ? 'Ativa · últimos 5 treinos a cada hora' : 'Conectado · atualização automática pausada' : 'Conecte sua conta Garmin'}</p>
+    <CardHead title="Garmin" eyebrow="Conector AuroraLAB" /><p>{!state ? 'Consultando sincronização…' : state.connected ? auto.enabled ? 'Ativa · últimos 5 treinos a cada hora' : 'Conectado · atualização automática pausada' : 'Conecte sua conta Garmin'}</p>
     {state && <><dl className="aurora-sync-details"><dt>Última consulta</dt><dd>{date(auto.last_run)}</dd><dt>Resultado</dt><dd>{busy ? 'Consulta em andamento…' : auto.last_status === 'error' ? 'Falhou' : auto.last_run ? `${auto.last_added || 0} importado(s) · ${auto.last_skipped || 0} já existente(s)` : 'Aguardando primeira consulta'}</dd><dt>Próxima consulta</dt><dd>{auto.enabled && auto.next_run ? date(auto.next_run*1000) : 'Sem agendamento'}</dd></dl>
     {auto.last_status === 'error' && <p role="alert">{auto.last_error || 'Falha na última consulta. Abra a conexão Garmin para conferir.'}</p>}</>}
     {error && <p role="alert">{error}</p>}

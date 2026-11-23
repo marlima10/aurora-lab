@@ -1,3 +1,4 @@
+import CardHead from './CardHead.jsx'
 import { useEffect, useState } from 'react'
 import { useStore } from '../store/useStore.js'
 import { validGoals, weeklyProgress, GOAL_LIMITS } from '../lib/weekly-goals.js'
@@ -19,7 +20,7 @@ export default function WeeklyGoals({ S }) {
     setEditing(false);setMessage('Metas atualizadas no perfil; acompanham a sincronização do openGym.')
   }
   return <section className="card aurora-upgrade" aria-label="Metas semanais">
-    <h2>Metas semanais</h2><p className="small muted">Segunda-feira até hoje · {progress.first.split('-').reverse().join('/')}. Treinos concluídos; cada sessão conta uma vez.</p>
+    <CardHead title="Metas semanais" eyebrow="Seu planejamento" /><p className="small muted">Segunda-feira até hoje · {progress.first.split('-').reverse().join('/')}. Treinos concluídos; cada sessão conta uma vez.</p>
     {goals && Object.entries(labels).map(([key,label]) => <div className="aurora-goal" key={key}>
       <label htmlFor={'goal-meter-'+key}>{label}: {fmt(progress[key])}{goals[key] > 0 ? ' / '+fmt(goals[key]) : ' · sem meta'}</label>
       {goals[key] > 0 && <progress id={'goal-meter-'+key} max={goals[key]} value={Math.min(progress[key],goals[key])} aria-label={label} />}

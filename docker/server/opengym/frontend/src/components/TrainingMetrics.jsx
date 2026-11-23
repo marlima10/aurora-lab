@@ -1,3 +1,4 @@
+import CardHead from './CardHead.jsx'
 import { useMemo, useState } from 'react'
 import LineChart from './LineChart.jsx'
 import { Segmented } from './ui.jsx'
@@ -20,7 +21,7 @@ export default function TrainingMetrics({ S, only = null }) {
         {key: 'calories', title: 'Calorias gastas', unit: 'kcal', count: data.calorieCount, color: 'var(--orange)', empty: 'Sem calorias informadas pelo Garmin neste período.'}].filter(metric => !only || metric.key === only).map(metric => {
         const points = data[metric.key], sum = points.reduce((total, point) => total + point.y, 0)
         return <section className="card aurora-metric" aria-label={metric.title} key={metric.key}>
-          <h2>{metric.title}</h2>
+          <CardHead title={metric.title} eyebrow="Seu histórico" />
           <div className="aurora-metric-total">{points.length ? number(sum) : '—'} <span className="muted small">{metric.unit} no período</span></div>
           {points.length ? <>
             <div className="chart" role="img" aria-label={metric.title + ': ' + number(sum) + ' ' + metric.unit + '. Totais por dia.'}>

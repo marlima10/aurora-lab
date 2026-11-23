@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 47.0.0 — 2026-11-22
+
+openGym 1.4.5 com interface nativa padronizada, navegação das Estatísticas e módulos opcionais. SSO, Garmin, histórico, metas, gráficos, fundo e organização dos painéis preservados; compatibilidade verificada em ambiente sintético. [Revisão detalhada](RELEASE-47.md).
+
 ## 46.0.0 — 2026-11-22
 
 Avaliação wger encerrada: instalação, dados, backups próprios e rota de teste removidos. OpenGym/Garmin preservados como aplicativo atual. [Detalhes](RELEASE-46.md).
