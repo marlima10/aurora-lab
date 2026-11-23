@@ -1,6 +1,8 @@
 # openGym
 
-A API usa a imagem oficial 1.4.1 do projeto DuarteSantos8/openGym, fixada por digest. Desde a versão 19, o frontend é reconstruído do mesmo commit upstream com os gráficos Aurora, herdando a imagem oficial fixada por digest; fonte e patch em `docker/server/opengym/`. Consulte [personalização e testes](../docker/server/opengym/README.md). O overlay também define o importador Garmin separado. Não é o mesmo armazenamento do Fitness Aurora.
+A API usa a imagem oficial 1.4.5 do projeto DuarteSantos8/openGym, fixada por digest. Desde a versão 19, o frontend é reconstruído do mesmo commit upstream com os gráficos Aurora, herdando a imagem oficial fixada por digest; fonte e patch em `docker/server/opengym/`. Consulte [personalização e testes](../docker/server/opengym/README.md). O overlay também define o importador Garmin separado. Não é o mesmo armazenamento do Fitness Aurora.
+
+A release 47 recompila o frontend do commit upstream 1.4.5 e adapta o login central à confirmação de pareamento Garmin; veja [alterações, testes e retorno](RELEASE-47.md). Os módulos opcionais ficam em Configurações → Módulos. As opções de aparência e tamanho do texto ficam em Configurações → Aparência e Início.
 
 ## Pré-requisitos
 

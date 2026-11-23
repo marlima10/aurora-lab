@@ -7,7 +7,7 @@
 .aurora-metrics-grid > .card { grid-column: 1 / -1; }
 .aurora-training-charts > p { grid-column: 1 / -1; }
 .aurora-metric { min-width: 0; margin: 0; }
-.aurora-metric-total { font-size: 26px; font-weight: 600; margin-block: 10px; font-variant-numeric: tabular-nums; }
+.aurora-metric-total { font-size: 1.625rem; font-weight: 600; margin-block: 10px; font-variant-numeric: tabular-nums; }
 .aurora-metric-table { max-height: 230px; overflow: auto; margin-block: 8px; }
 .aurora-metric table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .aurora-metric th, .aurora-metric td { padding: 6px; text-align: start; border-bottom: 1px solid var(--sep); }

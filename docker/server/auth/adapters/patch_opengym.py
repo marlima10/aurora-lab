@@ -20,4 +20,8 @@ addition = '''  if (process.env.AURORA_SSO_ENABLED === '1') {
     if (!(req.headers.authorization || '').startsWith('Bearer ')) return null;
   }
 '''
-path.write_text("import { auroraSession } from './aurora-sso.js';\n" + text.replace(needle, needle + addition))
+proof = 'async function proveOwner(req, res, user, body, act) {\n'
+if text.count(proof) != 1:
+    raise SystemExit('openGym pairing proof changed')
+patched = text.replace(needle, needle + addition).replace(proof, proof + "  if (process.env.AURORA_SSO_ENABLED === '1' && auroraPairingProof(req, user, db.users, act)) return 'aurora';\n")
+path.write_text("import { auroraSession, auroraPairingProof } from './aurora-sso.js';\n" + patched)

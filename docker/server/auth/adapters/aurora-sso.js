@@ -11,3 +11,8 @@ export function auroraSession(req, users, secret=process.env.AURORA_SSO_SECRET, 
   const user=users.find(u=>u.id===id&&!u.disabled);
   return user?{user,exp:now+60000,bearer:false}:null;
 }
+
+// The central login authorizes only the existing Garmin pairing action, not account changes.
+export function auroraPairingProof(req, user, users, action, secret=process.env.AURORA_SSO_SECRET) {
+  return action === 'pair' && auroraSession(req, users, secret)?.user === user;
+}
