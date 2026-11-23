@@ -14,3 +14,26 @@
 
 #aurora-mirror{background:linear-gradient(rgb(13 12 8 / var(--mirror-dim,.35)),rgb(13 12 8 / calc(var(--mirror-dim,.35) + .1))),url("sunset.png") center/cover fixed;font-size:calc(16px * var(--mirror-scale,1))}#aurora-mirror .glass{background:rgb(21 21 16 / var(--mirror-panel,.4));backdrop-filter:blur(var(--mirror-blur,9px))}#aurora-mirror .glass h1,#aurora-mirror .glass h2{font-size:calc(20px * var(--mirror-scale,1))}#aurora-mirror .clock time{font-size:calc(clamp(54px,5.4vw,82px) * var(--mirror-scale,1))}#aurora-mirror .clock p{font-size:calc(18px * var(--mirror-scale,1))}#aurora-mirror .reminder label{font-size:calc(16px * var(--mirror-scale,1))}#aurora-mirror #mirror-news a{font-size:calc(12px * var(--mirror-scale,1))}#aurora-mirror.settings-custom .mirror-grid{height:auto;grid-template-rows:none;grid-auto-rows:minmax(170px,auto)}#aurora-mirror.settings-custom .calendar #mirror-calendar{flex:none;grid-template-rows:24px repeat(var(--weeks,5),minmax(55px,auto))}#aurora-mirror.settings-custom .history #mirror-chart{height:130px}#aurora-mirror.settings-custom #mirror-news{max-height:180px}#aurora-mirror.settings-custom .dock{min-height:64px}#aurora-mirror.settings-custom .goals{min-height:200px}
 @media(max-width:560px){#aurora-mirror{background-attachment:scroll}#aurora-mirror .glass h1,#aurora-mirror .glass h2{font-size:calc(18px * var(--mirror-scale,1))}#aurora-mirror .calendar header h2{font-size:calc(16px * var(--mirror-scale,1))}#aurora-mirror .clock time{font-size:calc(76px * var(--mirror-scale,1))}}
+
+/* Release 48: quiet top row, saved-place weather and a dock that wraps on tablets. */
+#aurora-mirror .mirror-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+#aurora-mirror .clock,#aurora-mirror .weather,#aurora-mirror .reminders{border:0;background:transparent;box-shadow:none;backdrop-filter:none}
+#aurora-mirror .clock time{font-size:calc(clamp(42px,4.5vw,64px) * var(--mirror-scale,1))}
+#aurora-mirror .clock p{font-size:calc(14px * var(--mirror-scale,1))}
+#aurora-mirror .current-weather{font-size:calc(30px * var(--mirror-scale,1))}
+#aurora-mirror .weather p,#aurora-mirror .reminder label{font-size:calc(14px * var(--mirror-scale,1))}
+#aurora-mirror .reminders header{justify-content:flex-end;margin-bottom:0}
+#aurora-mirror .weather-settings{display:inline-block;font-size:11px;text-decoration:underline;margin-block:4px}
+#aurora-mirror select{font:inherit;color:#fff;background:#24251fe6;border:1px solid #ffffff66;border-radius:7px;padding:5px 7px;max-width:100%}
+#aurora-mirror .calendar header{flex-wrap:wrap}
+#aurora-mirror .calendar header h2{min-width:0;flex:1;text-align:center}
+#aurora-mirror .event.holiday{background:#93803fe6!important;color:#fff}
+#aurora-mirror #mirror-calendar.week-view .day{min-height:130px}
+#aurora-mirror .dock{flex-wrap:wrap;overflow:visible;gap:12px;align-content:center}
+#aurora-mirror .dock a:not(.brand),#aurora-mirror .dock button{min-width:64px;min-height:48px;flex-shrink:0}
+#aurora-mirror .jarvis-icon{display:block;flex-shrink:0;width:30px;height:39px;fill:none;stroke:#c8efff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px #abd9df)}
+@media(min-width:1000px) and (min-height:680px){#aurora-mirror:not(.settings-custom) .mirror-grid{grid-template-rows:128px minmax(245px,1fr) 185px minmax(64px,auto)}}
+@media(min-width:561px) and (max-width:1180px){#aurora-mirror .mirror-grid{height:auto;grid-template-rows:none;grid-auto-rows:auto}#aurora-mirror .dock .brand{width:100%;text-align:center;margin-right:0}#aurora-mirror .calendar #mirror-calendar{flex:none;grid-template-rows:24px repeat(var(--weeks,5),minmax(60px,auto))}#aurora-mirror .history #mirror-chart{height:125px}#aurora-mirror .reminders{max-height:180px}}
+@media(max-width:560px){#aurora-mirror .clock time{font-size:calc(50px * var(--mirror-scale,1))}#aurora-mirror .clock p{font-size:calc(14px * var(--mirror-scale,1))}#aurora-mirror .calendar header h2{font-size:14px}#aurora-mirror #mirror-calendar.week-view .day{min-height:150px}.event.holiday{white-space:normal;line-height:1.25}}
+
+#aurora-mirror .weather>.weather-settings,#aurora-mirror .weather>small{display:inline-block;vertical-align:middle;margin:3px 4px 0}#aurora-mirror .weather .forecast{margin:5px 0;font-size:11px}#aurora-mirror .weather p{font-size:calc(12px * var(--mirror-scale,1))}

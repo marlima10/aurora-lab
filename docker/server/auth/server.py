@@ -207,6 +207,9 @@ def handler(store, origin, assets=None, apps_config=None):
                     token, csrf = store.authenticate(data.get('email'), data.get('key'), self.headers.get('X-Aurora-Client-IP', self.client_address[0]))
                     return self.send(200, {'ok': True, 'csrf': csrf}, {'Set-Cookie': COOKIE + '=' + token + '; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=' + str(SESSION_SECONDS)})
                 session = self.current(csrf=True)
+                if path == '/auth/mirror/locations':
+                    status,result=mirror_query(self.current(csrf=True,admin=True),apps_config,'locations',data)
+                    return self.send(status,result)
                 if path == '/auth/mirror/settings':
                     status,result=mirror_query(self.current(csrf=True,admin=True),apps_config,'settings-save',data)
                     return self.send(status,result)

@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 47.0.0
+# Estrutura e arquitetura — AuroraLAB 48.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -245,3 +245,11 @@ Frontend reconstruído do commit upstream `2d70e026effc6602f513555166a97443520f0
 Os cartões nativos respeitam os módulos do perfil. HomePanels conserva IDs/ordem anteriores e remove visualmente os espaços de componentes que retornam vazio, sem desmontá-los para sempre. Recapitulacão, resumo anual, recuperação, deload e desafios são identificadores adicionais. Não há migração para outro banco nem substituição do conector Garmin pelo suporte nativo a relógios.
 
 A API 1.4.5 pede confirmação adicional em operações sensíveis. O adaptador aceita a identidade central validada somente para `pair`, necessário à autorização existente do agendador Garmin. Alterações de senha, e-mail, passkey e conta mantêm as verificações nativas. Tokens existentes e o segredo de sessão devem ser preservados. Consulte [release 47](RELEASE-47.md).
+
+## MagicMirror — cidade persistente e calendário (48.0.0)
+
+O esquema limitado de display_settings ganha weatherLocation, calendarView e holidayRegion. A inicialização estende preferências antigas sem repor escolhas já feitas. A cidade escolhida é compartilhada pelo servidor; nenhum código chama geolocalização do navegador. POST /auth/mirror/locations exige administrador, sessão, CSRF e origem exata, e consulta somente o geocodificador Open-Meteo. A previsão usa as coordenadas salvas pelo administrador, ignorando coordenadas enviadas por clientes.
+
+A tabela holiday_events recebe um catálogo idempotente de 2026–2030 definido em docker/server/mirror/holidays.py, com escopo e fonte legal. É separado de entries e goals, não ocupa a cota de eventos pessoais e não é apagado pela exclusão de um evento particular. Os escopos disponíveis são Brasil, Brasil/SP e Brasil/SP/Jacareí. Mês/Semana pode ser alternado durante a sessão; a opção administrativa define o padrão persistido.
+
+O módulo MMM-Aurora oculta visualmente os títulos redundantes dos três blocos superiores, preservando seus nomes acessíveis; remove suas superfícies/bordas e reduz as fontes. A barra de aplicativos quebra linhas e o Jarvis usa SVG local com nome acessível. A restrição administrativa do Jarvis e as permissões dos outros aplicativos permanecem vigentes. Consulte [MAGICMIRROR.md](MAGICMIRROR.md).

@@ -208,6 +208,18 @@ class HttpAuthenticationTests(Fixture, unittest.TestCase):
             self.assertEqual(self.request('/auth/mirror/settings',{},headers)[0],200)
             self.assertEqual(query.call_args.args[2],'settings-save')
 
+    def test_mirror_city_search_requires_admin_csrf_and_exact_origin(self):
+        from unittest.mock import patch
+        token,csrf=self.login();headers={'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf}
+        with patch('server.mirror_query',return_value=(200,{'locations':[]})) as query:
+            self.assertEqual(self.request('/auth/mirror/locations',{'query':'Jacareí, SP'},headers)[0],200)
+            self.assertEqual(query.call_args.args[2],'locations')
+            self.assertTrue(query.call_args.args[0]['admin'])
+            self.assertEqual(self.request('/auth/mirror/locations',{'query':'x'},headers|{'X-Aurora-CSRF':'wrong'})[0],403)
+            self.assertEqual(self.request('/auth/mirror/locations',{'query':'x'},headers|{'Origin':'https://other.test'})[0],403)
+        key=self.store.issue(ADMIN_EMAIL,'person@example.test');token,csrf=self.login('person@example.test',key)
+        self.assertEqual(self.request('/auth/mirror/locations',{'query':'Jacareí, SP'},{'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf,'X-Aurora-Admin':'1'})[0],403)
+
     def test_cookie_is_host_only_secure_httponly_and_no_store(self):
         status, headers, body = self.request('/auth/login', {'email':ADMIN_EMAIL, 'key':self.key})
         self.assertEqual(status, 200)

@@ -10,8 +10,10 @@ const root={querySelector:selector=>selector==='[data-widget="clock"]'?visible.c
  querySelectorAll:()=>hidden,style:{setProperty:(key,value)=>{css[key]=value}},classList:{toggle:(name,value)=>{root.custom=value}}};
 const widgets=['clock','weather','reminders','calendar','goals','history','news'];for(const key of widgets)visible[key]={key};
 hidden.push({dataset:{app:'actual',shortcut:'actual'},hasAttribute:()=>false},{dataset:{shortcut:'javis'},hasAttribute:()=>true});
-const prefs={order:[...widgets].reverse(),widgets:Object.fromEntries(widgets.map(k=>[k,k!=='weather'])),shortcuts:{actual:true,javis:true},fontScale:110,backgroundDim:50,panelOpacity:40,blur:9,refreshMinutes:5};
-const context={root,state:{settings:prefs},session:{admin:false,grants:{}},refreshMinutes:5,tick(){},coords:{lat:1}};
+const prefs={order:[...widgets].reverse(),widgets:Object.fromEntries(widgets.map(k=>[k,k!=='weather'])),shortcuts:{actual:true,javis:true},fontScale:110,backgroundDim:50,panelOpacity:40,blur:9,refreshMinutes:5,calendarView:'week',weatherLocation:null};
+const context={root,state:{settings:prefs},session:{admin:false,grants:{}},refreshMinutes:5,tick(){},el(){return {}},text(){},weatherKey:'old'};
 definition.applySettings.call(context);
-assert.equal(order.join(),prefs.order.join());assert.equal(visible.weather.hidden,true);assert(hidden.every(x=>x.hidden));assert.equal(css['--mirror-scale'],1.1);assert.equal(context.coords,null);assert(root.custom);
+assert.equal(order.join(),prefs.order.join());assert.equal(visible.weather.hidden,true);assert(hidden.every(x=>x.hidden));assert.equal(css['--mirror-scale'],1.1);assert.equal(context.weatherKey,'null');assert.equal(context.calendarView,'week');assert(root.custom);
 console.log('Settings render in saved order, retain permission checks, hide blocks and apply numeric preferences.');
+
+let weatherCalls=0;context.weather=()=>{weatherCalls++};prefs.weatherLocation={name:"Cidade salva",lat:1,lon:2};prefs.widgets.weather=true;definition.applySettings.call(context);assert.equal(weatherCalls,1);prefs.widgets.weather=false;definition.applySettings.call(context);prefs.widgets.weather=true;definition.applySettings.call(context);assert.equal(weatherCalls,2);console.log("Saved weather refreshes immediately when the widget is re-enabled.");
