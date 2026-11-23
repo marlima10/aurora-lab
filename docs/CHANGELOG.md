@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 48.0.0 — 2026-11-22
+
+MagicMirror com blocos superiores limpos, cidade salva sem GPS, calendário mensal/semanal e feriados nacionais/SP/Jacareí até 2030. Ícone Jarvis e barra ajustados ao tablet. [Revisão detalhada](RELEASE-48.md).
+
 ## 47.0.0 — 2026-11-22
 
 openGym 1.4.5 com interface nativa padronizada, navegação das Estatísticas e módulos opcionais. SSO, Garmin, histórico, metas, gráficos, fundo e organização dos painéis preservados; compatibilidade verificada em ambiente sintético. [Revisão detalhada](RELEASE-47.md).

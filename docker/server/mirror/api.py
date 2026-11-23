@@ -2,6 +2,7 @@
 from contextlib import contextmanager
 import datetime as dt
 import settings
+import holidays
 import hmac
 import json
 import math
@@ -33,6 +34,11 @@ class Data:
             db.execute('CREATE TABLE IF NOT EXISTS entries(id TEXT PRIMARY KEY,owner TEXT NOT NULL,kind TEXT NOT NULL,title TEXT NOT NULL,day TEXT NOT NULL,done INTEGER NOT NULL DEFAULT 0)')
             db.execute('CREATE TABLE IF NOT EXISTS goals(owner TEXT PRIMARY KEY,sessions INTEGER NOT NULL,minutes INTEGER NOT NULL,calories INTEGER NOT NULL)')
             db.execute('CREATE TABLE IF NOT EXISTS display_settings(id INTEGER PRIMARY KEY CHECK(id=1),value TEXT NOT NULL)')
+            db.execute('CREATE TABLE IF NOT EXISTS holiday_events(id TEXT PRIMARY KEY,day TEXT NOT NULL,title TEXT NOT NULL,scope TEXT NOT NULL,source TEXT NOT NULL)')
+            db.executemany('INSERT INTO holiday_events VALUES(:id,:day,:title,:scope,:source) ON CONFLICT(id) DO UPDATE SET day=excluded.day,title=excluded.title,scope=excluded.scope,source=excluded.source',holidays.catalogue())
+            row=db.execute('SELECT value FROM display_settings WHERE id=1').fetchone()
+            upgraded=settings.migrate(json.loads(row[0])) if row else settings.defaults()
+            db.execute('INSERT INTO display_settings VALUES(1,?) ON CONFLICT(id) DO UPDATE SET value=excluded.value',(json.dumps(upgraded),))
     @contextmanager
     def db(self):
         db=sqlite3.connect(self.path,timeout=5)
@@ -50,7 +56,10 @@ class Data:
         with self.db() as db:
             rows=db.execute('SELECT id,kind,title,day,done FROM entries WHERE owner=? ORDER BY day,id',(owner,)).fetchall()
             goals=db.execute('SELECT sessions,minutes,calories FROM goals WHERE owner=?',(owner,)).fetchone()
-        return {'settings':self.settings(),'entries':[dict(zip(('id','kind','title','day','done'),r)) for r in rows], 'goals':dict(zip(('sessions','minutes','calories'),goals)) if goals else None}
+        prefs=self.settings()
+        with self.db() as db:
+            holiday_rows=db.execute('SELECT id,day,title,scope,source FROM holiday_events ORDER BY day,id').fetchall()
+        return {'settings':prefs,'holidays':[dict(zip(('id','day','title','scope','source'),r)) for r in holiday_rows if r[3] in holidays.REGIONS[prefs['holidayRegion']]],'holidayRange':{'first':holidays.FIRST_YEAR,'last':holidays.LAST_YEAR},'entries':[dict(zip(('id','kind','title','day','done'),r)) for r in rows], 'goals':dict(zip(('sessions','minutes','calories'),goals)) if goals else None}
     def save(self,owner,value):
         action=value.get('action')
         with self.db() as db:
@@ -99,6 +108,26 @@ def weather(data,lat,lon):
     query=urllib.parse.urlencode({'latitude':lat,'longitude':lon,'current':'temperature_2m,weather_code','daily':'weather_code,temperature_2m_max,temperature_2m_min','timezone':'auto','forecast_days':3})
     return data.cached(('weather',lat,lon),900,lambda:json.loads(fetch('https://api.open-meteo.com/v1/forecast?'+query)))
 
+def saved_weather(data):
+    loc=data.settings()['weatherLocation']
+    if loc is None:raise ValueError('Configure a cidade do clima.')
+    result=weather(data,loc['lat'],loc['lon'])
+    return result|{'location':loc['name']}
+
+def locations(data,query):
+    if not isinstance(query,str) or not 2<=len(query.strip())<=100 or any(ord(c)<32 for c in query):raise ValueError('Informe a cidade.')
+    query=query.strip()
+    def load():
+        params=urllib.parse.urlencode({'name':query,'count':5,'language':'pt','format':'json'})
+        source=json.loads(fetch('https://geocoding-api.open-meteo.com/v1/search?'+params))
+        result=[]
+        for row in source.get('results',[])[:5]:
+            loc={'name':', '.join(str(row[k]) for k in ('name','admin1','country') if row.get(k))[:160],'lat':row.get('latitude'),'lon':row.get('longitude')}
+            settings.validate(settings.defaults()|{'weatherLocation':loc})
+            result.append(loc)
+        return {'locations':result}
+    return data.cached(('locations',query.casefold()),3600,load)
+
 def news(data):
     def load():
         root=ET.fromstring(fetch('https://news.google.com/rss?hl=pt-BR&gl=BR&ceid=BR:pt-419'))
@@ -137,7 +166,10 @@ def run():
                     try:result['fitness']=fitness(cfg,v.get('identity'))
                     except Exception:result['fitness']={'available':False,'reason':'openGym indisponível no momento.'}
                 elif action=='news':result=news(data)
-                elif action=='weather':result=weather(data,v.get('lat'),v.get('lon'))
+                elif action=='locations':
+                    if v.get('admin') is not True:return self.send(403,{'error':'Somente o administrador pode configurar a cidade.'})
+                    result=locations(data,(v.get('value') or {}).get('query'))
+                elif action=='weather':result=saved_weather(data)
                 else:result=data.save(owner,v.get('value',{}))
                 self.send(200,result)
             except (ValueError,TypeError,KeyError):self.send(400,{'error':'Confira os campos e tente novamente.'})
