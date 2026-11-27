@@ -92,3 +92,12 @@
 - **Responsável** — OpenAI Codex.
 - **Tarefa** — AUR-012. Arquivos previstos: CLAUDE.md, FLUXO-DE-TRABALHO.md, docs/TASKS.md e docs/HANDOFF.md.
 - **Validação** — Nove testes no gerenciador passaram, incluindo entrega do plano externo ao Codex e revisão do Antigravity com adaptadores de teste. A API local confirmou disponibilidade da entrada e a raiz DEV correta. A execução pelo Claude Code interativo está pendente de validação.
+
+## 27/11/2026 — Preparação do merge e da release 50.0.0
+
+- **Agente responsável** — Claude Code, com autorização do usuário para executar a AUR-011.
+- **Tarefa** — AUR-011, **Em andamento**. Arquivos alterados: `docs/CHANGELOG.md` (50.0.0 datada de 2026-11-27), `docs/TASKS.md` e `docs/HANDOFF.md`. Os registros da AUR-012 do Codex foram preservados.
+- **Verificação** — `origin/main` em `51ced03` (49.0.0) e `origin/rafael` em `922ab67` (50.0.0). A `rafael` está um commit à frente da `main` e não há divergência, então o merge não tem conflito.
+- **Bloqueio** — A sessão do Claude não recebeu permissão de push no GitHub, e o Aurora Server não é acessível a partir dela. O commit, o merge `--no-ff` na `main`, a tag `v50.0.0`, a release e a implantação ficam com o usuário, pelos comandos entregues no chat.
+- **Atenção** — A `main` local rastreia o remoto `fork` (`rafaellima2222/aurora-lab`). O push da `main` precisa usar explicitamente `origin`.
+- **Próximos passos** — Depois do push, marcar a release no GitHub e implantar no servidor com backup prévio, conforme ATUALIZACAO.md seções 1 a 6 e RELEASE-50.md. Atualizar só `magicmirror`, `mirror-api` e `auth`, e conferir o calendário no tablet real. Ao final, marcar a AUR-011 como **Concluída** e atualizar o CONTEXT.md.

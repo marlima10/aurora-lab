@@ -1,6 +1,6 @@
 # Histórico de versões
 
-## 50.0.0 — Não publicado
+## 50.0.0 — 2026-11-27
 
 Agenda unificada do MagicMirror: compromissos, lembretes com data e horário, treinos openGym/Garmin e refeições Mealie em visão mensal/semanal, com leitura somente das identidades da sessão. Corrige a entrega das imagens da galeria pela fachada de autenticação e o corte de itens no calendário em telas de altura fixa. [Revisão detalhada](RELEASE-50.md).
 
