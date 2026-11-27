@@ -86,3 +86,9 @@
 - **Tarefa** — AUR-010, concluída. Aberta a AUR-011 para merge, release e implantação, que dependem de nova autorização.
 - **Escopo** — Todas as alterações locais da Release 50 e os cinco arquivos de memória compartilhada foram para um único commit na `rafael`, com push para `origin/rafael`. Não houve merge, tag, release nem deploy.
 - **Próximos passos** — Revisar e fazer o merge na `main`, conforme ATUALIZACAO.md seção 8. Depois, implantar no Aurora Server com backup prévio e conferir o calendário no tablet real.
+
+## 27/11/2026 — Fluxo iniciado no Claude
+
+- **Responsável** — OpenAI Codex.
+- **Tarefa** — AUR-012. Arquivos previstos: CLAUDE.md, FLUXO-DE-TRABALHO.md, docs/TASKS.md e docs/HANDOFF.md.
+- **Validação** — Nove testes no gerenciador passaram, incluindo entrega do plano externo ao Codex e revisão do Antigravity com adaptadores de teste. A API local confirmou disponibilidade da entrada e a raiz DEV correta. A execução pelo Claude Code interativo está pendente de validação.
