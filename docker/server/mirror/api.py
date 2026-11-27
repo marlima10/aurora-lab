@@ -2,6 +2,8 @@
 from contextlib import contextmanager
 import datetime as dt
 import settings
+import agenda
+import re
 import holidays
 from gallery import Gallery,MAX_BYTES
 import hmac
@@ -33,6 +35,7 @@ class Data:
         self.path=path;self.cache={};self.lock=threading.Lock();self.gallery=Gallery(Path(path).parent/"backgrounds")
         with self.db() as db:
             db.execute('CREATE TABLE IF NOT EXISTS entries(id TEXT PRIMARY KEY,owner TEXT NOT NULL,kind TEXT NOT NULL,title TEXT NOT NULL,day TEXT NOT NULL,done INTEGER NOT NULL DEFAULT 0)')
+            if 'time' not in {row[1] for row in db.execute('PRAGMA table_info(entries)')}:db.execute("ALTER TABLE entries ADD COLUMN time TEXT NOT NULL DEFAULT ''")
             db.execute('CREATE TABLE IF NOT EXISTS goals(owner TEXT PRIMARY KEY,sessions INTEGER NOT NULL,minutes INTEGER NOT NULL,calories INTEGER NOT NULL)')
             db.execute('CREATE TABLE IF NOT EXISTS display_settings(id INTEGER PRIMARY KEY CHECK(id=1),value TEXT NOT NULL)')
             db.execute('CREATE TABLE IF NOT EXISTS holiday_events(id TEXT PRIMARY KEY,day TEXT NOT NULL,title TEXT NOT NULL,scope TEXT NOT NULL,source TEXT NOT NULL)')
@@ -58,12 +61,12 @@ class Data:
         return value
     def state(self,owner):
         with self.db() as db:
-            rows=db.execute('SELECT id,kind,title,day,done FROM entries WHERE owner=? ORDER BY day,id',(owner,)).fetchall()
+            rows=db.execute('SELECT id,kind,title,day,done,time FROM entries WHERE owner=? ORDER BY day,id',(owner,)).fetchall()
             goals=db.execute('SELECT sessions,minutes,calories FROM goals WHERE owner=?',(owner,)).fetchone()
         prefs=self.settings()
         with self.db() as db:
             holiday_rows=db.execute('SELECT id,day,title,scope,source FROM holiday_events ORDER BY day,id').fetchall()
-        return {'settings':prefs,'holidays':[dict(zip(('id','day','title','scope','source'),r)) for r in holiday_rows if r[3] in holidays.REGIONS[prefs['holidayRegion']]],'holidayRange':{'first':holidays.FIRST_YEAR,'last':holidays.LAST_YEAR},'entries':[dict(zip(('id','kind','title','day','done'),r)) for r in rows], 'goals':dict(zip(('sessions','minutes','calories'),goals)) if goals else None}
+        return {'settings':prefs,'holidays':[dict(zip(('id','day','title','scope','source'),r)) for r in holiday_rows if r[3] in holidays.REGIONS[prefs['holidayRegion']]],'holidayRange':{'first':holidays.FIRST_YEAR,'last':holidays.LAST_YEAR},'entries':[dict(zip(('id','kind','title','day','done','time'),r)) for r in rows], 'goals':dict(zip(('sessions','minutes','calories'),goals)) if goals else None}
     def save(self,owner,value):
         action=value.get('action')
         with self.db() as db:
@@ -71,13 +74,18 @@ class Data:
                 goals=[value.get(k) for k in ('sessions','minutes','calories')]
                 if any(type(v)!=int or not 1<=v<=100000 for v in goals):raise ValueError('Metas inválidas.')
                 db.execute('INSERT INTO goals VALUES(?,?,?,?) ON CONFLICT(owner) DO UPDATE SET sessions=excluded.sessions,minutes=excluded.minutes,calories=excluded.calories',(owner,*goals))
-            elif action=='add':
+            elif action in ('add','edit'):
                 kind,title,day=value.get('kind'),value.get('title'),value.get('day','')
                 if kind not in ('reminder','event') or not isinstance(title,str) or not 1<=len(title.strip())<=160:raise ValueError('Preencha um título de até 160 caracteres.')
-                if kind=='event' and dt.date.fromisoformat(day).isoformat()!=day:raise ValueError('Data inválida.')
-                if kind=='reminder':day=''
-                if db.execute('SELECT count(*) FROM entries WHERE owner=?',(owner,)).fetchone()[0]>=500:raise ValueError('Limite de 500 itens. Exclua itens antigos.')
-                db.execute('INSERT INTO entries VALUES(?,?,?,?,?,0)',(secrets.token_urlsafe(16),owner,kind,title.strip(),day))
+                clock=value.get('time','')
+                if not isinstance(day,str) or (day and dt.date.fromisoformat(day).isoformat()!=day) or (kind=='event' and not day):raise ValueError('Data inválida.')
+                if not isinstance(clock,str) or (clock and not re.fullmatch(r'(?:[01][0-9]|2[0-3]):[0-5][0-9]',clock)) or (clock and not day):raise ValueError('Informe a data junto do horário.')
+                if action=='edit':
+                    identifier=value.get('id')
+                    if not isinstance(identifier,str) or not db.execute('SELECT 1 FROM entries WHERE owner=? AND id=?',(owner,identifier)).fetchone():raise ValueError('Item não encontrado.')
+                    db.execute('UPDATE entries SET kind=?,title=?,day=?,time=? WHERE owner=? AND id=?',(kind,title.strip(),day,clock,owner,identifier))
+                elif db.execute('SELECT count(*) FROM entries WHERE owner=?',(owner,)).fetchone()[0]>=500:raise ValueError('Limite de 500 itens. Exclua itens antigos.')
+                if action=='add':db.execute('INSERT INTO entries(id,owner,kind,title,day,done,time) VALUES(?,?,?,?,?,0,?)',(secrets.token_urlsafe(16),owner,kind,title.strip(),day,clock))
             elif action in ('delete','toggle'):
                 if not isinstance(value.get('id'),str):raise ValueError('Item inválido.')
                 sql='DELETE FROM entries WHERE owner=? AND id=?' if action=='delete' else 'UPDATE entries SET done=1-done WHERE owner=? AND id=?'
@@ -186,6 +194,7 @@ def run():
                     result=data.state(owner)
                     try:result['fitness']=fitness(cfg,v.get('identity'))
                     except Exception:result['fitness']={'available':False,'reason':'openGym indisponível no momento.'}
+                elif action=='agenda':result=agenda.collect(data,cfg,v,fetch)
                 elif action=='news':result=news(data)
                 elif action=='backgrounds':
                     if v.get('admin') is not True:return self.send(403,{})

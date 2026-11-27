@@ -22,13 +22,28 @@ Datas futuras são projeções das regras permanentes verificadas em novembro de
 
 Fontes: [feriados nacionais — Lei 662](https://www.planalto.gov.br/ccivil_03/leis/l0662.htm), [Nossa Senhora Aparecida — Lei 6.802](https://www.planalto.gov.br/ccivil_03/leis/l6802.htm), [Consciência Negra — Lei 14.759](https://www2.camara.leg.br/legin/fed/lei/2023/lei-14759-21-dezembro-2023-795091-publicacaooriginal-170522-pl.html), [data magna de SP — Lei 9.497](https://www.al.sp.gov.br/repositorio/legislacao/lei/1997/original-lei-9497-05.03.1997.html) e [Lei Orgânica de Jacareí, art. 222](https://www.jacarei.sp.leg.br/geral/lei-organica-do-municipio-de-jacarei-teste/).
 
+## Agenda unificada
+
+O calendário mostra no mesmo lugar os compromissos e lembretes pessoais, os treinos do openGym/Garmin e as refeições planejadas no Mealie. Treinos e refeições são somente leitura e se editam no aplicativo de origem.
+
+1. Clique em **＋** no calendário para criar um compromisso. A data é obrigatória e o horário é opcional.
+2. Lembretes aceitam data e horário opcionais. Sem data, aparecem só na lista de lembretes; com data, aparecem também no calendário.
+3. Clique em um compromisso ou lembrete para editar ou excluir. O horário é o de Brasília.
+4. Use **Mês / Semana**, as setas e **Hoje** para navegar. **Ver agenda do período** abre a lista com data, horário, situação e origem.
+
+Cada dia mostra até três itens, com compromissos e lembretes à frente de treinos e refeições, e um botão **＋N itens** para os demais. Quando a tela deixa menos espaço por dia, o botão reúne também os itens que não couberem. Os feriados continuam à parte. Os treinos aparecem como **Planejado** ou **Realizado**. As datas passadas mostram só os treinos realizados. As refeições mostram o tipo, como almoço ou jantar. Clicar em um treino ou refeição abre o aplicativo responsável.
+
+A agenda usa as contas openGym e Mealie vinculadas ao seu login AuroraLAB. Sem esse vínculo, a fonte aparece como **Acesso não configurado**. Se um aplicativo estiver fora do ar, a agenda avisa e continua mostrando o restante. Os dados são relidos a cada atualização da tela, com cache de até 60 segundos, e o botão de atualizar faz uma nova leitura.
+
+A agenda não envia notificações, não sincroniza com Google ou Outlook e não cria treinos ou refeições. Para atualizar ou voltar à versão anterior, consulte [RELEASE-50.md](RELEASE-50.md).
+
 ## Jarvis no tablet
 
 A barra de aplicativos ajusta suas linhas ao espaço disponível. O Jarvis tem ícone de robô e texto **JARVIS**. Em **Atalhos de aplicativos**, mantenha Jarvis selecionado. O serviço continua reservado ao administrador; uma conta sem essa permissão não passa a ter acesso por causa da mudança visual. Reabra a tela para carregar a versão nova.
 
 ## Validação e recuperação
 
-Testes sintéticos Python em docker/server/mirror/test_*.py, autenticação em docker/server/auth/test_auth.py e verificações Node check_settings.mjs, check_calendar.mjs e check_pwa.mjs. Executar os scripts Node passando a raiz do repositório. As imagens alteradas são magicmirror, mirror-api e auth; openGym/Garmin e suas imagens não precisam ser reconstruídos.
+Testes sintéticos Python em docker/server/mirror/test_*.py, autenticação em docker/server/auth/test_auth.py e test_mirror_facade.py e verificações Node check_settings.mjs, check_calendar.mjs, check_backgrounds.mjs e check_pwa.mjs. Executar os scripts Node passando a raiz do repositório. As imagens alteradas são magicmirror, mirror-api e auth; openGym/Garmin e suas imagens não precisam ser reconstruídos.
 
 O backup inclui mirror.sqlite3, preferências, catálogo e dados pessoais. Ao voltar para código anterior à release 48, restaurar coerentemente o snapshot anterior do Mirror: seu esquema antigo de configurações não reconhece as novas chaves. Não sobrepor um banco em uso. Seguir ATUALIZACAO.md.
 

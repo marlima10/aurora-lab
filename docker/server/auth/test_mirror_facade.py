@@ -27,7 +27,19 @@ class FacadeTests(unittest.TestCase):
         body=json.loads(call.call_args.args[0].data)
         self.assertEqual(body['action'],'weather');self.assertEqual(body['owner'],session['email'])
         self.assertEqual(body['identity'],'native');self.assertIs(body['admin'],False)
-        self.assertNotIn('value',body);self.assertEqual((body['lat'],body['lon']),(1,2))
+        self.assertNotIn('value',body);self.assertNotIn('lat',body);self.assertNotIn('lon',body)
+
+    def test_background_image_is_forwarded(self):
+        class Response:
+            status=200
+            def __enter__(self):return self
+            def __exit__(self,*args):pass
+            def read(self,*args):return b'fixture-image'
+        session={'email':'owner@example.test','grants':{'portal':'owner'}}
+        with patch.object(mirror.urllib.request,'urlopen',return_value=Response()) as call:
+            self.assertEqual(mirror.image(session,{'_mirror_secret':'x'*48},'a'*64,thumb=True),(200,b'fixture-image'))
+        self.assertTrue(call.call_args.args[0].full_url.endswith('/backgrounds/'+'a'*64+'/thumb'))
+        self.assertEqual(call.call_args.kwargs['timeout'],20)
 
     def test_portal_grant_required(self):
         with self.assertRaises(ValueError):mirror.query({'email':'x','grants':{}},{},'state')

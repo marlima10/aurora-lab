@@ -2,7 +2,7 @@
 services:
   magicmirror:
     build: {context: ./docker/server/mirror}
-    image: auroralab-magicmirror:49.0.0
+    image: auroralab-magicmirror:50.0.0
     user: '1000:1000'
     read_only: true
     tmpfs: ['/tmp:size=32m,mode=1777']
@@ -21,10 +21,10 @@ services:
     logging: {driver: json-file, options: {max-size: 3m, max-file: '2'}}
   mirror-api:
     build: {context: ./docker/server/mirror, dockerfile: Dockerfile.api}
-    image: auroralab-mirror-api:49.0.0
+    image: auroralab-mirror-api:50.0.0
     user: '65534:65534'
     volumes: ['./data/mirror:/data', './secrets/mirror.json:/run/secrets/mirror.json:ro']
-    networks: [auth, opengym, mirror-outbound]
+    networks: [auth, opengym, mealie, mirror-outbound]
     read_only: true
     tmpfs: ['/tmp:size=16m,mode=1777']
     cap_drop: [ALL]

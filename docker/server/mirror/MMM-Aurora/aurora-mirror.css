@@ -37,3 +37,18 @@
 @media(max-width:560px){#aurora-mirror .clock time{font-size:calc(50px * var(--mirror-scale,1))}#aurora-mirror .clock p{font-size:calc(14px * var(--mirror-scale,1))}#aurora-mirror .calendar header h2{font-size:14px}#aurora-mirror #mirror-calendar.week-view .day{min-height:150px}.event.holiday{white-space:normal;line-height:1.25}}
 
 #aurora-mirror .weather>.weather-settings,#aurora-mirror .weather>small{display:inline-block;vertical-align:middle;margin:3px 4px 0}#aurora-mirror .weather .forecast{margin:5px 0;font-size:11px}#aurora-mirror .weather p{font-size:calc(12px * var(--mirror-scale,1))}
+
+/* Unified agenda: source labels, touch targets and a readable period list. */
+#aurora-mirror .agenda-toolbar{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:0 0 5px;font-size:11px}
+#aurora-mirror .agenda-toolbar button{font-size:11px!important;padding:4px 8px!important;min-height:30px}
+#aurora-mirror #mirror-agenda-sources{display:flex;gap:7px;flex-wrap:wrap;opacity:.9}
+#aurora-mirror .agenda-source.unavailable{color:#ffda9b}
+#aurora-mirror .agenda-personal{background:#3184a4!important}#aurora-mirror .agenda-reminders{background:#976640!important}#aurora-mirror .agenda-training{background:#337d69!important}#aurora-mirror .agenda-meals{background:#6f5896!important}
+#aurora-mirror .agenda-more{background:#343a3f!important}
+#mirror-agenda-dialog{color:#fff;background:#192321;border:1px solid #ffffff66;border-radius:14px;padding:20px;max-width:min(680px,calc(100vw - 28px));max-height:85dvh;box-sizing:border-box}
+#mirror-agenda-dialog h2{font-size:20px;margin:0 0 8px}#mirror-agenda-dialog p{font-size:13px;line-height:1.4}
+#mirror-agenda-dialog .agenda-list{display:grid;gap:7px;max-height:56dvh;overflow:auto;margin:16px 0}
+#mirror-agenda-dialog .agenda-row{display:block;text-align:left;color:#fff;border:0;border-radius:7px;padding:11px;font:inherit;font-size:14px;white-space:normal;overflow-wrap:anywhere;line-height:1.4;margin:0}
+#mirror-agenda-dialog::backdrop{background:#0009}#aurora-mirror .agenda-delete{margin-block:12px;color:#ffb9a9}
+#aurora-mirror .reminder>button{font-size:11px!important;flex-shrink:0}
+@media(max-width:560px){#aurora-mirror .agenda-toolbar button{min-height:40px}#aurora-mirror .agenda-toolbar{font-size:10px}#aurora-mirror .calendar{overflow:visible}#aurora-mirror .calendar #mirror-calendar{grid-template-rows:24px repeat(var(--weeks,5),minmax(74px,auto))}#aurora-mirror .calendar .day{min-width:0;overflow:hidden}#aurora-mirror .calendar .event{max-width:100%;font-size:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#aurora-mirror .reminder label{min-width:0;overflow-wrap:anywhere}}
