@@ -101,3 +101,12 @@
 - **Bloqueio** — A sessão do Claude não recebeu permissão de push no GitHub, e o Aurora Server não é acessível a partir dela. O commit, o merge `--no-ff` na `main`, a tag `v50.0.0`, a release e a implantação ficam com o usuário, pelos comandos entregues no chat.
 - **Atenção** — A `main` local rastreia o remoto `fork` (`rafaellima2222/aurora-lab`). O push da `main` precisa usar explicitamente `origin`.
 - **Próximos passos** — Depois do push, marcar a release no GitHub e implantar no servidor com backup prévio, conforme ATUALIZACAO.md seções 1 a 6 e RELEASE-50.md. Atualizar só `magicmirror`, `mirror-api` e `auth`, e conferir o calendário no tablet real. Ao final, marcar a AUR-011 como **Concluída** e atualizar o CONTEXT.md.
+
+## 27/11/2026 — Release 50.0.0 publicada e implantada
+
+- **Agente responsável** — Claude Code. Merge, release e implantação executados pelo usuário a partir dos comandos preparados.
+- **Tarefa** — AUR-011, **Concluída**.
+- **Resultado** — `origin/main` em `ebeb06d` (merge `--no-ff` da `rafael`, que inclui `3f9731a` da AUR-012 e `3936835` com o CHANGELOG datado). A tag `v50.0.0` aponta para `ebeb06d`, e a release "Aurora LAB 50.0.0 — Agenda unificada" está publicada como Latest. O usuário confirmou a conclusão da implantação no Aurora Server.
+- **Arquivos alterados** — `docs/TASKS.md`, `docs/HANDOFF.md` e `docs/CONTEXT.md`, somente texto.
+- **Não verificado pelo Claude** — Esta sessão não acessa o Aurora Server. Backup prévio, serviços recriados e conferência no tablet foram informados pelo usuário e não foram observados diretamente.
+- **Próximos passos** — Commit destes três arquivos na `rafael`, se autorizado. Acompanhar no tablet real o `fitCalendar` e a agenda com dados reais.
