@@ -110,3 +110,9 @@
 - **Arquivos alterados** — `docs/TASKS.md`, `docs/HANDOFF.md` e `docs/CONTEXT.md`, somente texto.
 - **Não verificado pelo Claude** — Esta sessão não acessa o Aurora Server. Backup prévio, serviços recriados e conferência no tablet foram informados pelo usuário e não foram observados diretamente.
 - **Próximos passos** — Commit destes três arquivos na `rafael`, se autorizado. Acompanhar no tablet real o `fitCalendar` e a agenda com dados reais.
+
+## 27/11/2026 — Validação da agenda no tablet físico
+
+- **Responsável pelo registro** — OpenAI Codex.
+- **Validação em produção** — O usuário confirmou no tablet físico que a agenda do MagicMirror abriu nos modos Mês e Semana e que o botão **＋N** abriu a lista nos dias com itens excedentes.
+- **Fechamento** — AUR-011 marcada como **Concluída** em TASKS.md. A versão v50.0.0 foi confirmada como a mais recente no GitHub. Os três serviços atualizados estavam saudáveis no Aurora Server, e o backup pós-implantação passou na restauração isolada.
