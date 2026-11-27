@@ -235,7 +235,7 @@ def handler(store, origin, assets=None, apps_config=None):
                 if path == '/auth/mirror/settings':
                     status,result=mirror_query(self.current(csrf=True,admin=True),apps_config,'settings-save',data)
                     return self.send(status,result)
-                if path in ('/auth/mirror/save','/auth/mirror/weather'):
+                if path in ('/auth/mirror/save','/auth/mirror/weather','/auth/mirror/agenda'):
                     status,result=mirror_query(session,apps_config,path.rsplit('/',1)[1],data)
                     return self.send(status,result)
                 if path == '/auth/logout':

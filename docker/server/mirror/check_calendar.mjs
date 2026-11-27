@@ -14,4 +14,7 @@ module.shiftCalendar.call(ctx,1);assert.equal(ctx.month.getDate(),8);
 module.shiftCalendar.call(ctx,-1);assert.equal(ctx.month.getDate(),1);
 assert(!source.includes('geolocation'));assert(!source.includes('navigator.permissions'));
 assert(source.includes('aria-label="Abrir Jarvis"'));assert(source.includes('class="jarvis-icon"'));
+const items=[{id:'m',source:'meals',day:'2026-11-27',time:''},{id:'t',source:'training',day:'2026-11-27',time:''},{id:'h',source:'holidays',day:'2026-11-27',time:''},{id:'r',source:'reminders',day:'2026-11-27',time:'09:00'},{id:'p',source:'personal',day:'2026-11-27',time:'14:30'},{id:'x',source:'personal',day:'2026-11-28',time:''}];
+assert.deepEqual(module.dayRows(items,'2026-11-27').map(x=>x.id),['r','p','m','t']);assert.equal(module.dayRows(undefined,'2026-11-27').length,0);
+console.log('Agenda cells keep personal commitments ahead of imported plans and leave holidays apart.');
 console.log('Month/week ranges, leap years, year boundary, navigation, no GPS and named Jarvis shortcut passed.');

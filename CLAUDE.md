@@ -1,0 +1,2 @@
+@AGENTS.md
+@FLUXO-DE-TRABALHO.md

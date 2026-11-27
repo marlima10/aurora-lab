@@ -1,4 +1,4 @@
-# Estrutura e arquitetura — AuroraLAB 49.0.0
+# Estrutura e arquitetura — AuroraLAB 50.0.0
 
 Este documento descreve o código atual, não o estado de uma máquina específica. Os caminhos de código são relativos à raiz do repositório; os links entre guias são relativos a `docs/`.
 
@@ -261,3 +261,11 @@ O módulo MMM-Aurora oculta visualmente os títulos redundantes dos três blocos
 GET `/auth/mirror/backgrounds` lista a galeria para o administrador. POST `/auth/mirror/backgrounds/upload` recebe bytes raster, exige administrador, CSRF e origem exata antes de ler o corpo e tem limite separado de 12 MiB. JSON comum continua limitado a 8 KiB. GET `/auth/mirror/backgrounds/<sha256>` e `/thumb` exigem sessão com acesso ao portal e encaminham somente JPEG validado, sem cache público. Caminhos fornecidos por clientes não são usados para ler arquivos.
 
 As preferências `backgroundMode`, `backgroundImages` e `backgroundSeconds` estendem o esquema persistente. A sequência em `MMM-Aurora/backgrounds.js` carrega a foto antes de trocar, cancela respostas antigas após reconfiguração e pausa o temporizador quando o documento fica oculto. O pôr do sol original é a opção padrão e a reserva para uma seleção indisponível. Os recursos privados não entram no service worker.
+
+## MagicMirror — agenda unificada (50.0.0)
+
+`docker/server/mirror/agenda.py` monta uma projeção somente leitura do período pedido, com até 42 dias. Ela reúne os itens de `entries` (compromissos e lembretes com data), `holiday_events`, os treinos do openGym (`opengym-api:3000/api/data`) e as refeições planejadas do Mealie (`mealie:9000/api/households/mealplans`, paginado). A tabela `entries` ganha a coluna `time` (HH:MM, horário de Brasília) por `ALTER TABLE` idempotente na inicialização. A ação `edit` altera o próprio item com verificação de proprietário.
+
+POST `/auth/mirror/agenda` exige sessão, CSRF e origem exata. A fachada `docker/server/auth/mirror.py` envia `identity` e `mealieIdentity` dos grants da sessão e ignora qualquer identidade enviada pelo cliente. O tempo limite da consulta à agenda é de 35 s; as demais consultas mantêm 20 s. Cada fonte tem cache de 60 s, separado por fonte, identidade, período e dia corrente. Uma fonte sem grant aparece como `unauthorized` e uma fonte com falha aparece como `unavailable`, sem descartar as demais.
+
+`mirror-api` passa a usar também a rede `mealie`, de modo que `compose.mirror.yaml` só é válido junto com `compose.mealie.yaml` e `compose.opengym.yaml`. `docker/server/mirror/prepare.py` grava `mealieSecret` em `secrets/mirror.json`. Se `secrets/sso/apps.json` não tiver a entrada `mealie`, o segredo fica vazio e a agenda trata a fonte como sem acesso, sem consultá-la. No MMM-Aurora, `dayRows` põe compromissos e lembretes à frente das fontes importadas, e `fitCalendar` move para **＋N** os itens que ficariam cortados no layout de altura fixa. Testes: `docker/server/mirror/test_agenda.py` e os casos de agenda em `docker/server/auth/test_auth.py`.

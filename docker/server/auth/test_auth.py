@@ -249,6 +249,28 @@ class HttpAuthenticationTests(Fixture, unittest.TestCase):
             self.assertEqual(self.request('/auth/mirror/backgrounds',headers={'Cookie':COOKIE+'='+admin})[0],200)
             self.assertEqual(query.call_args.args[2],'backgrounds')
 
+    def test_agenda_requires_session_csrf_and_origin(self):
+        from unittest.mock import patch
+        token,csrf=self.login();headers={'Cookie':COOKIE+'='+token,'X-Aurora-CSRF':csrf}
+        with patch('server.mirror_query',return_value=(200,{'items':[]})) as query:
+            self.assertEqual(self.request('/auth/mirror/agenda',{'start':'2026-11-23','end':'2026-11-29'},headers)[0],200)
+            self.assertEqual(query.call_args.args[2],'agenda')
+            query.reset_mock()
+            for extra in [{'X-Aurora-CSRF':'wrong'},{'Origin':'https://attacker.example.test'},{'Cookie':''}]:
+                self.assertEqual(self.request('/auth/mirror/agenda',{},headers|extra)[0],403)
+            query.assert_not_called()
+
+    def test_agenda_facade_uses_session_native_identities(self):
+        from unittest.mock import patch,MagicMock
+        from mirror import query
+        response=MagicMock();response.__enter__.return_value=response;response.status=200;response.read.return_value=b'{"items":[]}'
+        session={'email':'a@example.test','admin':False,'grants':{'portal':'a','opengym':'native-a','mealie':'meal-a'}}
+        with patch('mirror.urllib.request.urlopen',return_value=response) as opened:
+            query(session,{'_mirror_secret':'s'*48},'agenda',{'start':'2026-11-23','end':'2026-11-29','identity':'victim','mealieIdentity':'victim'})
+            sent=json.loads(opened.call_args.args[0].data)
+            self.assertEqual(sent['identity'],'native-a');self.assertEqual(sent['mealieIdentity'],'meal-a');self.assertEqual(sent['owner'],'a@example.test')
+        with self.assertRaises(ValueError):query(session|{'grants':{}},{'_mirror_secret':'s'*48},'agenda',{})
+
     def test_cookie_is_host_only_secure_httponly_and_no_store(self):
         status, headers, body = self.request('/auth/login', {'email':ADMIN_EMAIL, 'key':self.key})
         self.assertEqual(status, 200)
