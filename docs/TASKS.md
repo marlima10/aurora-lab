@@ -30,7 +30,7 @@ Use os estados **Pendente**, **Em andamento**, **Bloqueada** e **Concluída**. R
 | AUR-024 | Release 53 · Fechamento: versão 53.0.0, documentação, testes, commit, release e implantação do openGym | Alta | OpenAI Codex | AUR-018 a AUR-022 e autorização explícita do usuário | Concluída |
 | AUR-025 | Nova numeração de versões a partir da 5.4: `X.Y.Z` com tags `aurora-X.Y.Z`, tabela de correspondência com as tags `vNN.0.0` e guia de release atualizado | Alta | OpenAI Codex | Decisão do usuário (opção 3, 28/11/2026) | Concluída |
 | AUR-026 | README com a seção "Aurora LAB em imagens": 4 capturas com dados de demonstração em `docs/images/` (MagicMirror, openGym, Monitor e Energia) | Alta | OpenAI Codex | Nenhuma | Concluída |
-| AUR-027 | Apresentação geral do Aurora LAB em 8 slides, em PowerPoint e PDF, com as capturas da AUR-026 e as complementares | Média | OpenAI Codex | AUR-026 | Em andamento |
+| AUR-027 | Apresentação geral do Aurora LAB em 8 slides, em PowerPoint e PDF, com as capturas da AUR-026 e as complementares | Média | OpenAI Codex | AUR-026 | Concluída |
 
 ## AUR-004 — Requisitos e critérios de aceitação
 

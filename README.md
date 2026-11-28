@@ -10,7 +10,7 @@ Este README acompanha a versão registrada em [`VERSION`](VERSION). Os guias ope
 
 ## Aurora LAB em imagens
 
-As capturas abaixo usam dados de demonstração.
+As capturas abaixo usam dados de demonstração. Veja também a [apresentação geral do Aurora LAB em PDF](docs/apresentacao/aurora-lab.pdf).
 
 ![Calendário semanal do MagicMirror com compromissos, lembretes, treinos e refeições em cores distintas](docs/images/magicmirror-agenda.png)
 
