@@ -1,12 +1,25 @@
 # AuroraLAB 53.0.0
 
-A versão 5.3 melhora o openGym com o painel Tempo e calorias, a tela Início em duas colunas e estados mais claros do Garmin. [Notas da release 53](docs/RELEASE-53.md).
+A versão 5.3 melhora o openGym com o painel Tempo e calorias, a tela Início em duas colunas e estados mais claros do Garmin. [Notas da release 53](docs/RELEASE-53.md) · [Convenção de versões](docs/VERSOES.md).
 
 A versão 52 melhora a agenda e a configuração do MagicMirror, o login e o Monitor de processos. A nova página Energia reúne histórico e simulação de custo. [Notas da release 52](docs/RELEASE-52.md).
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
 Este README acompanha a versão registrada em [`VERSION`](VERSION). Os guias operacionais ficam em [`docs/`](docs/); os padrões de trabalho, em [`skills/`](skills/).
+
+## Aurora LAB em imagens
+
+As capturas abaixo usam dados de demonstração.
+
+![Calendário semanal do MagicMirror com compromissos, lembretes, treinos e refeições em cores distintas](docs/images/magicmirror-agenda.png)
+
+**MagicMirror** — A agenda da casa reúne rotina, treino e refeições.
+
+| openGym | Monitor | Energia |
+| --- | --- | --- |
+| [![Tela Início em duas colunas com o painel Tempo e calorias](docs/images/opengym-inicio.png)](docs/images/opengym-inicio.png) | [![Resumo de serviços online, CPU, memória, disco e verificação de backup](docs/images/monitor-saude.png)](docs/images/monitor-saude.png) | [![Histórico de potência da bateria e do processador com simulação de custo mensal](docs/images/energia-historico.png)](docs/images/energia-historico.png) |
+| Treinos e métricas em um painel. | Saúde dos serviços e dos backups. | Leituras do notebook e estimativa pela tarifa. |
 
 ## Tela inicial MagicMirror
 

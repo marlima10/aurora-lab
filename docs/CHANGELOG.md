@@ -1,5 +1,7 @@
 # Histórico de versões
 
+Veja a [convenção de versões e a correspondência das tags](VERSOES.md).
+
 ## 53.0.0 — 2026-11-28
 
 Melhora a tela Início do openGym, reúne tempo e calorias num painel e simplifica o resumo Garmin. [Revisão detalhada](RELEASE-53.md).

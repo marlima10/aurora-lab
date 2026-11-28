@@ -187,3 +187,27 @@
 - Somente opengym-web foi recriado. O frontend 53.0.0 ficou saudável, serviu o bundle com o painel novo e respondeu pelo redirecionamento HTTPS do portal. Os IDs de contêiner de API e Garmin foram preservados.
 - A primeira tentativa voltou à imagem 47.0.0 por usar 8080 na checagem interna. A checagem passou ao usar a porta NGINX_PORT do contêiner.
 - Backups de 10:27:11 e 10:30:55 UTC passaram no SHA-256 e na restauração isolada. A imagem anterior e a cópia dos arquivos anteriores ficam disponíveis para retorno no Aurora Server.
+
+## 28/11/2026 — Nova numeração de versões
+
+- **Agente responsável** — Claude Code. Somente planejamento e documentação de controle.
+- **Constatação** — No GitHub, os títulos de todas as releases foram renomeados para X.Y (v52.0.0 → "Aurora LAB 5.2", v5.0.0 → "AuroraLAB 0.5"). A 5.3 foi publicada com tag `v53.0.0` e `VERSION 53.0.0`, antes de a decisão chegar à execução.
+- **Decisão do usuário** — Opção 3: padrão X.Y.Z daqui para frente, com tags `aurora-X.Y.Z`. Isso evita conflito com as tags existentes `v5.0.0` a `v9.0.0`, que hoje são as releases 0.5 a 0.9. Começa na 5.4. A 5.3 e as anteriores ficam como histórico, sem mudar tags.
+- **Tarefa** — AUR-025 criada (**Pendente**, OpenAI Codex), com convenção, requisitos e aceite no [TASKS.md](TASKS.md#aur-025--nova-numeração-de-versões).
+- **Arquivos alterados** — `docs/TASKS.md`, `docs/CONTEXT.md` e `docs/HANDOFF.md`.
+- **Próximo passo** — Executar a AUR-025 antes da próxima release.
+
+## 28/11/2026 — README em imagens e apresentação geral
+
+- **Agente responsável** — Claude Code. Somente planejamento.
+- **Tarefas** — AUR-026 (README com 4 capturas em `docs/images/`) e AUR-027 (apresentação de 8 slides em PPTX e PDF, depende da AUR-026) registradas como **Pendente** para o OpenAI Codex. A proposta do usuário está detalhada no [TASKS.md](TASKS.md#aur-026-e-aur-027--readme-em-imagens-e-apresentação-geral), com regras de privacidade e dados de demonstração obrigatórios.
+- **Arquivos alterados** — `docs/TASKS.md` e `docs/HANDOFF.md`, somados às alterações da AUR-025 ainda sem commit (`docs/TASKS.md`, `docs/CONTEXT.md` e `docs/HANDOFF.md`).
+- **Próximo passo** — O Codex pode fazer a AUR-025 e a AUR-026 em paralelo. A AUR-027 vem depois da AUR-026.
+
+## 28/11/2026 — Execução da documentação da 5.4 e materiais de apresentação
+
+- OpenAI Codex assumiu AUR-025 a AUR-027. Arquivos previstos: guias de versão, README, imagens, PowerPoint, PDF e registros de tarefa.
+
+- **AUR-025** — VERSOES.md registra todas as 52 tags históricas e os links de documentação disponíveis. VERSION permanece 53.0.0. Sem ordenação, comparação semântica ou cálculo de próxima versão do Aurora LAB encontrado nas fontes rastreadas. O Dockerfile do Javis compara seu próprio VERSION com o lock de origem, por igualdade, e é independente. O guia recomenda conferir colisões Docker e usar ID ou digest no retorno.
+- **AUR-026** — Quatro PNGs demonstrativos no tema escuro. MagicMirror 1440 × 1000 com compromissos e lembretes, treino e refeição fictícios. openGym 1024 × 950 do modo VITE_DEMO. Monitor 1440 × 1580 com status e backup simulados. Energia 1440 × 1000 com série e tarifa fictícias. Imagens e recortes conferidos visualmente, sem credenciais, IPs, hostnames reais ou informações pessoais. PNGs regravados sem EXIF e com menos de 400 KB por imagem.
+- **AUR-027** — PPTX de oito slides editáveis e PDF exportado no PowerPoint, prontos em docs/apresentacao local. O PDF foi rasterizado e revisado página por página. Três links verificados em cada formato. Destino público dos binários aguarda escolha do usuário.
