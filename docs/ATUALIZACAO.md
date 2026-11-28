@@ -51,10 +51,10 @@ git pull --ff-only
 git log -1 --oneline
 ```
 
-Se houver alterações locais ou divergência, resolva-as antes de prosseguir; não use `reset --hard` ou `clean` como atualização. Para produção, escolha um commit/release da `main` conforme o processo de revisão. Para desenvolver na branch `marcelo`:
+Se houver alterações locais ou divergência, resolva-as antes de prosseguir; não use `reset --hard` ou `clean` como atualização. Para produção, escolha um commit/release da `main` conforme o processo de revisão. Para desenvolver na branch `rafael`:
 
 ```sh
-git switch marcelo
+git switch rafael
 git fetch origin
 git merge origin/main
 ```
@@ -111,12 +111,12 @@ git add CAMINHOS-REVISADOS
 git diff --cached
 git diff --cached --check
 git commit -m 'Descreva a alteração'
-git push -u origin marcelo
+git push -u origin rafael
 ```
 
 Substitua os caminhos/mensagem e o nome da branch quando diferente. Revise também arquivos novos e remoções; nunca adicione bancos/credenciais. Abra ou atualize o PR da branch de trabalho para `main`, com alteração, validação e implantação descritas.
 
-Crie a release oficial após o merge e a revisão aplicável ao projeto. Confira a última versão do repositório oficial, `VERSION`, [CHANGELOG.md](CHANGELOG.md) e o commit de destino. A convenção histórica deste projeto incrementa o primeiro componente (`v12.0.0` → `v13.0.0`); isso é uma convenção local, não uma regra geral de versionamento semântico. Mudança documental em andamento fica em **Não publicado**, sem inventar uma release já lançada.
+Crie a release oficial após o merge e a revisão aplicável ao projeto. Confira a última versão do repositório oficial, `VERSION`, [CHANGELOG.md](CHANGELOG.md) e o commit de destino. A partir da 5.4.0, use a [convenção de versões](VERSOES.md). Por exemplo, crie a tag com `git tag -a aurora-5.4.0 -m "Aurora LAB 5.4"` sobre o commit de destino e use o título **Aurora LAB 5.4** no GitHub. Mudança documental em andamento fica em **Não publicado**, sem inventar uma release já lançada.
 
 Não reutilize tags nem substitua releases publicadas para representar conteúdo novo. A release precisa registrar testes realmente realizados e limitações; depois, a implantação no servidor segue este guia.
 

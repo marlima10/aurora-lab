@@ -28,6 +28,9 @@ Use os estados **Pendente**, **Em andamento**, **Bloqueada** e **Concluída**. R
 | AUR-022 | Release 53 · openGym: Início em duas colunas a partir de 900 px e véu do fundo mais forte entre os cards | Média | OpenAI Codex | AUR-020 | Concluída |
 | AUR-023 | openGym oficial: rascunhar sugestões ao projeto (dias da semana em pt-BR, nomes de exercício duplicados, dias de descanso compactos no Plano) | Baixa | OpenAI Codex | Nenhuma | Concluída |
 | AUR-024 | Release 53 · Fechamento: versão 53.0.0, documentação, testes, commit, release e implantação do openGym | Alta | OpenAI Codex | AUR-018 a AUR-022 e autorização explícita do usuário | Concluída |
+| AUR-025 | Nova numeração de versões a partir da 5.4: `X.Y.Z` com tags `aurora-X.Y.Z`, tabela de correspondência com as tags `vNN.0.0` e guia de release atualizado | Alta | OpenAI Codex | Decisão do usuário (opção 3, 28/11/2026) | Concluída |
+| AUR-026 | README com a seção "Aurora LAB em imagens": 4 capturas com dados de demonstração em `docs/images/` (MagicMirror, openGym, Monitor e Energia) | Alta | OpenAI Codex | Nenhuma | Concluída |
+| AUR-027 | Apresentação geral do Aurora LAB em 8 slides, em PowerPoint e PDF, com as capturas da AUR-026 e as complementares | Média | OpenAI Codex | AUR-026 | Em andamento |
 
 ## AUR-004 — Requisitos e critérios de aceitação
 
@@ -154,3 +157,118 @@ Não criar patch local para esses itens sem decisão do usuário.
 - Commit, merge, release e implantação somente com autorização explícita. Fazer backup antes e recriar apenas `opengym-web`. Dados e API não mudam.
 
 **Aceite** — Release `v53.0.0` publicada, o HANDOFF com resultado, validação, limites e retorno, e a AUR-024 marcada como **Concluída**.
+
+## AUR-025 — Nova numeração de versões
+
+**Decisão do usuário (28/11/2026, opção 3)** — Os títulos das releases no GitHub foram renomeados: a antiga N passou a se chamar X.Y, com X = N ÷ 10 e Y = resto (53 → 5.3, 49 → 4.9, 5 → 0.5). As tags `vNN.0.0` continuam iguais. Como `v5.0.0` a `v9.0.0` já existem e correspondem às releases 0.5 a 0.9, as próximas tags usam um prefixo próprio, sem conflito.
+
+**Situação de partida** — A 5.3 foi publicada antes desta tarefa, ainda no padrão antigo (`VERSION 53.0.0`, tag `v53.0.0`, `RELEASE-53.md`, imagem `auroralab-opengym-web:53.0.0`). Ela fica como histórico. O padrão novo começa na **5.4**.
+
+### Convenção a partir da 5.4
+
+| Item | Padrão | Exemplo |
+| --- | --- | --- |
+| `VERSION` e CHANGELOG | `X.Y.Z`. Z fica reservado para correções sem novidade | `5.4.0`, `## 5.4.0 — AAAA-MM-DD` |
+| Tag Git | `aurora-X.Y.Z` | `aurora-5.4.0` |
+| Título da release | `Aurora LAB X.Y — tema` | `Aurora LAB 5.4 — …` |
+| Documento da release | `docs/RELEASE-X.Y.md` | `docs/RELEASE-5.4.md` |
+| Imagens Docker locais | `auroralab-<serviço>:X.Y.Z` | `auroralab-opengym-web:5.4.0` |
+| Cache do PWA e `APP_BUILD` | `auroralab-X.Y.Z` / `auroralab-X.Y` | `auroralab-5.4.0` / `auroralab-5.4` |
+
+Tags históricas `vNN.0.0`, documentos `RELEASE-NN.md` e títulos antigos do CHANGELOG ficam como estão: não mover, apagar nem recriar tags.
+
+### Requisitos
+
+1. Criar `docs/VERSOES.md` com:
+   - a convenção acima;
+   - a tabela completa de correspondência (tag `vNN.0.0` → versão X.Y → documento da release, quando houver), incluindo `v53.0.0` → 5.3;
+   - a explicação do conflito com `v5.0.0` a `v9.0.0`.
+   Incluir links para ele no README, no CHANGELOG (nota no topo, sem reescrever entradas antigas), no CONTEXT e no ATUALIZACAO.
+2. No `docs/ATUALIZACAO.md`, seção 8:
+   - trocar o parágrafo da "convenção histórica" (`v12.0.0` → `v13.0.0`) pela nova convenção, com exemplo de `git tag -a aurora-5.4.0` e título "Aurora LAB 5.4";
+   - corrigir os comandos que ainda usam a branch removida `marcelo` (linhas ~57 e ~114) para `rafael`.
+3. `VERSION` continua `53.0.0` até a próxima release, que passa direto para `5.4.0`. Registrar isso no VERSOES.md, porque `5.4.0` é numericamente menor que `53.0.0`.
+4. Procurar no repositório comparações ou ordenações de versão que quebrariam com `5.4.0 < 53.0.0`: scripts, testes, `sort -V`, `git describe` e checagens de atualização. A busca inicial do Claude Code não encontrou nenhum leitor programático de `VERSION`, mas é preciso confirmar. Isso inclui o retorno de imagem do deploy, que na 5.3 voltou à 47.0.0 numa tentativa.
+5. Registrar o risco das imagens Docker: antes de usar tags `6.0.0` a `9.0.0` (a partir da série 6.0), conferir no servidor com `docker image ls 'auroralab-*'` se não existem imagens antigas com essas tags.
+6. Os cabeçalhos internos das releases antigas no GitHub (por exemplo, a 49 ainda mostra "AuroraLAB 49.0.0" no corpo) ficam opcionais. Só editar com autorização do usuário.
+
+### Aceite
+
+- `docs/VERSOES.md` existe e tem uma linha por tag existente (`git tag -l 'v*'`).
+- Todos os links relativos novos funcionam.
+- O ATUALIZACAO não menciona mais `marcelo`.
+- Nenhuma tag foi criada, movida ou apagada.
+- `VERSION` continua `53.0.0`.
+- O HANDOFF tem o resultado da busca do item 4.
+
+## AUR-026 e AUR-027 — README em imagens e apresentação geral
+
+**Proposta do usuário (28/11/2026)** — O README ajuda quem acabou de chegar a entender o Aurora LAB em poucos segundos, e a apresentação mostra como os módulos se conectam no uso diário. A primeira captura a preparar é a do MagicMirror, que serve de capa no GitHub e nos slides.
+
+### Regras de privacidade (valem para as duas tarefas)
+
+1. Todas as capturas públicas usam um perfil de demonstração, com agenda, lembretes, treinos, refeições, peso e leituras de energia fictícios.
+2. Nenhuma imagem pode mostrar e-mails, chaves, tokens, IPs (local, Tailscale ou gateway), domínios `.ts.net`, hostnames reais, nomes de dispositivos, nomes reais de pessoas ou dados pessoais.
+   - Onde o layout exige um valor, usar fictícios: IPs da faixa de documentação `192.0.2.x`/`198.51.100.x`, host `aurora-demo`.
+3. Fontes de dados sintéticos já existentes:
+   - MagicMirror: `docker/server/mirror/check_calendar.mjs` e `check_settings.mjs`;
+   - openGym: build `VITE_DEMO=1`, idioma pt-BR, conforme a regra 6 da Release 5.3;
+   - portal e Monitor: `status.json` simulado, sem tocar no Aurora Server.
+4. Nenhuma captura é tirada da produção com dados reais. Antes de adicionar ao Git, conferir cada imagem ampliada e também os metadados (EXIF e nomes de arquivo).
+
+### AUR-026 — README com 4 capturas
+
+**Entregáveis**
+- Seção **"Aurora LAB em imagens"** perto do início do README, logo depois da apresentação: uma captura principal e três complementares.
+- Imagens em `docs/images/`, com nomes estáveis, sem a versão no nome. Mudar o nome quebraria links antigos.
+
+| Arquivo | O que mostrar |
+| --- | --- |
+| `docs/images/magicmirror-agenda.png` (principal) | Tela inicial do MagicMirror com a agenda do dia: compromissos, lembretes, treinos e refeições. Mostra a integração entre os módulos |
+| `docs/images/opengym-inicio.png` | Tela Início do openGym em duas colunas, com o painel Tempo e calorias da 5.3 |
+| `docs/images/monitor-saude.png` | Resumo dos serviços, recursos e estado do backup |
+| `docs/images/energia-historico.png` | Histórico de potência e simulação de custo, com um selo visível "Dados de demonstração" |
+
+**Requisitos**
+- Cada imagem tem uma legenda curta e texto alternativo descritivo em português (o `alt` não repete a legenda).
+- A captura principal ocupa a largura do README. As três complementares ficam em grade (tabela de 3 colunas ou `<p>` com largura reduzida) e cada uma abre a imagem inteira.
+- Tamanho:
+  - desktop com no máximo 1600 px de largura e celular com 780 px;
+  - cada arquivo com até ~400 KB (PNG otimizado; WebP só se o GitHub exibir corretamente);
+  - total da pasta abaixo de 2 MB.
+- Para manter o README fácil de percorrer, as capturas extras não entram nele: ficam na AUR-027.
+- Tema escuro padrão, com textos legíveis na miniatura.
+
+**Aceite**
+- O README mostra as 4 imagens no GitHub, com legenda e `alt`, e os links relativos funcionam.
+- O HANDOFF registra como cada captura foi gerada (dados, resolução, tema) e a conferência de privacidade de cada uma.
+- Commit somente com autorização do usuário.
+
+### AUR-027 — Apresentação de 8 slides
+
+**Entregáveis** — `docs/apresentacao/aurora-lab.pptx` e `docs/apresentacao/aurora-lab.pdf`, gerado a partir do PPTX, mais as capturas complementares em `docs/apresentacao/imagens/`.
+
+| Slide | Conteúdo e visual |
+| --- | --- |
+| 1. Aurora LAB | Capa com o MagicMirror e a frase "Agenda, treinos e monitoramento em um só portal." |
+| 2. Como tudo se conecta | Diagrama simples: portal, autenticação central, módulos (MagicMirror, openGym, Mealie, Monitor, Energia e demais) e Aurora Server. Desenhado com formas editáveis no PowerPoint, não como imagem |
+| 3. Sua rotina no MagicMirror | Print da agenda com três chamadas: compromissos e lembretes, treinos e refeições |
+| 4. Treinos no openGym | Print da tela Início e detalhe de Tempo e calorias. Explica o papel do Garmin na importação: somente leitura, sem calorias estimadas |
+| 5. Operação do servidor | Print do Monitor com serviços, recursos e backup |
+| 6. Energia e autonomia | Print do histórico e da simulação, separando as leituras medidas no notebook das estimativas de custo pela tarifa |
+| 7. Uso no celular e no tablet | Duas capturas lado a lado mostrando como o layout se adapta e como o PWA aparece no uso diário |
+| 8. Código, releases e documentação | Links para o repositório, a documentação e a release 5.3 (tag `v53.0.0`) |
+
+**Requisitos**
+- Formato 16:9, com identidade visual da skill `skills/aurora-visual` (cores e tipografia do tema Aurora).
+- No máximo uma ideia por slide, com títulos curtos e texto mínimo. Os detalhes vão nas notas do apresentador.
+- As mesmas regras de privacidade, com as capturas extras geradas pelos mesmos dados de demonstração.
+- Os textos devem ser editáveis: nada de slides inteiros como imagem.
+- Usar fontes que o PDF incorpore corretamente.
+- Os links do slide 8 devem ser clicáveis no PPTX e no PDF.
+- O PDF tem 8 páginas e é conferido página a página, sem texto cortado ou sobreposto.
+
+**Aceite**
+- PPTX abre sem aviso de reparo, e o PDF tem 8 páginas legíveis.
+- O HANDOFF registra a conferência visual e a de privacidade.
+- Decidir com o usuário se os arquivos ficam no repositório ou só como anexo de release (o PPTX com imagens pode passar de alguns MB). Commit somente com autorização.
