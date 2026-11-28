@@ -1,4 +1,6 @@
-# AuroraLAB 52.0.0
+# AuroraLAB 53.0.0
+
+A versão 5.3 melhora o openGym com o painel Tempo e calorias, a tela Início em duas colunas e estados mais claros do Garmin. [Notas da release 53](docs/RELEASE-53.md).
 
 A versão 52 melhora a agenda e a configuração do MagicMirror, o login e o Monitor de processos. A nova página Energia reúne histórico e simulação de custo. [Notas da release 52](docs/RELEASE-52.md).
 

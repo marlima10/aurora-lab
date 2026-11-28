@@ -21,6 +21,13 @@ Use os estados **Pendente**, **Em andamento**, **Bloqueada** e **Concluída**. R
 | AUR-015 | Release 51 · Configurar Mirror e login: ordem #1, #2… na galeria, prévia ao vivo da aparência, barra fixa de alterações não salvas, contador 0/151 e mostrar/ocultar chave | Média | OpenAI Codex | Nenhuma | Concluída |
 | AUR-016 | Release 52 · Portal: resumo de saúde no topo, energia compacta na home com detalhes em página própria, painéis recolhíveis no celular e estados de carregamento e erro | Média | OpenAI Codex | AUR-013 | Concluída |
 | AUR-017 | Release 52 · Visual: ícones SVG únicos com tooltip na barra compacta e tokens de tema no lugar dos `!important` dos cinco temas | Média | OpenAI Codex | AUR-013 | Concluída |
+| AUR-018 | Release 53 · openGym: card Garmin com um único estado por vez, motivo do botão desabilitado e "Tentar de novo" | Alta | OpenAI Codex | Nenhuma | Concluída |
+| AUR-019 | Release 53 · openGym: cards Aurora com ícone no CardHead, avisos resumidos em "Como é calculado", calorias vazio compacto e um único link "Código desta versão" | Alta | OpenAI Codex | Nenhuma | Concluída |
+| AUR-020 | Release 53 · openGym: Tempo e Calorias num único painel da Início, com abas e período único, preservando a ordem salva dos painéis | Média | OpenAI Codex | AUR-019 | Concluída |
+| AUR-021 | Release 53 · openGym: resumo nativo antes dos cards Aurora na Visão geral das Estatísticas | Média | OpenAI Codex | AUR-019 | Concluída |
+| AUR-022 | Release 53 · openGym: Início em duas colunas a partir de 900 px e véu do fundo mais forte entre os cards | Média | OpenAI Codex | AUR-020 | Concluída |
+| AUR-023 | openGym oficial: rascunhar sugestões ao projeto (dias da semana em pt-BR, nomes de exercício duplicados, dias de descanso compactos no Plano) | Baixa | OpenAI Codex | Nenhuma | Concluída |
+| AUR-024 | Release 53 · Fechamento: versão 53.0.0, documentação, testes, commit, release e implantação do openGym | Alta | OpenAI Codex | AUR-018 a AUR-022 e autorização explícita do usuário | Em andamento |
 
 ## AUR-004 — Requisitos e critérios de aceitação
 
@@ -55,3 +62,95 @@ Registradas pelo Claude Code e ainda não verificadas pelo Codex:
 - Os cinco arquivos de memória estão como não rastreados no Git.
 - Em uma sessão do Claude Code em 27/11/2026, o conteúdo do AGENTS.md não apareceu carregado automaticamente pela importação do CLAUDE.md e precisou ser lido de forma explícita.
 - O CHANGELOG.md e o ESTRUTURA.md ainda indicam 49.0.0, mas a correção deles está fora do escopo da AUR-004.
+
+## Release 53 · openGym — Requisitos e critérios de aceitação (AUR-018 a AUR-024)
+
+Planejamento registrado pelo Claude Code em 28/11/2026 para execução pelo OpenAI Codex. Base da análise: `rafael` em `ff07f43`. O openGym 1.4.5 (commit upstream `2d70e026`) foi gerado com `charts.patch` e a camada `docker/server/opengym/frontend/`, em modo demonstração (`VITE_DEMO=1`), com idioma pt-BR, a 390 px e 1024 px. Garmin e SSO não estavam disponíveis nesse ensaio.
+
+### Regras comuns
+
+1. Siga o [AGENTS.md](../AGENTS.md). Antes de editar, marque a tarefa como **Em andamento** aqui e registre no [HANDOFF.md](HANDOFF.md) os arquivos previstos.
+2. Prefira alterar a camada Aurora: `frontend/src/components/*`, `frontend/src/lib/*` e os CSS. Toque em `charts.patch` (Home.jsx, Stats.jsx) só quando a tarefa exigir. O patch precisa continuar aplicando com `git apply --check` sobre `2d70e026`.
+3. Não altere o código oficial além do patch, nem a API, os dados em `data/opengym/`, o importador Garmin ou o SSO.
+4. Mantenha português brasileiro nos textos, contraste legível sobre o fundo nos temas claro e escuro, alvos de toque de pelo menos 44 px e navegação por teclado.
+5. Cada tarefa precisa de teste Vitest novo ou ajustado. Rode também a suíte citada em [docker/server/opengym/README.md](../docker/server/opengym/README.md).
+6. Validação visual em build de demonstração, a 390, 820, 1024 e 1280 px: no checkout upstream com o patch e a camada aplicados, rode `VITE_DEMO=1 npx vite build` e sirva a pasta `dist/`. Para ver em português, troque `"lang":"en"` por `"lang":"pt-BR"` em `localStorage.gym_state_v1` e recarregue.
+7. Sem commit, push, merge, release ou deploy antes da AUR-024 e da autorização explícita do usuário.
+
+### AUR-018 — Card Garmin
+
+**Problema** — Em `GarminSummary.jsx`, quando a primeira consulta falha, `state` continua `null`. O card mostra ao mesmo tempo "Consultando sincronização…" e "Garmin indisponível…". O botão fica desabilitado em cinza, sem explicação.
+
+**Requisitos**
+- O card mostra um único estado por vez: consultando (só antes da primeira resposta); sem sessão (401); erro (com "Tentar de novo"); conectado, com a última consulta e o resultado; ou desconectado (com "Abrir conexão Garmin").
+- O botão "Sincronizar agora" só aparece habilitado quando pode agir. Desabilitado, deve ter um motivo visível, como "Ative a atualização automática na conexão Garmin".
+- O texto fixo de rodapé deve ter no máximo uma linha.
+- Os erros continuam em `role="alert"`, sem duplicação.
+
+**Aceite** — Teste com `fetch` simulado para 200 (conectado, automático ligado e desligado), 401, 500 e falha de rede. Em cada caso, o card exibe exatamente uma mensagem de estado.
+
+### AUR-019 — Cards Aurora
+
+**Arquivos** — `TrainingMetrics.jsx`, `WeeklyGoals.jsx`, `GarminSummary.jsx`, `training-metrics.css`, `aurora-upgrades.css` e testes.
+
+**Requisitos**
+- Passar `icon` (e `tint`, se preciso) ao `CardHead` nos cards Tempo, Calorias, Metas semanais e Garmin, usando nomes já existentes em `Icon.jsx`. Não adicionar biblioteca de ícones.
+- Deixar uma frase curta por card e mover as regras (como semana de segunda a hoje, sessão contada uma vez, calorias só do Garmin, sem estimativas, zeros reais aceitos) para um `<details>` "Como é calculado". Nenhuma regra pode ser removida.
+- Usar no máximo dois tamanhos de texto por card: o corpo e o `small`.
+- Calorias sem dados no período vira uma linha compacta ("Sem calorias do Garmin neste período"), sem o bloco do gráfico.
+- "Código desta versão" aparece uma vez por tela. Ele sai dos cards da Início e fica no fim da Visão geral das Estatísticas. A obrigação de oferecer o código-fonte (AGPL) continua atendida, e o `README.md` do openGym deve ser atualizado.
+
+**Aceite** — Testes de ícone, de `<details>` presente, de calorias vazio compacto e de link único. Visualmente, nenhum card Aurora tem mais de duas linhas de texto auxiliar visíveis sem expandir.
+
+### AUR-020 — Tempo e Calorias num painel
+
+**Requisitos**
+- Na Início, um painel "Tempo e calorias" com abas Tempo/Calorias e um único seletor de período (7, 30 ou 90 dias, ou Todos).
+- Ordem dos painéis (`home-panels.js` e `auroraHomePanels` do perfil):
+  - nova ID `metrics`, que ocupa a posição da primeira entre `minutes`/`calories` na ordem salva;
+  - `minutes` e `calories` continuam aceitas na leitura e são convertidas sem duplicar;
+  - ocultar o painel novo equivale a ocultar os dois antigos.
+- Cálculos de `training-metrics.js` inalterados.
+
+**Aceite** — Testes de migração da ordem: só `minutes`, só `calories`, ambas, nenhuma, ordem com IDs inválidas, e dois perfis separados. Testes de troca de aba e período. `HomePanels.test.jsx` continua passando.
+
+### AUR-021 — Ordem da Visão geral das Estatísticas
+
+**Requisitos** — Em `Stats.jsx`, pelo `charts.patch`, o bloco `aurora-stats-summary` (Metas e Tempo/Calorias) passa a ficar depois do resumo nativo da Visão geral (Treinos, Este mês, Peso 30 d, Total levantado), e não no topo da seção. O índice fixo e as âncoras das seções continuam iguais.
+
+**Aceite** — Teste que localiza o resumo nativo antes do bloco Aurora na Visão geral. `Stats.ex-range.test.jsx` e `Stats.speed.test.jsx` continuam passando. `git apply --check` limpo.
+
+### AUR-022 — Tablet e fundo
+
+**Requisitos**
+- A partir de 900 px, a Início usa duas colunas, com a agenda e o treino de hoje primeiro. A ordem de leitura e de tabulação segue a ordem salva dos painéis.
+- Abaixo de 900 px, o layout atual fica inalterado. Somente a página Início muda: o `max-width` de 560 px do openGym continua nas demais páginas.
+- O modo Organizar painéis funciona nas duas colunas, com arrastar, teclado e botões ↑/↓.
+- O véu sobre `aurora-background.jpg` fica mais forte entre os cards, para que textos da foto não apareçam entre eles. A imagem fornecida pelo titular não é editada.
+
+**Aceite** — Capturas a 820, 1024 e 1280 px nos temas claro e escuro, registradas no HANDOFF, e teste de que a ordem no DOM segue a preferência.
+
+### AUR-023 — Sugestões ao openGym oficial
+
+**Entregável** — Rascunho em `docs/OPENGYM-UPSTREAM.md`, com uma issue ou PR por item, cada uma com evidência e proposta. A publicação no GitHub do projeto é feita pelo usuário.
+
+**Itens**
+1. Em `frontend/src/locales/pt-BR.js` (linha ~1352), os dias da semana usam uma letra (`'Mo': 'S'`, `'Tu': 'T'`…). Isso gera "S T Q Q S S D", ambíguo na agenda da Início e no Plano. A proposta é usar "Seg Ter Qua Qui Sex Sáb Dom" ou duas letras.
+2. Os nomes traduzidos repetem o original entre parênteses, como "Leg Press 45 Graus No Sled (Sled 45° Leg Press)".
+3. No Plano, cada dia de descanso ocupa uma linha inteira. A proposta é usar linhas compactas.
+
+Não criar patch local para esses itens sem decisão do usuário.
+
+### AUR-024 — Fechamento da Release 53
+
+**Requisitos**
+- `VERSION` 53.0.0, `APP_BUILD=auroralab-53` e a tag da imagem `auroralab-opengym-web` atualizada em `compose.opengym.yaml`.
+- `docs/RELEASE-53.md`, CHANGELOG, README, `docs/OPENGYM.md` e CONTEXT atualizados.
+- Validação:
+  - `node --test docker/server/opengym/test_metrics.mjs`;
+  - Vitest da camada Aurora e das suítes citadas no README do openGym;
+  - `docker compose build opengym-web`;
+  - conferência visual da regra 6.
+- Commit, merge, release e implantação somente com autorização explícita. Fazer backup antes e recriar apenas `opengym-web`. Dados e API não mudam.
+
+**Aceite** — Release `v53.0.0` publicada, o HANDOFF com resultado, validação, limites e retorno, e a AUR-024 marcada como **Concluída**.

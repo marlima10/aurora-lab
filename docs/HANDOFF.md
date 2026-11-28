@@ -154,3 +154,29 @@
 - README, CHANGELOG e CONTEXT apontam para a documentação da versão. Criado RELEASE-52.md.
 - Conferência visual em Chrome headless (1280 × 900), com dados sintéticos: agenda do MagicMirror, Energia, configuração do MagicMirror e login. Conferidas a legenda e o seletor de fonte, as leituras de energia, a prévia de aparência e os controles de chave exibidos.
 - A nota pública da 50.0.0 agora registra a confirmação do tablet físico. O usuário confirmou separadamente a instalação e a abertura do PWA pelo ícone da tela inicial em Android e iOS.
+
+## 28/11/2026 — Planejamento de UX/UI do openGym (Release 53)
+
+- **Agente responsável** — Claude Code. Somente planejamento, sem alteração de código.
+- **Tarefas** — AUR-018 a AUR-024 registradas como **Pendente**, com responsável OpenAI Codex. Requisitos e critérios de aceitação estão no [TASKS.md](TASKS.md#release-53--opengym--requisitos-e-critérios-de-aceitação-aur-018-a-aur-024).
+- **Base da análise** — `rafael` em `ff07f43`. openGym 1.4.5 (`2d70e026`) gerado no ambiente do Claude com `charts.patch` e a camada Aurora, em `VITE_DEMO=1`, com pt-BR, a 390 px e 1024 px. O SSO e o Garmin reais não foram exercitados.
+- **Achados principais**
+  - A Início tem cerca de 3.500 px no celular e 10 painéis.
+  - O card Garmin mostra "Consultando" e "indisponível" juntos.
+  - Os cards Aurora não têm o ícone do CardHead e têm texto de aviso excessivo.
+  - O card de calorias vazio ocupa espaço, e "Código desta versão" aparece duplicado.
+  - Tempo e calorias usam seletores de período separados.
+  - Os cards Aurora vêm antes do resumo nativo nas Estatísticas.
+  - O tablet fica em coluna única.
+  - No openGym oficial, os dias da semana em pt-BR usam uma letra.
+- **Arquivos alterados** — `docs/TASKS.md` e `docs/HANDOFF.md`.
+- **Próximo passo** — O Codex começa pela AUR-018 e pela AUR-019, que são independentes e de risco baixo.
+
+## 28/11/2026 — Execução da Release 53
+
+- OpenAI Codex assumiu AUR-018 a AUR-024. Arquivos previstos: overlay, patch, testes e Dockerfile do openGym, Compose, VERSION e documentação. O planejamento local do Claude foi preservado.
+
+- AUR-018 a AUR-022 implementadas no frontend. AUR-023 entregue em OPENGYM-UPSTREAM.md como três rascunhos para o projeto oficial.
+- Validação DEV: 82 testes Vitest em dez suítes, cinco testes Node de métricas, patch aplicado no commit upstream fixado, build Vite de demonstração e imagem 53.0.0 construída pelo Compose em staging do Aurora Server. Docker Desktop não confiou no certificado do Alpine; o build de staging passou sem desabilitar a verificação TLS.
+- Chrome headless pt-BR, temas claro e escuro: capturas a 390, 820, 1024 e 1280 px em tmp/opengym53-visual do workspace DEV. Uma coluna nas duas primeiras larguras e duas nas demais, sem rolagem horizontal. Na Visão geral, o resumo nativo precedeu os cards Aurora.
+- Validação sintética. Sessão SSO real, pareamento Garmin e dados pessoais ficaram fora dos ensaios.

@@ -5,6 +5,7 @@ import './home-panels.css'
 
 export default function HomePanels({ panels }) {
   const saved = useStore(s => s.S.auroraHomePanels)
+  const metricsHidden = useStore(s => s.S.auroraMetricsHidden === true)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(null)
   const [dragging, setDragging] = useState(null)
@@ -13,7 +14,7 @@ export default function HomePanels({ panels }) {
   const [empty, setEmpty] = useState([])
   const gesture = useRef(null)
   const order = draft || panelOrder(saved)
-  const visible = order.filter(id => panels.some(panel => panel.id === id && panel.content))
+  const visible = order.filter(id => !(id === 'metrics' && metricsHidden) && panels.some(panel => panel.id === id && panel.content))
   const displayed = visible.filter(id => !empty.includes(id))
   useLayoutEffect(() => {
     const refresh = () => {
@@ -68,13 +69,14 @@ export default function HomePanels({ panels }) {
     const cancelled = event => finish(event, true)
     const escape = event => { if (event.key === 'Escape') cancel() }
     window.addEventListener('pointermove', motion)
-    window.addEventListener('pointerup', finish)
+    const dropped = event => finish(event)
+    window.addEventListener('pointerup', dropped)
     window.addEventListener('pointercancel', cancelled)
     window.addEventListener('keydown', escape)
     window.addEventListener('blur', cancel)
     return () => {
       window.removeEventListener('pointermove', motion)
-      window.removeEventListener('pointerup', finish)
+      window.removeEventListener('pointerup', dropped)
       window.removeEventListener('pointercancel', cancelled)
       window.removeEventListener('keydown', escape)
       window.removeEventListener('blur', cancel)
@@ -84,6 +86,10 @@ export default function HomePanels({ panels }) {
     <div className="aurora-arrange-toolbar">
       <button className="aurora-arrange-toggle" aria-pressed={editing} onClick={() => { cancel();setEditing(v => !v) }}>{editing ? 'Concluir organização' : 'Organizar painéis'}</button>
       {editing && <button onClick={() => commit(panelOrder(), 'Layout padrão')}>Restaurar ordem padrão</button>}
+      {editing && panels.some(panel => panel.id === 'metrics') && <button onClick={() => {
+        useStore.getState().update(state => { state.auroraMetricsHidden = !metricsHidden })
+        setMessage(metricsHidden ? 'Tempo e calorias exibidos.' : 'Tempo e calorias ocultos.')
+      }}>{metricsHidden ? 'Exibir Tempo e calorias' : 'Ocultar Tempo e calorias'}</button>}
     </div>
     {editing && <p className="small muted">Arraste pela alça ⠿ ou use as setas para mover. No teclado, use ↑ e ↓ na alça; Esc cancela o arraste. A ordem fica no seu perfil e acompanha a sincronização do openGym.</p>}
     <p className="aurora-panel-announcement" role="status" aria-live="polite">{message}</p>

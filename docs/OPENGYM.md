@@ -82,3 +82,7 @@ No dispositivo com Tailscale conectado, abra a origem HTTPS e crie seu perfil co
 Ao restaurar, pare API, web e importador Garmin, preserve o estado atual, recoloque `opengym/` e o ambiente local correto e mantenha domínio/RP_ID. Depois reinicie os três serviços e verifique login. Consulte [GARMIN.md](GARMIN.md) antes de restaurar perfis com histórico de importação.
 
 Para desativar, pare os serviços do overlay e remova apenas a rota Serve 8081 na instância usada; preserve dados. Não use `down -v` nem remova um overlay de COMPOSE_FILE enquanto pretende continuar gerenciando seus contêineres.
+
+## Atualização 5.3
+
+Na tela Início, Tempo e calorias compartilham o período. A ordem e a visibilidade do painel ficam no perfil. Em Estatísticas, consulte a Visão geral para encontrar as métricas e o link do código-fonte. [Notas da versão](RELEASE-53.md).

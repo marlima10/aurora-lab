@@ -40,5 +40,27 @@ it('shows auth failures and disables sync when no authorization is available',as
  vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:false,status:401}));await render(<GarminSummary/>);expect(host.querySelector('[role=alert]').textContent).toContain('Entre no perfil');expect(host.querySelector('button').disabled).toBe(true)
 })
 it('shows safe server errors without claiming synchronization succeeded',async()=>{
- vi.stubGlobal('fetch',vi.fn().mockResolvedValueOnce({ok:true,json:async()=>({connected:true,auto:{enabled:true,last_status:'error',last_error:'Falha Garmin'}})}).mockResolvedValueOnce({ok:false,json:async()=>({error:'Aguarde a operação atual.'})}));await render(<GarminSummary/>);await click('Sincronizar agora');expect(host.textContent).toContain('Falha Garmin');expect(host.textContent).toContain('Aguarde a operação atual.')
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValueOnce({ok:true,json:async()=>({connected:true,auto:{enabled:true,last_status:'error',last_error:'Falha Garmin'}})}).mockResolvedValueOnce({ok:false,json:async()=>({error:'Aguarde a operação atual.'})}));await render(<GarminSummary/>);await click('Sincronizar agora');expect(host.querySelectorAll('[role=alert]')).toHaveLength(1);expect(host.querySelector('[role=alert]').textContent).toBe('Aguarde a operação atual.')
+})
+
+it.each(['http','network'])('shows one retryable status for %s errors',async failure=>{
+ const fetcher=vi.fn()
+ if(failure==='http')fetcher.mockResolvedValueOnce({ok:false,status:500})
+ else fetcher.mockRejectedValueOnce(Error('Network failure'))
+ fetcher.mockResolvedValueOnce({ok:true,json:async()=>({connected:false})})
+ vi.stubGlobal('fetch',fetcher)
+ await render(<GarminSummary/>)
+ expect(host.querySelectorAll('[role=alert]')).toHaveLength(1)
+ expect(host.textContent).not.toContain('Consultando sincronização')
+ await click('Tentar de novo')
+ expect(host.querySelector('[role=alert]')).toBeNull()
+ expect(host.querySelector('[role=status]').textContent).toBe('Garmin desconectado.')
+})
+it('explains why manual sync is disabled while automatic updates are off',async()=>{
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({connected:true,auto:{enabled:false}})}))
+ await render(<GarminSummary/>)
+ expect(host.querySelector('button').disabled).toBe(true)
+ expect(host.textContent).toContain('Ative a atualização automática')
+ expect(host.querySelector('.card-head svg')).not.toBeNull()
+ expect(host.querySelector('summary').textContent).toBe('Como é calculado')
 })
