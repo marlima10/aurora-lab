@@ -147,4 +147,10 @@
 - **Produção** — MagicMirror e autenticação recriados com as imagens 52.0.0. Portal e página Energia servidos pelo Nginx. A API do Mirror permanece com a imagem 50.0.0 porque o pacote alterou apenas seu frontend. Os quatro serviços estavam saudáveis após a atualização.
 - **Validação** — 37 testes de autenticação e fachada no build de produção. Verificação do conteúdo servido no Monitor e na página Energia, conferência dos arquivos novos dentro dos contêineres e teste de resposta HTTPS do login e das rotas protegidas sem sessão.
 - **Recuperação** — Snapshot dos arquivos e imagens anteriores preservado. Backup anterior verificado. Backup posterior auroralab-data-20261128-004426.tar.gz (data UTC), SHA-256 conferido e restauração isolada aprovada com 991 arquivos, 27 bancos SQLite e 88 JSON.
-- **Limites** — Instalação do PWA em Android e iOS e conferência visual interativa com sessão real não foram observadas nesta implantação. Pacote implantado a partir do checkout DEV, sem publicação de release no GitHub.
+- **Limites** — Instalação do PWA em Android e iOS e conferência visual interativa com sessão real não foram observadas nesta implantação. Pacote implantado a partir do checkout DEV. Depois, o código foi integrado à main em ef97f83 e a [release v52.0.0](https://github.com/marlima10/aurora-lab/releases/tag/v52.0.0) foi publicada.
+
+## 27/11/2026 — Fechamento documental e revisão visual
+
+- README, CHANGELOG e CONTEXT apontam para a documentação da versão. Criado RELEASE-52.md.
+- Conferência visual em Chrome headless (1280 × 900), com dados sintéticos: agenda do MagicMirror, Energia, configuração do MagicMirror e login. Conferidas a legenda e o seletor de fonte, as leituras de energia, a prévia de aparência e os controles de chave exibidos.
+- A nota pública da 50.0.0 agora registra a confirmação do tablet físico. A checagem de instalação do PWA em Android e iOS continua separada da revisão visual.

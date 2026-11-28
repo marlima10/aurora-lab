@@ -11,7 +11,7 @@
 | Branches oficiais | `main` e `rafael`. As branches `terminal` (local) e `marcelo` (remota) foram removidas após conferir a integração de seus históricos. |
 | Versão do workspace | `52.0.0`, conforme [VERSION](../VERSION) |
 | Release 50 | Publicada em 27/11/2026: merge na `main` (`ebeb06d`), tag e release `v50.0.0` no GitHub e implantação no Aurora Server concluídas (AUR-011) |
-| Release 52 | AUR-013 a AUR-017 implantadas em produção em 27/11/2026. A última release publicada no GitHub é a 50.0.0. |
+| Release 52 | AUR-013 a AUR-017 implantadas em produção em 27/11/2026. A [release 52.0.0](https://github.com/marlima10/aurora-lab/releases/tag/v52.0.0) foi publicada a partir do merge ef97f83. |
 
 ## Arquitetura
 

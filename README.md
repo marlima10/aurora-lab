@@ -1,4 +1,6 @@
-# AuroraLAB 50.0.0
+# AuroraLAB 52.0.0
+
+A versão 52 melhora a agenda e a configuração do MagicMirror, o login e o Monitor de processos. A nova página Energia reúne histórico e simulação de custo. [Notas da release 52](docs/RELEASE-52.md).
 
 Portal de Home Lab com impressora 3D, monitoramento, backups e acesso a serviços independentes. O módulo de treinos atual é o **openGym**, com passkeys e importação opcional de atividades Garmin. O Fitness original e sua API PHP permanecem disponíveis para acesso direto e recuperação dos registros anteriores, sem migração automática.
 
