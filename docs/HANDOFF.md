@@ -180,3 +180,10 @@
 - Validação DEV: 82 testes Vitest em dez suítes, cinco testes Node de métricas, patch aplicado no commit upstream fixado, build Vite de demonstração e imagem 53.0.0 construída pelo Compose em staging do Aurora Server. Docker Desktop não confiou no certificado do Alpine; o build de staging passou sem desabilitar a verificação TLS.
 - Chrome headless pt-BR, temas claro e escuro: capturas a 390, 820, 1024 e 1280 px em tmp/opengym53-visual do workspace DEV. Uma coluna nas duas primeiras larguras e duas nas demais, sem rolagem horizontal. Na Visão geral, o resumo nativo precedeu os cards Aurora.
 - Validação sintética. Sessão SSO real, pareamento Garmin e dados pessoais ficaram fora dos ensaios.
+
+## 28/11/2026 — Publicação e implantação da 5.3
+
+- AUR-024 concluída. Merge 34ffb1d, tag v53.0.0 e release Aurora LAB 5.3 publicada no GitHub.
+- Somente opengym-web foi recriado. O frontend 53.0.0 ficou saudável, serviu o bundle com o painel novo e respondeu pelo redirecionamento HTTPS do portal. Os IDs de contêiner de API e Garmin foram preservados.
+- A primeira tentativa voltou à imagem 47.0.0 por usar 8080 na checagem interna. A checagem passou ao usar a porta NGINX_PORT do contêiner.
+- Backups de 10:27:11 e 10:30:55 UTC passaram no SHA-256 e na restauração isolada. A imagem anterior e a cópia dos arquivos anteriores ficam disponíveis para retorno no Aurora Server.

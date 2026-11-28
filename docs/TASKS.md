@@ -27,7 +27,7 @@ Use os estados **Pendente**, **Em andamento**, **Bloqueada** e **Concluída**. R
 | AUR-021 | Release 53 · openGym: resumo nativo antes dos cards Aurora na Visão geral das Estatísticas | Média | OpenAI Codex | AUR-019 | Concluída |
 | AUR-022 | Release 53 · openGym: Início em duas colunas a partir de 900 px e véu do fundo mais forte entre os cards | Média | OpenAI Codex | AUR-020 | Concluída |
 | AUR-023 | openGym oficial: rascunhar sugestões ao projeto (dias da semana em pt-BR, nomes de exercício duplicados, dias de descanso compactos no Plano) | Baixa | OpenAI Codex | Nenhuma | Concluída |
-| AUR-024 | Release 53 · Fechamento: versão 53.0.0, documentação, testes, commit, release e implantação do openGym | Alta | OpenAI Codex | AUR-018 a AUR-022 e autorização explícita do usuário | Em andamento |
+| AUR-024 | Release 53 · Fechamento: versão 53.0.0, documentação, testes, commit, release e implantação do openGym | Alta | OpenAI Codex | AUR-018 a AUR-022 e autorização explícita do usuário | Concluída |
 
 ## AUR-004 — Requisitos e critérios de aceitação
 
