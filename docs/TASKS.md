@@ -31,6 +31,7 @@ Use os estados **Pendente**, **Em andamento**, **Bloqueada** e **Concluída**. R
 | AUR-025 | Nova numeração de versões a partir da 5.4: `X.Y.Z` com tags `aurora-X.Y.Z`, tabela de correspondência com as tags `vNN.0.0` e guia de release atualizado | Alta | OpenAI Codex | Decisão do usuário (opção 3, 28/11/2026) | Concluída |
 | AUR-026 | README com a seção "Aurora LAB em imagens": 4 capturas com dados de demonstração em `docs/images/` (MagicMirror, openGym, Monitor e Energia) | Alta | OpenAI Codex | Nenhuma | Concluída |
 | AUR-027 | Apresentação geral do Aurora LAB em 8 slides, em PowerPoint e PDF, com as capturas da AUR-026 e as complementares | Média | OpenAI Codex | AUR-026 | Concluída |
+| AUR-028 | Refazer as capturas do README e da apresentação: agenda do MagicMirror preenchida, selo "Dados de demonstração" sem cobrir controles e Monitor sem falha aparente. Definir o destino do PPTX | Média | OpenAI Codex | AUR-026 e AUR-027 (concluídas) | Concluída |
 
 ## AUR-004 — Requisitos e critérios de aceitação
 
@@ -272,3 +273,43 @@ Tags históricas `vNN.0.0`, documentos `RELEASE-NN.md` e títulos antigos do CHA
 - PPTX abre sem aviso de reparo, e o PDF tem 8 páginas legíveis.
 - O HANDOFF registra a conferência visual e a de privacidade.
 - Decidir com o usuário se os arquivos ficam no repositório ou só como anexo de release (o PPTX com imagens pode passar de alguns MB). Commit somente com autorização.
+
+## AUR-028 — Ajustes nas capturas públicas
+
+**Origem** — Revisão do Claude Code em 28/11/2026 sobre `rafael` em `9e995f7`. Privacidade aprovada: IPs aparecem como "—", host `aurora-demo`, rede "Rede de demonstração" e PNG sem metadados. Os ajustes abaixo são de qualidade.
+
+### Problemas encontrados
+
+1. **`docs/images/magicmirror-agenda.png` (capa)** — Na semana de 22 a 28/11, só sexta e sábado têm itens, 4 no total, e quase todo o calendário fica vazio. Os painéis "Histórico de exercícios" (sem gráfico) e "Feed de notícias" ("Nenhuma notícia na demonstração") também aparecem vazios.
+2. **Selo "Dados de demonstração"** — No MagicMirror, cobre o botão do canto superior direito. Em `energia-historico.png`, cobre o rótulo "Bateria · configurar" do card da bateria.
+3. **`docs/images/monitor-saude.png`** — "Alertas do servidor" mostra "Monitor de alertas indisponível; tente novamente", e o gráfico "Histórico do Servidor" está vazio. Para quem chega ao README, isso passa a ideia de um sistema com falha.
+
+### Requisitos
+
+1. **Agenda da capa**
+   - Ter itens em pelo menos 5 dos 7 dias da semana mostrada, com as quatro fontes visíveis: compromissos, lembretes com horário, treinos openGym/Garmin e refeições Mealie. Um feriado fictício é opcional.
+   - Ter um dia com mais itens que o limite da célula, para mostrar o indicador ＋N.
+   - Preencher "Histórico de exercícios" com 7 dias de minutos fictícios.
+   - Preencher o "Feed de notícias" com 3 ou 4 manchetes fictícias e genéricas, sem marcas ou veículos reais.
+   - Manter o horário e a data coerentes com a semana exibida.
+2. **Selo** — Posicionar o selo num canto sem controles, ou como faixa no rodapé da captura, sem cobrir botões, rótulos ou valores. Ele precisa continuar visível na miniatura do README. Usar o mesmo padrão nas 4 imagens e nas capturas da apresentação.
+3. **Monitor**
+   - Simular a resposta dos alertas, com o estado "Nenhum alerta ativo" e o histórico de recuperações fictício.
+   - Preencher "Histórico do Servidor" com uma série fictícia de CPU, RAM e temperatura.
+   - Continuar sem IPs, gateway, hostname real ou nomes de dispositivos.
+4. **Apresentação** — Trocar nos slides 1, 3, 5 e 6 as capturas pelas novas, gerar de novo `docs/apresentacao/aurora-lab.pdf` (8 páginas, links do slide 8 funcionando) e manter os mesmos nomes de arquivo, para não quebrar os links do README.
+5. **Destino do PPTX** — Hoje `docs/apresentacao/aurora-lab.pptx` e `docs/apresentacao/imagens/` estão como não rastreados no DEV. Perguntar ao usuário antes de concluir e aplicar a escolha:
+   - (a) commitar o PPTX e as imagens complementares;
+   - (b) anexar o PPTX à release correspondente e não versioná-lo;
+   - (c) incluir `docs/apresentacao/*.pptx` e `docs/apresentacao/imagens/` no `.gitignore` e manter só o PDF.
+6. Mesmas regras de privacidade e de tamanho da AUR-026: até ~400 KB por imagem e menos de 2 MB em `docs/images/`.
+
+### Aceite
+
+- As 4 imagens do README e o PDF foram refeitos, com os mesmos nomes de arquivo.
+- Na capa, há itens em pelo menos 5 dias e as quatro fontes aparecem.
+- Nenhum selo cobre controles ou textos.
+- O Monitor não mostra mensagens de indisponibilidade nem gráficos vazios.
+- `git status` sem arquivos não rastreados em `docs/apresentacao/` depois da escolha do usuário.
+- O HANDOFF registra a nova conferência visual e a de privacidade de cada imagem.
+- Commit somente com autorização.

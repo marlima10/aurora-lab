@@ -30,3 +30,7 @@ Thumbs.db
 __pycache__/
 *.pyc
 /compose.rollback.yaml
+
+# Fontes locais da apresentação
+/docs/apresentacao/*.pptx
+/docs/apresentacao/imagens/

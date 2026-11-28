@@ -211,3 +211,20 @@
 - **AUR-025** — VERSOES.md registra todas as 52 tags históricas e os links de documentação disponíveis. VERSION permanece 53.0.0. Sem ordenação, comparação semântica ou cálculo de próxima versão do Aurora LAB encontrado nas fontes rastreadas. O Dockerfile do Javis compara seu próprio VERSION com o lock de origem, por igualdade, e é independente. O guia recomenda conferir colisões Docker e usar ID ou digest no retorno.
 - **AUR-026** — Quatro PNGs demonstrativos no tema escuro. MagicMirror 1440 × 1000 com compromissos e lembretes, treino e refeição fictícios. openGym 1024 × 950 do modo VITE_DEMO. Monitor 1440 × 1580 com status e backup simulados. Energia 1440 × 1000 com série e tarifa fictícias. Imagens e recortes conferidos visualmente, sem credenciais, IPs, hostnames reais ou informações pessoais. PNGs regravados sem EXIF e com menos de 400 KB por imagem.
 - **AUR-027** — PPTX de oito slides editáveis e PDF exportado no PowerPoint, prontos em docs/apresentacao local. O PDF foi rasterizado e revisado página por página. Três links verificados em cada formato. O usuário escolheu publicar o PDF na documentação do repositório. O PowerPoint editável e as capturas complementares ficam na cópia local.
+
+## 28/11/2026 — Revisão das capturas públicas (AUR-028)
+
+- **Agente responsável** — Claude Code. Revisão e planejamento, sem alterar imagens.
+- **Verificado** — AUR-025 a AUR-027 publicadas (`2a8d2e8`, `9e995f7`, merges `0238ac3` e `cee0f38`).
+  - `VERSOES.md` cobre as 52 tags `v*`.
+  - O ATUALIZACAO não menciona mais `marcelo`.
+  - As 4 imagens somam 524 KB, e o PDF tem 8 páginas com os links do slide 8 válidos.
+  - Privacidade aprovada nas 4 imagens.
+- **Tarefa** — AUR-028 registrada como **Pendente** para o OpenAI Codex: agenda da capa preenchida, selo sem cobrir controles, Monitor sem falha aparente, PDF gerado de novo e destino do PPTX não rastreado, a decidir com o usuário.
+- **Arquivos alterados** — `docs/TASKS.md` e `docs/HANDOFF.md`.
+
+## 28/11/2026 — Capturas e apresentação da 5.4
+
+- AUR-028 concluída. MagicMirror demonstrativo com itens em sete dias, quatro fontes, excedentes, sete barras de exercício e três manchetes fictícias. Monitor com histórico sintético de CPU, RAM e temperatura, zero alertas ativos e uma recuperação de exemplo.
+- As capturas usam faixa externa de demonstração. Conferidas as imagens, ausência de dados pessoais e metadados EXIF, limites de arquivo e as oito páginas do PDF. Os três links do PDF e do PPTX foram conferidos.
+- Somente o PDF integra a publicação. A fonte editável e os recortes permanecem locais e são ignorados pelo Git. A versão técnica mudou para 5.4.0, sem mudança nos serviços.

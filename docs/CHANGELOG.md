@@ -2,6 +2,10 @@
 
 Veja a [convenção de versões e a correspondência das tags](VERSOES.md).
 
+## 5.4.0 — 2026-11-28
+
+Atualiza as capturas do README e o PDF da apresentação com dados demonstrativos. Primeira release com a convenção aurora-X.Y.Z. [Notas da versão](RELEASE-5.4.md).
+
 ## 53.0.0 — 2026-11-28
 
 Melhora a tela Início do openGym, reúne tempo e calorias num painel e simplifica o resumo Garmin. [Revisão detalhada](RELEASE-53.md).

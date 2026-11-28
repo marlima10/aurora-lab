@@ -9,7 +9,7 @@ A partir da **5.4.0**, a versão técnica segue `X.Y.Z` e a tag usa `aurora-X.Y.
 | Imagem Docker | auroralab-opengym-web:5.4.0 |
 | Cache PWA / APP_BUILD | auroralab-5.4.0 / auroralab-5.4 |
 
-VERSION permanece em 53.0.0 nesta revisão. Na próxima release, ele passa diretamente para 5.4.0. Use a cronologia das releases ou a família de tags para ordenar o histórico, pois 5.4.0 é numericamente menor que 53.0.0.
+VERSION passou diretamente de 53.0.0 para 5.4.0 nesta transição. Use a cronologia das releases ou a família de tags para ordenar o histórico, pois 5.4.0 é numericamente menor que 53.0.0.
 
 O prefixo aurora- evita colisões com tags históricas como v5.0.0 a v9.0.0, que correspondem aos títulos 0.5 a 0.9. Antes de reutilizar números como 6.0.0 a 9.0.0 em imagens, confira o inventário do host com `docker image ls 'auroralab-*'`. Para rollback, use o ID ou digest da imagem registrada antes da implantação.
 
