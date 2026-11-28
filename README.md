@@ -1,4 +1,6 @@
-# AuroraLAB 53.0.0
+# AuroraLAB 5.4.0
+
+A versão 5.4 atualiza as capturas e a apresentação do projeto e inaugura a nova numeração. [Notas da release 5.4](docs/RELEASE-5.4.md).
 
 A versão 5.3 melhora o openGym com o painel Tempo e calorias, a tela Início em duas colunas e estados mais claros do Garmin. [Notas da release 53](docs/RELEASE-53.md) · [Convenção de versões](docs/VERSOES.md).
 

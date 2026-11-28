@@ -9,7 +9,7 @@
 | GitHub oficial | `marlima10/aurora-lab`, remoto local `origin` |
 | Branch oficial de desenvolvimento | `rafael`, rastreando `origin/rafael`. Decisão confirmada pelo usuário em 27/11/2026 e verificada por `git branch --show-current` (AUR-002) |
 | Branches oficiais | `main` e `rafael`. As branches `terminal` (local) e `marcelo` (remota) foram removidas após conferir a integração de seus históricos. |
-| Versão do workspace | `53.0.0`, conforme [VERSION](../VERSION) |
+| Versão do workspace | `5.4.0`, conforme [VERSION](../VERSION) |
 | Release 50 | Publicada em 27/11/2026: merge na `main` (`ebeb06d`), tag e release `v50.0.0` no GitHub e implantação no Aurora Server concluídas (AUR-011) |
 | Release 52 | AUR-013 a AUR-017 implantadas em produção em 27/11/2026. A [release 52.0.0](https://github.com/marlima10/aurora-lab/releases/tag/v52.0.0) foi publicada a partir do merge ef97f83. |
 | Numeração de versões | Decisão do usuário em 28/11/2026: títulos das releases em X.Y (53 → 5.3). A partir da 5.4, `VERSION` X.Y.Z e tags `aurora-X.Y.Z`; as tags `vNN.0.0`, inclusive `v53.0.0`, ficam como histórico. Implementação na AUR-025, ver [TASKS.md](TASKS.md#aur-025--nova-numeração-de-versões) |
