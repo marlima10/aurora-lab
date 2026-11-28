@@ -16,6 +16,11 @@ Use os estados **Pendente**, **Em andamento**, **Bloqueada** e **Concluída**. R
 | AUR-010 | Commit e push da 50.0.0 na branch `rafael` | Alta | Claude Code | Autorização do usuário (concedida em 27/11/2026) | Concluída |
 | AUR-011 | Merge na `main`, release e implantação da 50.0.0 no Aurora Server | Alta | Claude Code | AUR-010 e autorização explícita do usuário (concedida em 27/11/2026) | Concluída |
 | AUR-012 | Documentar a entrada pelo Claude no Aurora AI Manager | Alta | OpenAI Codex | Aurora AI Manager local | Concluída |
+| AUR-013 | Release 51 · Portal: status do topo com a cor real do estado, botão de instalação estilizado na topbar e oculto quando não se aplica, sem `alert()`, textos legados do rodapé e legenda da tabela de energia sem corte | Alta | Claude Code | Nenhuma | Concluída |
+| AUR-014 | Release 51 · MagicMirror: legenda colorida e filtro por fonte, criar compromisso pela data do dia, agenda do período agrupada por dia, confirmação de exclusão no próprio diálogo e realce da célula de hoje | Alta | OpenAI Codex | Nenhuma | Concluída |
+| AUR-015 | Release 51 · Configurar Mirror e login: ordem #1, #2… na galeria, prévia ao vivo da aparência, barra fixa de alterações não salvas, contador 0/151 e mostrar/ocultar chave | Média | OpenAI Codex | Nenhuma | Concluída |
+| AUR-016 | Release 52 · Portal: resumo de saúde no topo, energia compacta na home com detalhes em página própria, painéis recolhíveis no celular e estados de carregamento e erro | Média | OpenAI Codex | AUR-013 | Concluída |
+| AUR-017 | Release 52 · Visual: ícones SVG únicos com tooltip na barra compacta e tokens de tema no lugar dos `!important` dos cinco temas | Média | OpenAI Codex | AUR-013 | Concluída |
 
 ## AUR-004 — Requisitos e critérios de aceitação
 

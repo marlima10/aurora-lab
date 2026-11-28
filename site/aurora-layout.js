@@ -17,6 +17,7 @@
     ['network', '⌁', 'Rede', '/network.html'],
     ['services', '✣', 'Serviços', '/monitor-processos.html#services-card'],
     ['storage', '▤', 'Armazenamento', '/monitor-processos.html#storage-card'],
+    ['energy', 'ϟ', 'Energia', '/energia.html'],
     ['history', '◴', 'Histórico', '/history.html'],
     ['backup', '☁', 'Backup', '/monitor-processos.html#backup-card'],
     ['diagnostics', '✥', 'Diagnóstico', '/diagnostics.html'],
@@ -40,6 +41,7 @@
     if (path.endsWith('/fitness.html')) return 'fitness';
     if (path.endsWith('/monitor-processos.html')) return 'monitor';
     if (path.endsWith('/network.html')) return 'network';
+    if (path.endsWith('/energia.html')) return 'energy';
     if (path.endsWith('/history.html')) return 'history';
     if (path.endsWith('/diagnostics.html')) return 'diagnostics';
     if (location.hash.includes('services')) return 'services';
@@ -48,6 +50,28 @@
     if (location.hash.includes('system')) return 'system';
     return 'dashboard';
   }
+  const iconPaths = {
+    dashboard:'M3 10 12 3l9 7v10H3z M9 20v-6h6v6',
+    monitor:'M3 4h18v13H3z M8 21h8 M12 17v4 M5 11h4l2-4 2 7 2-3h4',
+    system:'M6 6h12v12H6z M9 9h6v6H9z M9 3v3 M15 3v3 M9 18v3 M15 18v3',
+    network:'M3 9q9-8 18 0 M6 13q6-5 12 0 M9 17q3-3 6 0 M12 21h.01',
+    services:'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h6v6h-6z',
+    storage:'M4 5h16v6H4z M4 13h16v6H4z M7 8h.01 M7 16h.01',
+    history:'M12 3a9 9 0 1 1-9 9 M3 5v7h7 M12 7v5l4 3',
+    backup:'M6 18a4 4 0 1 1 1-8 5 5 0 0 1 10-1 5 5 0 0 1 1 9 M12 12v9 M9 18l3 3 3-3',
+    diagnostics:'M9 3h6 M10 3v6l-5 9q-1 3 2 3h10q3 0 2-3l-5-9V3 M8 15h8',
+    opengym:'M3 9v6 M6 7v10 M18 7v10 M21 9v6 M6 12h12',
+    manyfold:'M12 3 3 8v8l9 5 9-5V8z M3 8l9 5 9-5 M12 13v8',
+    mealie:'M3 3v6a3 3 0 0 0 6 0V3 M6 3v18 M16 3q-3 4-3 10h5 M18 3v18',
+    actual:'M3 6h17v13H3z M3 6l14-3v3 M21 10h-6v5h6z',
+    energy:'M13 2 4 14h7l-1 8 10-13h-7z',
+    javis:'M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z',
+    account:'M12 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8z M4 21a8 8 0 0 1 16 0',
+    more:'M5 12h.01 M12 12h.01 M19 12h.01'
+  };
+  function navIcon(id) {
+    return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${iconPaths[id]}"/></svg>`;
+  }
   function makeAnchor(item, more = false) {
     const anchor = document.createElement('a');
     anchor.href = item.href;
@@ -55,7 +79,7 @@
     anchor.dataset.itemId = item.id;
     anchor.setAttribute('aria-label', item.label);
     anchor.title = item.label;
-    anchor.innerHTML = `<span aria-hidden="true">${item.icon}</span><span class="aurora-link-label">${item.label}</span>`;
+    anchor.innerHTML = `<span aria-hidden="true">${navIcon(item.id)}</span><span class="aurora-link-label">${item.label}</span>`;
     return anchor;
   }
   const sidebar = document.querySelector('.sidebar') || (() => {
@@ -73,7 +97,7 @@
   nav.replaceChildren();
 
   const primaryNav = document.createElement('div'); primaryNav.className = 'aurora-primary-nav';
-  const moreButton = document.createElement('button'); moreButton.type = 'button'; moreButton.className = 'aurora-more-toggle'; moreButton.innerHTML = '<span aria-hidden="true">•••</span><span class="aurora-link-label">Mais</span>'; moreButton.setAttribute('aria-label', 'Mais páginas e configurações'); moreButton.title = 'Mais'; moreButton.setAttribute('aria-expanded', 'false');
+  const moreButton = document.createElement('button'); moreButton.type = 'button'; moreButton.className = 'aurora-more-toggle'; moreButton.innerHTML = `<span aria-hidden="true">${navIcon('more')}</span><span class="aurora-link-label">Mais</span>`; moreButton.setAttribute('aria-label', 'Mais páginas e configurações'); moreButton.title = 'Mais'; moreButton.setAttribute('aria-expanded', 'false');
   nav.append(primaryNav, moreButton);
   const panel = document.createElement('section'); panel.className = 'aurora-more-panel'; panel.hidden = true; panel.setAttribute('aria-label', 'Mais páginas e configurações');
   const panelHead = document.createElement('div'); panelHead.className = 'aurora-menu-head'; panelHead.innerHTML = '<span class="aurora-mark">✦</span><button type="button" class="aurora-close" aria-label="Fechar menu">×</button>';
@@ -88,7 +112,7 @@
   dialog.innerHTML = '<form method="dialog"><div class="aurora-dialog-head"><h2>Atalhos principais</h2><button class="aurora-close" aria-label="Fechar">×</button></div><p>Escolha três páginas para o menu compacto.</p><div class="aurora-checks"></div><div class="aurora-dialog-actions"><button value="cancel" class="aurora-cancel">Cancelar</button><button value="save" class="aurora-save">Salvar atalhos</button></div></form>';
   document.body.append(dialog);
   const checks = dialog.querySelector('.aurora-checks');
-  coreItems.forEach(item => { const label = document.createElement('label'); label.className = 'aurora-check'; label.innerHTML = `<input type="checkbox" value="${item.id}"><span aria-hidden="true">${item.icon}</span><span>${item.label}</span>`; checks.append(label); });
+  coreItems.forEach(item => { const label = document.createElement('label'); label.className = 'aurora-check'; label.innerHTML = `<input type="checkbox" value="${item.id}"><span aria-hidden="true">${navIcon(item.id)}</span><span>${item.label}</span>`; checks.append(label); });
 
   function renderNav() {
     const primary = getPrimary(), active = currentId();
@@ -133,3 +157,13 @@
   renderNav();
   fetch('/auth/session', {cache:'no-store', credentials:'same-origin'}).then(response => response.ok && (response.headers.get('content-type')||'').includes('application/json') ? response.json() : null).then(value => { if(value?.email){accountSession=value;renderNav();document.dispatchEvent(new CustomEvent('aurora:session',{detail:value}));} }).catch(() => {});
 })();
+
+{
+  const narrow = matchMedia('(max-width: 850px)');
+  const adjust = () => document.querySelectorAll('.portal-section').forEach(section => {
+    section.open = !narrow.matches || section.parentElement.id === location.hash.slice(1);
+  });
+  narrow.addEventListener('change', adjust);
+  window.addEventListener('hashchange', adjust);
+  adjust();
+}

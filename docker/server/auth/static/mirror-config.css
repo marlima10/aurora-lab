@@ -3,3 +3,9 @@
 input[type=search]{display:block;width:100%;padding:10px;border:1px solid #4b5a67;border-radius:7px;background:#111a21;color:#fff;margin-top:6px}#cityResults{display:grid;gap:8px;margin-top:12px}#cityResults button{text-align:left;overflow-wrap:anywhere}#weather-settings{scroll-margin-top:20px}
 
 #background-settings{grid-column:1/-1;scroll-margin-top:20px}#backgroundGallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px}.background-choice{position:relative;margin:0;border:1px solid #4b5a67;border-radius:8px;padding:8px;min-width:0}.background-choice:has(input:checked){outline:2px solid #e4bb7a}.background-choice input{position:absolute;top:12px;left:12px}.background-choice img{width:100%;height:110px;object-fit:cover;border-radius:4px}.background-choice span{display:block;font-size:12px;overflow-wrap:anywhere}.background-choice code{overflow-wrap:anywhere}input[type=file]{display:block;width:100%;margin-top:10px}code{overflow-wrap:anywhere}#backgroundStatus{font-size:14px;min-height:22px}#uploadBackgrounds,#refreshBackgrounds{margin:4px 6px 4px 0}
+
+.settings-actions{position:sticky;bottom:0;z-index:2;background:#101c2e;padding:.7rem;border-radius:.75rem}
+#unsavedSettings{color:#ffd47c;font-weight:650}
+#appearancePreview{margin:.8rem 0;padding:1rem;border-radius:.75rem;background:linear-gradient(160deg,#27416a,#bc633f);background-size:cover;background-position:center;position:relative;isolation:isolate;color:white}
+#appearancePreview::before{content:'';position:absolute;inset:0;border-radius:inherit;background:rgb(0 0 0 / var(--preview-dim,.45));z-index:-1}
+.appearance-sample{margin-top:1rem;padding:.8rem;width:max-content;border-radius:.5rem;background:rgb(17 27 45 / var(--preview-alpha,.45));backdrop-filter:blur(var(--preview-blur,6px));font-size:var(--preview-font,100%)}

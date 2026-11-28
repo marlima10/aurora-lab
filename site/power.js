@@ -7,7 +7,8 @@
   const statusNames = { Discharging: 'Na bateria', Charging: 'Carregando', Full: 'Carga completa', 'Not charging': 'Na tomada', Unknown: 'Estado indisponível' };
   let latest = null, loading = false, lastFocus = null, adminKey = '', centralSession = null;
   const configKey = 'aurora.energy.estimate.v1';
-  const formFields = ['powerTariff', 'powerAwake', 'powerSleep', 'powerNightHours'];
+  const detailed = Boolean($('powerTariff'));
+  const formFields = detailed ? ['powerTariff', 'powerAwake', 'powerSleep', 'powerNightHours'] : [];
   let preferences = {};
   try { preferences = JSON.parse(localStorage.getItem(configKey) || '{}'); } catch (_) { /* Start with editable empty values. */ }
   formFields.forEach(id => {
@@ -92,7 +93,7 @@
   }
   function render(data) {
     latest = data;
-    renderEnergy(data);
+    if (detailed) renderEnergy(data);
     const battery = data.battery || {}, controls = data.controls || {}, cpu = data.cpu || {}, observed = data.observed || {};
     $('powerLive').textContent = 'Atualizado às ' + new Date(data.generated).toLocaleTimeString('pt-BR');
     $('powerBatteryPercent').textContent = battery.present ? number(battery.percent, 0) + '%' : 'Sem bateria';
@@ -102,16 +103,20 @@
     setValue('powerDraw', discharging ? battery.power_w : null, ' W');
     $('powerDrawSource').textContent = discharging ? 'Descarga da bateria · não mede a tomada' : battery.status === 'Charging' ? 'Bateria carregando · consumo da tomada não medido' : 'Consumo da tomada não medido';
     setValue('powerCpu', cpu.power_w, ' W');
+    if (detailed) {
     $('powerProfile').textContent = profiles[controls.profile] || 'Indisponível';
     $('powerProfileSub').textContent = controls.manager ? 'Gerenciado por ' + controls.manager : 'Clique na bateria para configurar';
     $('powerObserved').textContent = number(observed.cpu_kwh, 4) + ' kWh';
     $('powerCoverage').textContent = 'Pacote CPU hoje · ' + number((observed.cpu_seconds || 0) / 3600, 1) + ' h observadas';
+    }
     $('powerHealth').textContent = number(battery.health_percent, 0) + '%';
     $('powerAutonomy').textContent = battery.estimated_hours !== null && battery.estimated_hours !== undefined ? number(battery.estimated_hours, 1) + ' h' : '—';
     $('powerCycles').textContent = number(battery.cycles, 0);
     $('powerModalBattery').textContent = battery.present ? number(battery.percent, 0) + '% · ' + (statusNames[battery.status] || battery.status) : 'Sem bateria detectada';
+    if (detailed) {
     $('powerEstimateFromBattery').disabled = !(discharging && typeof battery.power_w === 'number');
     gpuRows(data.gpus || []); renderChart(data.history || []);
+    }
     if (!$('powerDialog').open) syncControls(controls);
   }
   function syncControls(controls) {
@@ -135,13 +140,17 @@
       latest = null;
       $('powerLive').textContent = 'Monitor de energia indisponível';
       $('powerBatteryPercent').textContent = '—'; $('powerBatteryState').textContent = 'Dados indisponíveis';
-      ['powerDraw', 'powerCpu', 'powerObserved', 'powerProfile'].forEach(id => { $(id).textContent = '—'; });
-      $('powerDrawSource').textContent = 'Sem leitura atual'; $('powerCoverage').textContent = 'Aguardando monitor';
-      $('powerProfileSub').textContent = 'Controles indisponíveis'; $('powerApply').disabled = true;
-      $('powerEstimateFromBattery').disabled = true;
+      ['powerDraw', 'powerCpu', 'powerObserved', 'powerProfile'].forEach(id => { const node=$(id); if(node)node.textContent='—'; });
+      $('powerDrawSource').textContent = 'Sem leitura atual'; $('powerApply').disabled = true;
+      if (detailed) {
+        $('powerCoverage').textContent = 'Aguardando monitor'; $('powerProfileSub').textContent = 'Controles indisponíveis';
+        $('powerEstimateFromBattery').disabled = true; $('energyMonth').textContent = 'Histórico indisponível'; $('energyDaily').replaceChildren();
+      }
       ['powerHealth', 'powerAutonomy', 'powerCycles', 'powerModalBattery'].forEach(id => { $(id).textContent = '—'; });
-      $('powerGpuList').textContent = 'Sem dados atuais das GPUs.';
-      $('powerChart').replaceChildren(); $('powerChartEmpty').hidden = false;
+      if (detailed) {
+        $('powerGpuList').textContent = 'Sem dados atuais das GPUs.';
+        $('powerChart').replaceChildren(); $('powerChartEmpty').hidden = false;
+      }
     } finally { loading = false; }
   }
   function openDialog() {
@@ -158,7 +167,7 @@
   $('powerDialog').addEventListener('close', () => { $('powerAdminKey').value = ''; lastFocus?.focus(); });
   $('powerDialog').addEventListener('click', event => { if (event.target !== $('powerDialog')) return; const rect = $('powerDialog').getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) $('powerDialog').close(); });
   $('powerBrightness').addEventListener('input', () => { $('powerBrightnessValue').textContent = $('powerBrightness').value + '%'; });
-  $('powerEstimateFromBattery').addEventListener('click', () => { if (latest?.battery?.status === 'Discharging') { $('powerAwake').value = latest.battery.power_w.toFixed(1); updateCost(); } });
+  $('powerEstimateFromBattery')?.addEventListener('click', () => { if (latest?.battery?.status === 'Discharging') { $('powerAwake').value = latest.battery.power_w.toFixed(1); updateCost(); } });
   $('powerSettingsForm').addEventListener('submit', async event => {
     event.preventDefault();
     if (!latest) return;
@@ -195,5 +204,6 @@
     if (label.nextElementSibling) label.nextElementSibling.textContent = session.admin ? 'Autorizado pela sua sessão central. Nenhuma segunda chave é necessária.' : 'Alterações disponíveis somente ao administrador do portal.';
     if (latest) syncControls(latest.controls || {});
   }).catch(() => {});
-  updateCost(); refresh(); setInterval(refresh, 10000);
+  if (detailed) updateCost();
+  refresh(); setInterval(refresh, 10000);
 })();

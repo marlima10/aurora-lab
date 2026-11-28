@@ -52,3 +52,15 @@
 #mirror-agenda-dialog::backdrop{background:#0009}#aurora-mirror .agenda-delete{margin-block:12px;color:#ffb9a9}
 #aurora-mirror .reminder>button{font-size:11px!important;flex-shrink:0}
 @media(max-width:560px){#aurora-mirror .agenda-toolbar button{min-height:40px}#aurora-mirror .agenda-toolbar{font-size:10px}#aurora-mirror .calendar{overflow:visible}#aurora-mirror .calendar #mirror-calendar{grid-template-rows:24px repeat(var(--weeks,5),minmax(74px,auto))}#aurora-mirror .calendar .day{min-width:0;overflow:hidden}#aurora-mirror .calendar .event{max-width:100%;font-size:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#aurora-mirror .reminder label{min-width:0;overflow-wrap:anywhere}}
+
+.calendar .calendar-date{font:inherit;line-height:1;background:transparent;color:inherit;border:1px solid transparent;border-radius:.35rem;padding:.1em .3em;align-self:start;cursor:pointer}
+.calendar .today .calendar-date{background:#fff;color:#25324b;font-weight:700}
+.agenda-list h3{margin:.75em 0 .2em;font-size:1em}
+
+.agenda-legend{display:flex;flex-wrap:wrap;gap:.25rem .55rem;list-style:none;margin:0;padding:0;font-size:.75em}
+.agenda-legend li{padding:.1rem .3rem;border-radius:.25rem}
+
+#aurora-mirror .agenda-holidays{background:#815939}
+#aurora-mirror .day .calendar-date{padding:1px 4px;line-height:1;margin-left:auto;display:block}
+#aurora-mirror .day.today{box-shadow:inset 0 0 0 2px #ffe1a0}
+#aurora-mirror .day.today .calendar-date{background:#fff;color:#25324b}
