@@ -14,7 +14,7 @@ Use os estados **Pendente**, **Em andamento**, **Bloqueada** e **Concluída**. R
 | AUR-008 | Reexecutar os testes Python do Mirror com Pillow apesar da interceptação TLS do AVG no DEV | Alta | Claude Code | Nenhuma | Concluída |
 | AUR-009 | Corrigir os itens do calendário cortados sem aviso no layout de altura fixa e tornar o segredo Mealie opcional na preparação | Alta | Claude Code | AUR-003 | Concluída |
 | AUR-010 | Commit e push da 50.0.0 na branch `rafael` | Alta | Claude Code | Autorização do usuário (concedida em 27/11/2026) | Concluída |
-| AUR-011 | Merge na `main`, release e implantação da 50.0.0 no Aurora Server | Alta | Claude Code | AUR-010 e autorização explícita do usuário (concedida em 27/11/2026) | Em andamento |
+| AUR-011 | Merge na `main`, release e implantação da 50.0.0 no Aurora Server | Alta | Claude Code | AUR-010 e autorização explícita do usuário (concedida em 27/11/2026) | Concluída |
 | AUR-012 | Documentar a entrada pelo Claude no Aurora AI Manager | Alta | OpenAI Codex | Aurora AI Manager local | Concluída |
 
 ## AUR-004 — Requisitos e critérios de aceitação
