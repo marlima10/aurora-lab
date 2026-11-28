@@ -119,7 +119,7 @@
   $('issue-form').elements.email.addEventListener('change',syncRegistrationPermissions);
   $('refresh-users').addEventListener('click',users);
   $('issue-form').addEventListener('invalid',()=>registrationStatus('Confira o e-mail cadastrado e os campos obrigatórios.',true),true);
-  $('login-form').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button');button.disabled=true;status('Verificando acesso…');try{await request('login',{email:form.elements.email.value,key:form.elements.key.value});form.elements.key.value='';await refresh();status('Sessão iniciada. Seus aplicativos autorizados estão disponíveis.')}catch(e){status(e.message,true)}finally{button.disabled=false}});
+  $('login-form').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button[type=submit]');button.disabled=true;status('Verificando acesso…');try{await request('login',{email:form.elements.email.value,key:form.elements.key.value});form.reset();await refresh();status('Sessão iniciada. Seus aplicativos autorizados estão disponíveis.')}catch(e){status(e.message,true)}finally{button.disabled=false}});
   $('issue-form').addEventListener('submit',async event=>{
     event.preventDefault();const form=event.currentTarget,button=form.querySelector('button');
     if(button.disabled||!registrationReady)return;
@@ -148,3 +148,19 @@
   window.addEventListener('pagehide',()=>{hideKey();issuedKeys.clear();});
   refresh().catch(e=>{registrationStatus(e.message,true);});
 })();
+
+{
+  const key = document.querySelector('#login-form [name="key"]');
+  const count = document.getElementById('login-key-count');
+  const toggle = document.getElementById('toggle-login-key');
+  const updateCount = () => { count.textContent = `${key.value.length}/151`; };
+  key.addEventListener('input', updateCount);
+  document.getElementById('login-form').addEventListener('reset', () => { if (key.type === 'text') toggle.click(); queueMicrotask(updateCount); });
+  toggle.addEventListener('click', () => {
+    const visible = key.type === 'password';
+    key.type = visible ? 'text' : 'password';
+    toggle.setAttribute('aria-pressed', String(visible));
+    toggle.textContent = visible ? 'Ocultar chave' : 'Mostrar chave';
+  });
+  updateCount();
+}

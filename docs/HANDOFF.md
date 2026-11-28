@@ -116,3 +116,35 @@
 - **Responsável pelo registro** — OpenAI Codex.
 - **Validação em produção** — O usuário confirmou no tablet físico que a agenda do MagicMirror abriu nos modos Mês e Semana e que o botão **＋N** abriu a lista nos dias com itens excedentes.
 - **Fechamento** — AUR-011 marcada como **Concluída** em TASKS.md. A versão v50.0.0 foi confirmada como a mais recente no GitHub. Os três serviços atualizados estavam saudáveis no Aurora Server, e o backup pós-implantação passou na restauração isolada.
+
+## 27/11/2026 — Backlog de UX/UI e início da AUR-013
+
+- **Agente responsável** — Claude Code, com autorização do usuário para registrar o backlog e iniciar a AUR-013.
+- **Tarefas** — AUR-013 a AUR-017 registradas a partir das propostas de UX/UI do Claude Code e de outro agente, conferidas no código da `rafael` em `07c4f5e`. O modal diário do Fitness legado ficou fora do backlog, porque o openGym é o aplicativo de treinos atual.
+- **AUR-013, Em andamento** — Arquivos previstos: `site/index.html`, `site/monitor-processos.html`, `site/fitness.html`, `site/fitness-planos.html`, `site/fitness-exercicios.html`, `site/pwa.js`, `site/aurora.css`, `site/power.css`, `site/service-worker.js`, `docs/TASKS.md` e `docs/HANDOFF.md`.
+- **Resultado da AUR-013** — Concluída no DEV, sem commit.
+  - O topo do Monitor começa em "Consultando servidor…", cinza, e passa a verde (Sistema Online), laranja (serviço offline ou dados desatualizados, com a contagem) ou vermelho (Dados indisponíveis). Antes, a bolinha ficava verde mesmo com erro.
+  - O botão de instalação saiu de baixo do título e virou uma pílula ao lado do h1. `pwa.js` só mostra o botão quando há o que instalar: depois de `beforeinstallprompt`, ou no iOS fora do modo app. Ele fica oculto sem HTTPS ou com o app já instalado. As mensagens agora aparecem em linha, sem `alert()`.
+  - O rodapé lateral perdeu "AURORA LAB 23.0", "V6.5" e "rk322x-box". Ele fica oculto pela barra compacta, então a mudança é só de limpeza.
+  - A legenda da tabela de energia ficou visualmente oculta (continua acessível) e foi exibida como texto acima da área com rolagem, sem corte.
+  - `aurora.css`, `power.css` e `pwa.js` passaram para `?v=20261127-v51` nas páginas e no APP_SHELL, e `CACHE_NAME` passou para `auroralab-51.0.0`. `index.html` e `monitor-processos.html` continuam idênticos.
+- **Arquivos alterados** — `site/index.html`, `site/monitor-processos.html`, `site/fitness.html`, `site/fitness-planos.html`, `site/fitness-exercicios.html`, `site/pwa.js`, `site/aurora.css`, `site/power.css`, `site/service-worker.js`, `docs/TASKS.md` e `docs/HANDOFF.md`.
+- **Validação** — `node --check` em `pwa.js`, `service-worker.js` e nos scripts em linha das duas páginas. `check_pwa.mjs` e `check_portal_removal.mjs` aprovados. `test_nginx_security` e `test_service_links`: 10 OK. Chrome headless com `status.json` sintético: estados ok, aviso e erro, botão oculto até `beforeinstallprompt`, celular a 390×844 e tema ice.
+- **Não validado** — Instalação real em Android e iOS e o comportamento no Aurora Server.
+- **Próximos passos** — Commit na `rafael` quando autorizado. AUR-014 e AUR-015 completam a Release 51.
+
+## 27/11/2026 — Continuidade das releases 51 e 52
+
+- **Responsável** — OpenAI Codex. AUR-014 a AUR-017 em implementação. Arquivos previstos no módulo MagicMirror, configuração e login, portal, energia e navegação.
+
+- **Implementação no DEV** — AUR-014: legenda e filtro, criação pela data do dia, agenda agrupada, confirmação no diálogo e destaque de hoje. AUR-015: posição das imagens selecionadas, prévia reativa, indicação de alterações não salvas e controle de visibilidade e contagem da chave. AUR-016: resumo de saúde, energia compacta e página energia.html, estados de consulta e painéis móveis. AUR-017: ícones SVG com rótulos e tooltips, cores dos temas por tokens e cache atualizado.
+- **Validação** — Sintaxe Node, verificações existentes de calendário, fundos, configurações, PWA e portal. Dez testes Python de rotas e links no Docker isolado. Teste sintético das leituras de energia, com sucesso e falha em ambas as entradas do portal e na página de detalhes.
+- **Escopo de validação** — Sem conferência visual em navegador para as mudanças recém-implementadas, instalação real em dispositivos ou validação em produção. As alterações da AUR-013 foram preservadas. As mudanças permanecem locais na rafael.
+
+## 27/11/2026 — Implantação consolidada da Release 52
+
+- **Responsável** — OpenAI Codex. AUR-013 a AUR-017 implantadas juntas como 52.0.0.
+- **Produção** — MagicMirror e autenticação recriados com as imagens 52.0.0. Portal e página Energia servidos pelo Nginx. A API do Mirror permanece com a imagem 50.0.0 porque o pacote alterou apenas seu frontend. Os quatro serviços estavam saudáveis após a atualização.
+- **Validação** — 37 testes de autenticação e fachada no build de produção. Verificação do conteúdo servido no Monitor e na página Energia, conferência dos arquivos novos dentro dos contêineres e teste de resposta HTTPS do login e das rotas protegidas sem sessão.
+- **Recuperação** — Snapshot dos arquivos e imagens anteriores preservado. Backup anterior verificado. Backup posterior auroralab-data-20261128-004426.tar.gz (data UTC), SHA-256 conferido e restauração isolada aprovada com 991 arquivos, 27 bancos SQLite e 88 JSON.
+- **Limites** — Instalação do PWA em Android e iOS e conferência visual interativa com sessão real não foram observadas nesta implantação. Pacote implantado a partir do checkout DEV, sem publicação de release no GitHub.

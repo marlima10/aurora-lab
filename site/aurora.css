@@ -37,3 +37,11 @@ html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(1100px 500p
   .quick{grid-template-columns:26px minmax(0,1fr);}
   .quick>i{display:none}
 }
+.top-status.loading i{background:var(--muted);box-shadow:none}
+.top-status.error i{background:var(--red);box-shadow:0 0 16px var(--red)}
+.page-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.page-head h1{margin:0}
+.install-app{font:inherit;font-size:13px;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.install-app:hover{border-color:var(--cyan)}
+.install-app:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.install-hint{flex-basis:100%;margin:0;color:var(--muted);font-size:13px}

@@ -80,3 +80,9 @@
 .energy-history-scroll{overflow-x:auto}.energy-history{width:100%;border-collapse:collapse;font-size:13px}.energy-history th,.energy-history td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}.energy-history caption{text-align:left;color:var(--muted);padding:8px}.server-alert{border-left:3px solid var(--orange);padding:10px;background:var(--panel2)}.server-alert[data-level=critical]{border-color:var(--red)}.operations-history{max-height:300px;overflow:auto;font-size:13px;color:var(--muted)}#serverAlertSummary[data-state=warning]{color:var(--orange)}
 .power-warning{font-size:12px;line-height:1.6;margin:8px 0;padding:8px 10px;border:1px solid var(--orange);border-radius:10px;background:rgba(255,157,46,.08);color:var(--text)}
 .power-warning[hidden]{display:none}
+.energy-history caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.energy-history-label{margin:8px 0 0}
+
+.energy-page{max-width:1250px;margin-inline:auto;min-width:0}
+.energy-page>article{margin-block:1rem}
+#energy-card .power-stats:has(.power-stat:nth-child(2):last-child){grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr))}

@@ -9,11 +9,11 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/app-192.png">
 <link rel="icon" href="/favicon.svg">
-<link rel="stylesheet" href="/aurora.css?v=20261007-2">
+<link rel="stylesheet" href="/aurora.css?v=20261127-v52">
 <link rel="stylesheet" href="/portal-health.css?v=20261007-1">
 <title>Aurora Lab · Monitor de processos</title>
-<link rel="stylesheet" href="/aurora-layout.css?v=20261024-v25">
-<link rel="stylesheet" href="/power.css?v=20261024-v24">
+<link rel="stylesheet" href="/aurora-layout.css?v=20261127-v52">
+<link rel="stylesheet" href="/power.css?v=20261127-v52">
 </head>
 <body>
 <div class="app">
@@ -32,14 +32,14 @@
       <a href="#backup-card">☁ <span>Backup</span></a>
       <a href="/diagnostics.html">✥ <span>Diagnóstico</span></a>
     </nav>
-    <div class="side-foot"><b>AURORA LAB 23.0</b><span id="sideHost">rk322x-box</span></div>
+    <div class="side-foot"><b>AURORA LAB</b><span id="sideHost">--</span></div>
   </aside>
 
   <button class="nav-scrim" id="navScrim" type="button" aria-label="Fechar menu" hidden></button>
   <main class="main">
     <header class="topbar">
       <div class="mobile-brand"><button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button><span>✦ AURORA LAB</span></div>
-      <div class="top-status ok"><i></i><div><b id="systemOnline">Sistema Online</b><small id="topUptime">Uptime --</small></div></div>
+      <div class="top-status loading" id="topStatus" role="status"><i aria-hidden="true"></i><div><b id="systemOnline">Consultando servidor…</b><small id="topUptime">Uptime --</small><small id="topHealthSummary">Aguardando indicadores</small></div></div>
       <button class="head-stat power-battery-button" id="powerBatteryButton" type="button" aria-haspopup="dialog" aria-controls="powerDialog" aria-label="Bateria e configurações de economia">
         <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="3" y="8" width="24" height="16" rx="3" stroke="currentColor" stroke-width="2"/><path d="M29 13v6M7 12v8M11 12v8M15 12v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <div><small>Bateria · configurar</small><b id="powerBatteryPercent">—</b><small id="powerBatteryState">Aguardando leitura</small></div>
@@ -52,16 +52,15 @@
 
     <div id="banner" class="banner">⚠ Dados indisponíveis ou desatualizados.</div>
 
-    <h1 class="panel-title">Monitor de processos</h1>
-    <p><button id="installApp" type="button" class="fitness-btn">Instalar app no celular ou tablet</button></p>
+    <div class="page-head"><h1 class="panel-title">Monitor de processos</h1><button id="installApp" type="button" class="install-app" hidden>⬇ Instalar app</button></div>
 
     <section class="dashboard-grid">
-      <article class="panel services-panel" id="services-card">
+      <article class="panel services-panel" id="services-card"><details class="portal-section" open><summary>Status dos serviços</summary>
         <div class="panel-title"><h2>♟ Status dos Serviços</h2><span class="status-count" id="serviceCount">--</span></div>
         <div id="serviceRows" class="service-list"></div>
-      </article>
+      </details></article>
 
-      <article class="panel resources-panel" id="system-card">
+      <article class="panel resources-panel" id="system-card"><details class="portal-section" open><summary>Sistema</summary>
         <div class="panel-title"><h2>✣ Recursos do Sistema</h2><span class="live-dot">AO VIVO</span></div>
         <div class="gauges">
           <div class="gitem"><div class="gauge" id="g_cpu"><b id="cpu">--</b><small>CPU</small></div><span id="cpuSub">--</span></div>
@@ -71,7 +70,7 @@
         </div>
         <div class="chart-title"><span>Uso de CPU</span><small>histórico recente</small></div>
         <div class="chartbox"><svg id="cpuChart" viewBox="0 0 600 130" preserveAspectRatio="none"></svg></div>
-      </article>
+      </details></article>
 
       <article class="panel sysinfo-panel">
         <div class="panel-title"><h2>🖥 Informações do Sistema</h2><span>🐧</span></div>
@@ -89,60 +88,13 @@
       </article>
 
       <article class="panel power-panel" id="energy-card" aria-labelledby="powerHeading">
-        <div class="panel-title">
-          <div><p class="power-eyebrow">AuroraServer / Energia</p><div class="power-title"><h2 id="powerHeading">Consumo e autonomia</h2><span class="power-status" id="powerLive" role="status">Aguardando sensores</span></div></div>
-          <button class="power-btn" id="powerSettingsButton" type="button" aria-haspopup="dialog" aria-controls="powerDialog">Configurar economia ↗</button>
-        </div>
-        <p class="power-subtitle">Acompanhe o notebook, conheça o consumo dos componentes e planeje o gasto mensal.</p>
+        <div class="panel-title"><h2 id="powerHeading">Energia</h2><a href="/energia.html">Histórico e consumo ↗</a></div>
+        <p id="powerLive" role="status">Consultando energia…</p>
         <div class="power-stats">
-          <div class="power-stat"><small>Potência do notebook</small><b class="power-value" id="powerDraw">—</b><p class="power-note" id="powerDrawSource">Aguardando leitura da bateria</p></div>
-          <div class="power-stat"><small>Pacote do processador</small><b class="power-value" id="powerCpu">—</b><p class="power-note">Intel RAPL · CPU e domínios integrados</p></div>
-          <div class="power-stat"><small>Energia acompanhada</small><b class="power-value" id="powerObserved">—</b><p class="power-note" id="powerCoverage">Pacote CPU hoje · somente intervalos observados</p></div>
-          <div class="power-stat"><small>Perfil atual</small><b class="power-value" style="font-size:22px" id="powerProfile">—</b><p class="power-note" id="powerProfileSub">Clique na bateria para configurar</p></div>
+          <div class="power-stat"><small>Descarga da bateria</small><b id="powerDraw">—</b><p id="powerDrawSource" class="power-note">Aguardando leitura</p></div>
+          <div class="power-stat"><small>Pacote do processador</small><b id="powerCpu">—</b></div>
         </div>
-        <div class="power-split">
-          <section class="power-surface" aria-labelledby="powerHistoryTitle">
-            <h3 id="powerHistoryTitle">Potência ao longo do tempo</h3>
-            <div class="power-legend"><span><i></i>Descarga da bateria</span><span><i class="cpu"></i>Pacote CPU</span></div>
-            <svg class="power-chart" id="powerChart" viewBox="0 0 600 145" role="img" aria-label="Histórico recente da potência da bateria e do pacote CPU, em watts"></svg>
-            <p class="power-small" id="powerChartEmpty">O histórico aparece após duas amostras. Não são estimados intervalos sem leitura.</p>
-            <p class="power-small">Uma amostra por minuto · até 90 minutos no gráfico. CPU e GPU integrada podem compartilhar energia; não some as leituras.</p>
-          </section>
-          <section class="power-surface" aria-labelledby="powerGpuTitle">
-            <h3 id="powerGpuTitle">Placas de vídeo</h3>
-            <div class="gpu-list" id="powerGpuList"><p class="power-note">Aguardando identificação das GPUs…</p></div>
-          </section>
-        </div>
-        <hr class="power-divider">
-        <div class="panel-title"><h3 style="margin:0;font-size:14px">Planejamento do gasto energético</h3><span class="power-status">Simulação · 30 dias</span></div>
-        <div class="power-cost-layout">
-          <div>
-            <div class="power-inputs">
-              <label for="powerTariff">Tarifa total (R$/kWh)<input id="powerTariff" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="Sua tarifa"></label>
-              <label for="powerAwake">Potência ligado (W)<input id="powerAwake" type="number" inputmode="decimal" min="0" max="10000" step="0.1" placeholder="Medida na tomada"></label>
-              <label for="powerSleep">Potência suspenso (W)<input id="powerSleep" type="number" inputmode="decimal" min="0" max="10000" step="0.1" placeholder="Informe a medição"></label>
-              <label for="powerNightHours">Horas suspenso por dia<input id="powerNightHours" type="number" inputmode="decimal" min="0" max="24" step="0.5" value="7"></label>
-            </div>
-            <button class="power-btn" id="powerEstimateFromBattery" style="margin-top:10px" type="button" disabled>Usar descarga atual como estimativa</button>
-            <p class="power-small">Parâmetros salvos somente neste navegador.</p>
-          </div>
-          <div>
-            <div class="power-cost-grid">
-              <div class="power-cost-cell"><small>Ligado 24 h por dia</small><b id="powerCost24">—</b><span class="power-small" id="powerKwh24">Informe a potência</span></div>
-              <div class="power-cost-cell"><small>Com suspensão simulada</small><b id="powerCostNight">—</b><span class="power-small" id="powerKwhNight">Preencha os parâmetros</span></div>
-              <div class="power-cost-cell saving"><small>Economia estimada</small><b id="powerSavings">—</b><span class="power-small" id="powerSavingsKwh">Comparação estimada</span></div>
-            </div>
-            <p class="power-note" id="powerCostNote" role="status">Informe a tarifa e as potências para comparar.</p>
-          </div>
-        </div>
-        <p class="power-notice">O consumo na tomada precisa de wattímetro ou tomada com medição. A bateria informa sua descarga, e o RAPL acompanha componentes da CPU. A suspensão das 00h às 07h é apenas uma simulação até validar o despertar automático no notebook.</p>
-      </article>
-      <article class="panel" id="energy-history-card">
-        <div class="panel-title"><h2>Histórico de energia</h2><span>CPU e bateria · até 90 dias</span></div>
-        <p class="power-note">Energia observada, sem preencher períodos desligados. CPU e descarga da bateria são medidas diferentes e não devem ser somadas. Os valores abaixo não representam a conta total da tomada.</p>
-        <p id="energyMonth" role="status">Aguardando leituras…</p>
-        <div class="energy-history-scroll"><table class="energy-history"><caption>Consumo diário e custo parcial da CPU pela tarifa configurada acima</caption><thead><tr><th>Dia</th><th>CPU kWh</th><th>Horas CPU</th><th>Descarga kWh</th><th>Horas bateria</th><th>Custo CPU</th></tr></thead><tbody id="energyDaily"></tbody></table></div>
-        <p class="power-note">O histórico começa nesta versão; dias antigos não são reconstruídos por estimativa. A tarifa fica salva neste navegador e recalcula todos os valores exibidos.</p>
+        <button class="power-btn" id="powerSettingsButton" type="button" aria-haspopup="dialog" aria-controls="powerDialog">Configurar economia</button>
       </article>
       <article class="panel network-panel">
         <div class="panel-title"><h2>⌁ Rede</h2><span class="online" id="networkStatus">● Conectado</span></div>
@@ -156,7 +108,7 @@
         <a class="panel-link" href="/network.html">Ver monitor de rede →</a>
       </article>
 
-      <article class="panel storage-panel" id="storage-card">
+      <article class="panel storage-panel" id="storage-card"><details class="portal-section" open><summary>Armazenamento</summary>
         <div class="panel-title"><h2>▤ Armazenamento</h2><span id="storageTotal">--</span></div>
         <div class="storage-body">
           <div class="disk-ring" id="diskRing"><b id="diskPct">--</b><small>Usado</small></div>
@@ -170,7 +122,7 @@
         <div class="storage-small">
           <span>Prints <b id="prints">--</b></span>
         </div>
-      </article>
+      </details></article>
 
       <article class="panel history-panel">
         <div class="panel-title"><h2>◴ Histórico do Servidor</h2><a href="/history.html">Ver todos →</a></div>
@@ -190,7 +142,7 @@
         <p class="power-note">Serviços indisponíveis, disco acima de 80% (crítico em 90%) e backup com falha ou atrasado. Ocorrências confirmadas por 30 segundos. Os avisos aparecem aqui enquanto o portal estiver aberto.</p>
         <details><summary>Histórico de alertas e recuperações</summary><div id="serverAlertHistory" class="operations-history"></div></details>
       </article>
-      <article class="panel backup-panel" id="backup-card">
+      <article class="panel backup-panel" id="backup-card"><details class="portal-section" open><summary>Backup e dados</summary>
         <div class="panel-title"><h2>☁ Backup & Dados</h2><span class="safe">Verificação</span></div>
         <div class="backup-grid">
           <div><small>Logs sistema</small><b id="systemlogs">--</b></div>
@@ -200,13 +152,13 @@
         <div class="backup-health" id="restoreHealth" role="status">Consultando teste de restauração…</div>
         <div class="backup-health" id="backupHealth" role="status" aria-live="polite">Verificando backup do servidor…</div>
         <div class="note">Backups completos permanecem fora do webroot por segurança.</div>
-      </article>
+      </details></article>
     </section>
   </main>
 </div>
 
 <script src="/mobile-nav.js?v=20261007-1" defer></script>
-<script src="/pwa.js?v=20261122-v40" defer></script>
+<script src="/pwa.js?v=20261127-v51" defer></script>
 <script src="/aurora.js?v=20261121-v39"></script>
 <script>
 const val=(v,f='--')=>(v===undefined||v===null||v==='')?f:v;
@@ -222,6 +174,7 @@ function poly(svgId,data,key,max,color,fill){let svg=$(svgId);if(!svg||data.leng
 function multiHistory(data){let svg=$('historyChart');if(!svg||data.length<2){if(svg)svg.innerHTML='';return}let a=data.slice(-120),w=500,h=150;function pts(k,max){return a.map((x,i)=>`${(i*w/(a.length-1)).toFixed(1)},${(h-10-(Math.min(max,Math.max(0,Number(x[k])||0))/max)*(h-20)).toFixed(1)}`).join(' ')}svg.innerHTML=`<line x1="0" y1="40" x2="${w}" y2="40" class="gridline"/><line x1="0" y1="80" x2="${w}" y2="80" class="gridline"/><line x1="0" y1="120" x2="${w}" y2="120" class="gridline"/><polyline points="${pts('cpu',100)}" class="line cpu"/><polyline points="${pts('memory',100)}" class="line mem"/><polyline points="${pts('temperature',100)}" class="line tmp"/>`}
 async function loadHistory(){if(document.hidden)return;try{let x=await json('/history.json');H=Array.isArray(x)?x:(x.history||x.data||[]);poly('cpuChart',H,'cpu',100,'#2fa8ff');multiHistory(H)}catch(e){}}
 async function loadNetwork(){if(document.hidden)return;try{let n=await json('/network.json');let arr=Array.isArray(n)?n:(n.devices||[]);let online=arr.filter(x=>x.online===true||x.status==='online'||x.alive===true).length;onlineDevices.textContent=online;knownDevices.textContent=arr.length;NH.push({v:online});if(NH.length>60)NH.shift();let fake=NH.map(x=>({v:x.v}));let svg=$('netChart');if(fake.length>1){let w=400,h=90,max=Math.max(5,...fake.map(x=>x.v));let pts=fake.map((x,i)=>`${i*w/(fake.length-1)},${h-8-(x.v/max)*(h-16)}`).join(' ');svg.innerHTML=`<polyline points="${pts}" fill="none" stroke="#2ee6d6" stroke-width="3" vector-effect="non-scaling-stroke"/>`}}catch(e){onlineDevices.textContent='--';knownDevices.textContent='--'}}
+function setTopStatus(state,text){const box=document.getElementById('topStatus');box.classList.remove('loading','ok','warn','error');box.classList.add(state);systemOnline.textContent=text}
 async function update(){
  if(document.hidden)return;
  try{
@@ -236,16 +189,17 @@ async function update(){
   netIface.textContent=val(d.interface);gateway.textContent=val(d.gateway);topNetwork.textContent=d.interface?d.interface:'Conectado';networkStatus.textContent='● '+(d.interface?'Conectado':'Rede');
   let sv=[['🌐','Nginx (Portal)',d.nginx,':80'],['📁','Samba (Arquivos)',d.samba,':445'],['🛠️','Cockpit (Sistema)',d.cockpit,':9090'],['💪','openGym',d.opengym,':8081 · HTTPS'],['🔒','Tailscale (VPN)',d.tailscale,val(d.tailscale_ip)]];
   for(const [key,icon,label,port] of [['manyfold','🧊','Manyfold',3214],['mealie','🍽️','Mealie',9925],['actual','💰','Actual Budget',5006]])if(key in d)sv.push([icon,label,d[key],':'+port+' · HTTPS']);
-  serviceRows.innerHTML=sv.map(x=>serviceRow(...x)).join('');let ons=sv.filter(x=>x[2]==='online').length;serviceCount.textContent=ons+'/'+sv.length+' Online';systemOnline.textContent=(ons===sv.length?'Sistema Online':'Atenção: serviço offline');document.querySelector('.top-status').classList.toggle('warn',ons!==sv.length);
+  serviceRows.innerHTML=sv.map(x=>serviceRow(...x)).join('');let ons=sv.filter(x=>x[2]==='online').length;serviceCount.textContent=ons+'/'+sv.length+' Online';let off=sv.length-ons;setTopStatus(stale?'warn':off?'warn':'ok',stale?'Dados desatualizados':off?'Atenção: '+off+(off>1?' serviços offline':' serviço offline'):'Sistema Online');
+  document.getElementById('topHealthSummary').textContent=stale?'Última leitura desatualizada':ons+'/'+sv.length+' serviços online · Disco '+val(d.disk)+'%';
   sensorCpu.textContent=val(d.temperature,0)+'°C';load.textContent=val(d.load);sensorCpuBar.style.width=Math.min(100,Number(d.temperature||0))+'%';loadBar.style.width=Math.min(100,(Number(d.load||0)/Math.max(1,Number(d.cores||1)))*100)+'%';
   diskPct.textContent=val(d.disk,0)+'%';diskRing.style.setProperty('--p',Number(d.disk)||0);diskUsed.textContent=val(d.disk_used);diskFree.textContent=val(d.disk_free);diskTotal.textContent=val(d.disk_total);storageTotal.textContent=val(d.disk_total);storageBar.style.width=Math.min(100,Number(d.disk)||0)+'%';prints.textContent=val(d.prints);systemlogs.textContent=val(d.system_logs);aptcache.textContent=val(d.apt_cache);
- }catch(e){console.error(e);banner.style.display='block';systemOnline.textContent='Dados indisponíveis'}
+ }catch(e){console.error(e);banner.style.display='block';setTopStatus('error','Dados indisponíveis');document.getElementById('topHealthSummary').textContent='Indicadores indisponíveis'}
 }
 function updateBackupHealth(){let el=document.getElementById('backupHealth');fetch('/api/fitness-backup.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('sem estado');return r.json()}).then(d=>{let stamp=Date.parse(d.time),date=Number.isFinite(stamp)?new Date(stamp).toLocaleString('pt-BR'):'horário indisponível',fresh=Number.isFinite(stamp)&&Date.now()-stamp<36*60*60*1000;if(d.status==='ok'&&d.verified&&fresh){el.dataset.state='ok';el.textContent=`✓ Backup verificado · ${date} · ${d.file||'arquivo protegido'}`}else if(d.status==='ok'&&d.verified){el.dataset.state='stale';el.textContent=`⚠ Último backup verificado em ${date}; novo backup atrasado.`}else{el.dataset.state='error';el.textContent=`⚠ Última tentativa falhou · ${date} · ${d.message||'verificação pendente'}`}}).catch(()=>{el.dataset.state='unknown';el.textContent='Sem resultado de backup registrado ainda.'})}fmtDate();setInterval(fmtDate,1000);updateBackupHealth();setInterval(updateBackupHealth,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){update();loadHistory();loadNetwork()}});
 update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadHistory,60000);setInterval(loadNetwork,120000);
 </script>
-<script src="/aurora-layout.js?v=20261122-v40" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
+<script src="/aurora-layout.js?v=20261127-v52" defer></script><dialog class="power-dialog" id="powerDialog" aria-labelledby="powerDialogTitle" aria-describedby="powerDialogDescription">
   <div class="panel-title"><div><p class="power-eyebrow">Energia do notebook</p><h2 id="powerDialogTitle">Escolha como economizar</h2></div><button class="power-close" id="powerClose" type="button" aria-label="Fechar configurações de energia">×</button></div>
   <p class="power-note" id="powerDialogDescription"><span id="powerModalBattery">Aguardando bateria</span>. Os perfis abaixo mantêm o servidor ligado.</p>
   <div class="power-battery-detail"><div>Saúde da bateria<b id="powerHealth">—</b>Capacidade / projeto</div><div>Autonomia estimada<b id="powerAutonomy">—</b>Na descarga atual</div><div>Ciclos de carga<b id="powerCycles">—</b>Informados pela bateria</div></div>
@@ -266,6 +220,6 @@ update();loadHistory();loadNetwork();setInterval(update,10000);setInterval(loadH
     <div class="power-dialog-actions"><button class="power-btn" id="powerCancel" type="button">Fechar</button><button class="power-btn primary" id="powerApply" type="submit" disabled>Aplicar economia</button></div>
   </form>
 </dialog>
-<script src="/power.js?v=20261024-v24" defer></script>
+<script src="/power.js?v=20261127-v52" defer></script>
 <script src="/operations.js?v=20261024-v23" defer></script>
 </body></html>
