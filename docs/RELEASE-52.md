@@ -20,4 +20,4 @@ O backup posterior passou na restauração isolada de 991 arquivos, 27 bancos SQ
 
 A conferência visual em Chrome headless (1280 × 900), com dados sintéticos, cobriu o calendário com filtro e legenda, a página Energia com leituras, a prévia na configuração do MagicMirror e o contador e controle de visibilidade da chave no login.
 
-A instalação do PWA em aparelhos físicos Android e iOS permanece sem validação. Consulte o [guia de atualização](ATUALIZACAO.md) e o [registro de implantação](HANDOFF.md#27112026--implantação-consolidada-da-release-52).
+O usuário confirmou a instalação e a abertura do PWA pelo ícone da tela inicial em aparelhos físicos Android e iOS. Consulte o [guia de atualização](ATUALIZACAO.md) e o [registro de implantação](HANDOFF.md#27112026--implantação-consolidada-da-release-52).

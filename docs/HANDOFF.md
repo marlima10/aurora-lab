@@ -153,4 +153,4 @@
 
 - README, CHANGELOG e CONTEXT apontam para a documentação da versão. Criado RELEASE-52.md.
 - Conferência visual em Chrome headless (1280 × 900), com dados sintéticos: agenda do MagicMirror, Energia, configuração do MagicMirror e login. Conferidas a legenda e o seletor de fonte, as leituras de energia, a prévia de aparência e os controles de chave exibidos.
-- A nota pública da 50.0.0 agora registra a confirmação do tablet físico. A checagem de instalação do PWA em Android e iOS continua separada da revisão visual.
+- A nota pública da 50.0.0 agora registra a confirmação do tablet físico. O usuário confirmou separadamente a instalação e a abertura do PWA pelo ícone da tela inicial em Android e iOS.
