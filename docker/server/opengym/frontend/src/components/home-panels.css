@@ -1,6 +1,6 @@
 body { isolation: isolate; background: transparent; }
-body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(rgba(3,10,15,.66),rgba(3,10,15,.3)),url('/aurora-background.jpg') center center / cover no-repeat; }
-:root[data-theme="light"] body::before { background-image: linear-gradient(rgba(248,250,248,.55),rgba(248,250,248,.35)),url('/aurora-background.jpg'); }
+body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(rgba(3,10,15,.81),rgba(3,10,15,.68)),url('/aurora-background.jpg') center center / cover no-repeat; }
+:root[data-theme="light"] body::before { background-image: linear-gradient(rgba(248,250,248,.8),rgba(248,250,248,.68)),url('/aurora-background.jpg'); }
 #app .card { background: color-mix(in srgb,var(--surface) 96%,transparent); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); }
 .aurora-home-panels { display: grid; gap: 14px; min-width: 0; }
 .aurora-home-panel { min-width: 0; }
@@ -28,3 +28,9 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
 .aurora-home-panel[hidden] { display:none; }
 
 .aurora-stats-summary > p { grid-column: 1 / -1; }
+
+@media (min-width: 900px) {
+  #app:has(> .page:not(.under) .aurora-home-panels) { max-width: 1120px; }
+  .aurora-home-panels { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; }
+  .aurora-home-panels > :not(.aurora-home-panel) { grid-column: 1 / -1; }
+}

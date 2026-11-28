@@ -1,5 +1,9 @@
 # Histórico de versões
 
+## 53.0.0 — 2026-11-28
+
+Melhora a tela Início do openGym, reúne tempo e calorias num painel e simplifica o resumo Garmin. [Revisão detalhada](RELEASE-53.md).
+
 ## 52.0.0 — 2026-11-27
 
 As melhorias das etapas 51 e 52 foram reunidas nesta versão. O Monitor apresenta o estado dos serviços e um painel compacto de energia, com uma página própria para histórico e simulação de custo. O MagicMirror ganhou filtros por fonte, criação pela data selecionada, agenda agrupada por dia e prévia de configuração. O login passou a exibir a contagem de caracteres e o controle de visibilidade da chave. [Revisão detalhada](RELEASE-52.md).

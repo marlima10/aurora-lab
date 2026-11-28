@@ -23,3 +23,12 @@
  .aurora-metrics-grid > .card:first-child { grid-column: 5 / 9; grid-row: 2; }
  .aurora-metrics-grid > .card:last-child { grid-column: 9 / -1; grid-row: 2; }
 }
+
+.aurora-metric-tabs { display: flex; gap: 8px; margin-block: 8px; }
+.aurora-metric-tabs button, .aurora-metrics-range button, .aurora-metric summary { min-height: 44px; }
+.aurora-metric-tabs button { border-radius: 10px; padding-inline: 14px; background: var(--surface); color: var(--label); }
+.aurora-metric-tabs button[aria-selected="true"] { background: color-mix(in srgb,var(--acc) 18%,var(--surface)); font-weight: 700; }
+.aurora-metric-tabs button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.aurora-metric [role="tabpanel"][hidden] { display: none; }
+.aurora-metric .aurora-metrics-range { margin-block: 8px; }
+.aurora-metric-total { font-size: inherit; }

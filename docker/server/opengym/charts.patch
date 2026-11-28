@@ -1,5 +1,5 @@
 diff --git a/frontend/public/sw.js b/frontend/public/sw.js
-index a023ab31..c43d023c 100644
+index a023ab3..c43d023 100644
 --- a/frontend/public/sw.js
 +++ b/frontend/public/sw.js
 @@ -62,6 +62,7 @@ async function precache() {
@@ -19,7 +19,7 @@ index a023ab31..c43d023c 100644
  
    if (isMediaPath(url.pathname)) {
 diff --git a/frontend/src/components/LineChart.jsx b/frontend/src/components/LineChart.jsx
-index 8753a5c3..25dbeb3c 100644
+index 8753a5c..25dbeb3 100644
 --- a/frontend/src/components/LineChart.jsx
 +++ b/frontend/src/components/LineChart.jsx
 @@ -1,4 +1,4 @@
@@ -46,7 +46,7 @@ index 8753a5c3..25dbeb3c 100644
    const hoverDates = hoverSource.map(p => p.d || isoOf(new Date(p.t)))
    const showYear = new Set(hoverDates.map(iso => new Date(iso + 'T12:00:00').getFullYear())).size > 1
 diff --git a/frontend/src/views/Home.jsx b/frontend/src/views/Home.jsx
-index df7030e9..2c9bc74a 100644
+index df7030e..6ae9683 100644
 --- a/frontend/src/views/Home.jsx
 +++ b/frontend/src/views/Home.jsx
 @@ -1,3 +1,8 @@
@@ -76,7 +76,7 @@ index df7030e9..2c9bc74a 100644
        {/* A running programme (lib/programmes.js) wrote this week's plan: where it stands, one tap from its screen. */}
        {progChip && <button type="button" className="chip ichip prog-chip" onClick={() => nav('/plan/programmes')}><Icon name="calendar" /><span>{progChip}</span></button>}
        {/* A coach week runs by order, not by weekday, so its progress row stands in for the
-@@ -218,48 +232,24 @@ export default function Home() {
+@@ -218,48 +232,23 @@ export default function Home() {
          </Button>
        </div>}
        <SeasonDeco spot="home-hero" />
@@ -128,13 +128,12 @@ index df7030e9..2c9bc74a 100644
 -    {on('body') && S.showWeightCard !== false && <div className="card">
 +    )) },
 +      { id: 'progress', title: 'Progresso por exercício', content: <ExerciseProgress /> },
-+      { id: 'minutes', title: 'Tempo de exercício', content: <TrainingMetrics S={S} only="minutes" /> },
-+      { id: 'calories', title: 'Calorias gastas', content: <TrainingMetrics S={S} only="calories" /> },
++      { id: 'metrics', title: 'Tempo e calorias', content: <TrainingMetrics S={S} combined /> },
 +      { id: 'weight', title: 'Peso corporal', content: (on('body') && S.showWeightCard !== false && <div className="card">
        {/* one trailing action, Log; the goal lives with the goal line and the weigh-ins below (P2) */}
        <CardHead icon="scale" tint="var(--teal)" title={t('Body weight')} className="bw-head"
          action={<Button size="sm" icon="plus" onClick={() => bwSheet()}>{t('Log')}</Button>} />
-@@ -295,11 +285,8 @@ export default function Home() {
+@@ -295,11 +284,8 @@ export default function Home() {
            : t("No weigh-ins yet. Log your weight to start the curve (we also ask before every workout).")}</div>
          <Button size="sm" variant="ghost" icon="target" className="bw-goal" style={{ marginTop: 6, ...(S.targetW ? { color: 'var(--gold-ink)' } : {}) }} onClick={goalSheet}>{S.targetW ? fmtNum(S.targetW) : t('Goal')}</Button>
        </>}
@@ -148,7 +147,7 @@ index df7030e9..2c9bc74a 100644
        <SeasonDeco spot="home-streak" />
        {/* in season, a Santa hat on the flame (components/Seasonal.jsx) */}
        <CardHead className="streak-head" glyph={<span className="streak-flame-wrap"><StreakFlame lit={streak.current > 0} /><SeasonDeco spot="streak-flame" /></span>}
-@@ -314,6 +301,12 @@ export default function Home() {
+@@ -314,6 +300,12 @@ export default function Home() {
        {S.homeMuscleSets === true && <WeeklySetsHomeLine S={S} onOpen={() => nav('/stats?section=lifts')} />}
      </div>
        // Motivation off: no streak card, but the weekly sets line it carried keeps a card of its own.
@@ -163,7 +162,7 @@ index df7030e9..2c9bc74a 100644
    </div>
  }
 diff --git a/frontend/src/views/Stats.jsx b/frontend/src/views/Stats.jsx
-index 2be11d45..77db6137 100644
+index 2be11d4..764794b 100644
 --- a/frontend/src/views/Stats.jsx
 +++ b/frontend/src/views/Stats.jsx
 @@ -1,3 +1,5 @@
@@ -263,15 +262,16 @@ index 2be11d45..77db6137 100644
    return <>
      <div className="hdr"><SeasonDeco spot="stats-hdr" /><div><h1>{t('Stats')}</h1><div className="sub">{t('Progress & history')}</div></div>
        <div className="row" style={{ gap: 8 }}>
-@@ -922,6 +995,7 @@ export default function Stats() {
-     <StatsIndex sections={sections} />
+@@ -965,6 +1038,8 @@ export default function Stats() {
+       <div className="list">{recent.map(w => <WorkoutRow key={w.id} w={w} onClick={() => workoutDetailSheet(w)} />)}</div>
+     </>}
  
-     <section className="stats-sect" id="stats-overview" data-stats-sect="overview" aria-label={t('Overview')}>
 +    <div className="aurora-stats-summary"><WeeklyGoals S={rawS} /><TrainingMetrics S={rawS} /></div>
-     {/* The headline numbers as one divided card: three across, the lifetime total under them at
-         full width (a few hundred sessions make a long number). The week streak is not a tile any
-         more: it is the card right below, once. */}
-@@ -993,72 +1067,7 @@ export default function Stats() {
++    <p className="small muted"><a href="https://github.com/marlima10/aurora-lab/tree/v53.0.0/docker/server/opengym" target="_blank" rel="noopener noreferrer">Código desta versão</a></p>
+     </section>
+ 
+     {bodyOn && <section className="stats-sect" id="stats-body" data-stats-sect="body" aria-labelledby="stats-h-body">
+@@ -993,72 +1068,7 @@ export default function Stats() {
  
      <section className="stats-sect" id="stats-lifts" data-stats-sect="lifts" aria-labelledby="stats-h-lifts">
        <h2 className="stats-sect-h" id="stats-h-lifts">{t('Lifts')}</h2>
